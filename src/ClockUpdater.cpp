@@ -10,24 +10,27 @@ using namespace TMPro;
 
 DEFINE_CLASS(ClockMod::ClockUpdater);
 
+// Updates the Clock.
+
 void ClockMod::ClockUpdater::Update() {
     time_t rawtime;
     char timestr[20];
-//    char time24[20];
     struct tm* timeinfo;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 
+// Checks config Settings for 12/24 Hour time and if Show Seconds is toggled on or off.
+
     if (getConfig().config["12Toggle"].GetBool() == false) {
-        if (getConfig().config["SecToggle"].GetBool() == true) {
+        if (getConfig().config["SecToggle"].GetBool() == true) {    //Check if seconds should be shown
             strftime(timestr, 20, "%H:%M:%S", timeinfo);
         }
         else {
             strftime(timestr, 20, "%H:%M", timeinfo);
         }
     }
-    else {
-        if (getConfig().config["SecToggle"].GetBool() == true) {
+    else {      // If set to show 24 Hour Format
+        if (getConfig().config["SecToggle"].GetBool() == true) {    //Check if seconds should be shown
             strftime(timestr, 20, "%l:%M:%S %p", timeinfo);
         }
         else {
