@@ -6,7 +6,7 @@
   "description": [
     "Displays the time in game."
   ],
-  "category": "Gameplay",
+  "category": "Other",
   "gameVersion": "1.13.2",
   "platform": "Quest",
   "components": [
