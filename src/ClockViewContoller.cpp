@@ -23,9 +23,6 @@ void FormatToggle(ClockMod::ClockViewController* parent, bool newValue) {
 void SecToggle(ClockMod::ClockViewController* parent, bool newValue) {
     getConfig().config["SecToggle"].SetBool(newValue);
 }
-//void SetFontSize(ClockMod::ClockViewController* parent, bool newValue) {
-//getConfig().config["Font Size"].SetFloat(newValue);
-//}
 
 void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     if (firstActivation) {
@@ -50,11 +47,6 @@ void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool added
             );
         UnityEngine::UI::Toggle* SecToggleObject = QuestUI::BeatSaberUI::CreateToggle(container->get_transform(), "Show Seconds", getConfig().config["SecToggle"].GetBool(), onSecSettingChange);
         QuestUI::BeatSaberUI::AddHoverHint(SecToggleObject->get_gameObject(), "Whether or not to show seconds.");
-        // Change Size
-//        auto IncrementChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
-//            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetFontSize);                                               Decimal places   Value Steps                              Min Value   Max Value
-//        QuestUI::IncrementSetting* IncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Increment Text", 0, 1.0, getConfig().config["Property"].GetFloat(), 0.0f, 100.0f, IncrementChange);
-//        QuestUI::BeatSaberUI::AddHoverHint(IncrementObject->get_gameObject(), "Hover Hint for Increment");
     }
 }
 // Write config
