@@ -81,7 +81,9 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
         layout->get_transform()->set_position(UnityEngine::Vector3(0, -2.20, 3));
-        clock_text->set_fontSize(4);
+
+//        float fontsize = getConfig().config["FontSize"].GetFloat();
+
         clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 2.6));
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
     }
@@ -156,6 +158,10 @@ extern "C" void setup(ModInfo & info) {
     }
     if (!getConfig().config.HasMember("SecToggle")) {
         getConfig().config.AddMember("SecToggle", rapidjson::Value(0).SetBool(false), allocator);
+        getConfig().Write();
+    }
+    if (!getConfig().config.HasMember("FontSize")) {
+        getConfig().config.AddMember("FontSize", rapidjson::Value(0).SetFloat(4), allocator);
         getConfig().Write();
     }
 }

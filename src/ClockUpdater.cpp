@@ -37,6 +37,8 @@ void ClockMod::ClockUpdater::Update() {
             strftime(timestr, 20, "%l:%M %p", timeinfo);
         };
     }
+    float fontsize = getConfig().config["FontSize"].GetFloat();
        auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
+       text->set_fontSize(fontsize);
        text->set_text(il2cpp_utils::createcsstr(timestr));
 }

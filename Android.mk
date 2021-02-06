@@ -35,7 +35,7 @@ LOCAL_MODULE := codegen_0_6_2
 LOCAL_EXPORT_C_INCLUDES := extern/codegen
 LOCAL_SRC_FILES := extern/libcodegen_0_6_2.so
 include $(PREBUILT_SHARED_LIBRARY)
-# Creating prebuilt for dependency: questui - version: 0.4.3
+# Creating prebuilt for dependency: questui - version: 0.4.4
 include $(CLEAR_VARS)
 LOCAL_MODULE := questui
 LOCAL_EXPORT_C_INCLUDES := extern/questui

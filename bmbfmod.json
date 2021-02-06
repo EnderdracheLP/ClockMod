@@ -1,11 +1,13 @@
 {
   "id": "clockmod",
   "name": "Clock Mod",
-  "version": "0.1.2",
-  "author": "BoopetyDoopety",
+  "version": "0.1.3",
+  "author": "BoopetyDoopety, EnderdracheLP",
   "description": [
     "Displays the time in game."
   ],
+  "coverImageFilename": "Cover.png",
+  "icon": "Cover.png",
   "category": "Other",
   "gameVersion": "1.13.2",
   "platform": "Quest",
