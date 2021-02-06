@@ -2,12 +2,14 @@ name: NDK build
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   build:
+    env:
+     module_id: clockmod
     runs-on: ubuntu-latest
     
     steps:
@@ -18,15 +20,32 @@ jobs:
         lfs: true
     - name: Install Powershell
       run: sudo apt-get install -y powershell
-    
-    - name: Setup NDK
-      id: setup-ndk
-      uses: nttld/setup-ndk@v1.0.2
+
+    - name: Cache Android NDK
+      id: cache-ndk
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ndk
+        ndkname: android-ndk-r21
       with:
-        ndk-version: r21
+        path: ndk
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+    
+    - name: Install Android NDK
+      if: steps.cache-ndk.outputs.cache-hit != 'true'
+      env:
+        ndkname: android-ndk-r21
+      run: |
+        wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
+        unzip -q ndk.zip
+        mv ${ndkname} ndk
       
     - name: Create ndkpath.txt
-      run: echo ${{ steps.setup-ndk.outputs.ndk-path }} > ${GITHUB_WORKSPACE}/ndkpath.txt
+      run: |
+        cd ndk
+        pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
         
 #     - name: Cache QPM
 #       id: cache-qpm
@@ -76,7 +95,7 @@ jobs:
       id: libname
       run: |
         cd ./libs/arm64-v8a/
-        pattern="libclockmod.so"
+        pattern="lib${module_id}*.so"
         files=( $pattern )
         echo ::set-output name=NAME::"${files[0]}"
     - name: Upload non-debug artifact
