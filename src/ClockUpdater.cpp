@@ -5,6 +5,7 @@
 #include "UnityEngine/GameObject.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include <ctime>
+#include "GlobalNamespace/OVRPlugin_OVRP_1_1_0.hpp"
 using namespace UnityEngine;
 using namespace TMPro;
 
@@ -37,8 +38,22 @@ void ClockMod::ClockUpdater::Update() {
             strftime(timestr, 20, "%l:%M %p", timeinfo);
         };
     }
+    // Sets the fontsize
     float fontsize = getConfig().config["FontSize"].GetFloat();
        auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
        text->set_fontSize(fontsize);
-       text->set_text(il2cpp_utils::createcsstr(timestr));
+       // Sets position
+//       text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 2.6));
+        // Get current Battery Level
+       float batterylvl = GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel();
+       batterylvl = batterylvl * 100;
+       std::string tandb = timestr;
+       tandb += " ";
+       std::string batterylevel = std::to_string(batterylvl);
+       batterylevel.erase(batterylevel.find_last_not_of('0') + 1, std::string::npos);
+       batterylevel.erase(batterylevel.find_last_not_of('.') + 1, std::string::npos);
+       tandb += batterylevel;
+       tandb += "%";
+
+       text->set_text(il2cpp_utils::createcsstr(tandb));
 }
