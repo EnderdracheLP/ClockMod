@@ -11,6 +11,7 @@ using namespace GlobalNamespace;
 #include "TMPro/TextMeshPro.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "TMPro/TextAlignmentOptions.hpp"
+#include "TMPro/TMP_Text.hpp"
 using namespace TMPro;
 
 #include "UnityEngine/Canvas.hpp"
@@ -22,6 +23,7 @@ using namespace TMPro;
 #include "UnityEngine/RenderMode.hpp"
 #include "UnityEngine/UI/CanvasScaler.hpp"
 #include "UnityEngine/CanvasRenderer.hpp"
+#include "UnityEngine/MonoBehaviour.hpp"
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 
@@ -67,7 +69,7 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         auto canvas_renderer = canvas_object->AddComponent<CanvasRenderer*>();
 
         canvas_object->AddComponent<CurvedCanvasSettings*>();
-        canvas_object->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 2.6));
+        canvas_object->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3));
         canvas_object->get_transform()->set_localScale(UnityEngine::Vector3(0.1, 0.1, 0.1));
 
         Object::DontDestroyOnLoad(canvas_object);
@@ -79,14 +81,22 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
 
         layout->GetComponent<LayoutElement*>()->set_minWidth(7);
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
+//        layout->set_childAlignment(TMPro::TextAlignmentOptions::Center, TMPro::TMP_Text::m_lineSpacing(0));
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
-        layout->get_transform()->set_position(UnityEngine::Vector3(0, -2.20, 3));
-        clock_text->set_fontSize(4);
-        clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 2.6));
+//        layout->set_(TMPro::TMP_Text::m_lineSpacing(0))
+        layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.7, 3.85));
+//        float fontsize = getConfig().config["FontSize"].GetFloat();
+
+        clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3.85));
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
     }
     canvas->get_gameObject()->SetActive(true);
 }
+
+//void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+//    UnityEngine::MonoBehaviour::Update();
+//    clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 12.6));
+//}
 
 MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
     AudioTimeSyncController_StartSong(self, startTimeOffset);
@@ -127,13 +137,15 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
 MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_ActivateMultiplayerLobby(self);
 
-    layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.9, 3));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, -0.45, 1.62));
+    layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
 }
 
 MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_DeactivateMultiplayerLobby(self);
 
-    layout->get_transform()->set_position(UnityEngine::Vector3(0, -2.2, 3));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.7, 3.85));
+    layout->get_transform()->set_localScale(UnityEngine::Vector3(1.0, 1.0, 1.0));
 }
 
 // Called at the early stages of game loading
@@ -147,7 +159,7 @@ extern "C" void setup(ModInfo & info) {
 
     rapidjson::Document::AllocatorType& allocator = getConfig().config.GetAllocator();
     if (!getConfig().config.HasMember("insong")) {
-        getConfig().config.AddMember("insong", rapidjson::Value(0).SetBool(false), allocator);
+        getConfig().config.AddMember("insong", rapidjson::Value(0).SetBool(true), allocator);
         getConfig().Write();
     }
     if (!getConfig().config.HasMember("12Toggle")) {
@@ -158,6 +170,26 @@ extern "C" void setup(ModInfo & info) {
         getConfig().config.AddMember("SecToggle", rapidjson::Value(0).SetBool(false), allocator);
         getConfig().Write();
     }
+    if (!getConfig().config.HasMember("FontSize")) {
+        getConfig().config.AddMember("FontSize", rapidjson::Value(0).SetFloat(4), allocator);
+        getConfig().Write();
+    }
+    if (!getConfig().config.HasMember("BattToggle")) {
+        getConfig().config.AddMember("BattToggle", rapidjson::Value(0).SetBool(false), allocator);
+        getConfig().Write();
+    }
+//    if (!getConfig().config.HasMember("ClockXOffset")) {
+//        getConfig().config.AddMember("ClockXOffset", rapidjson::Value(0).SetFloat(0), allocator);
+//        getConfig().Write();
+//    }
+//    if (!getConfig().config.HasMember("ClockYOffset")) {
+//        getConfig().config.AddMember("ClockYOffset", rapidjson::Value(0).SetFloat(0), allocator);
+//        getConfig().Write();
+//    }
+//    if (!getConfig().config.HasMember("ClockZOffset")) {
+//        getConfig().config.AddMember("ClockZOffset", rapidjson::Value(0).SetFloat(0), allocator);
+//        getConfig().Write();
+//    }
 }
 
 // Called later on in the game loading - a good time to install function hooks
