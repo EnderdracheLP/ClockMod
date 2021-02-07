@@ -6,7 +6,6 @@
 #include "TMPro/TextMeshProUGUI.hpp"
 #include <ctime>
 #include "GlobalNamespace/OVRPlugin_OVRP_1_1_0.hpp"
-#include "UnityEngine/Vector3.hpp"
 using namespace UnityEngine;
 using namespace TMPro;
 
@@ -21,9 +20,8 @@ void ClockMod::ClockUpdater::Update() {
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 
-//    MAKE_HOOK_OFFSETLESS(EnteredSettings, void, Il2CppObject * self, bool firstActivation, int activationType)
-
 // Checks config Settings for 12/24 Hour time and if Show Seconds is toggled on or off.
+
     if (getConfig().config["12Toggle"].GetBool() == false) {
         if (getConfig().config["SecToggle"].GetBool() == true) {    //Check if seconds should be shown
             strftime(timestr, 20, "%H:%M:%S", timeinfo);
@@ -44,22 +42,19 @@ void ClockMod::ClockUpdater::Update() {
     float fontsize = getConfig().config["FontSize"].GetFloat();
        auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
        text->set_fontSize(fontsize);
-
        // Sets position
 //       text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 2.6));
-       // Adds current Battery Level next to the clock
+        // Get current Battery Level
        if (getConfig().config["BattToggle"].GetBool() == true) {
            float batterylvl = GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel();
            batterylvl = batterylvl * 100;
            std::string tandb = timestr;
-
-//           tandb += " \n ";
            tandb += " - ";
-
            std::string batterylevel = std::to_string(batterylvl);
            batterylevel.erase(batterylevel.find_last_not_of('0') + 1, std::string::npos);
            batterylevel.erase(batterylevel.find_last_not_of('.') + 1, std::string::npos);
-           tandb += batterylevel + "%";
+           tandb += batterylevel;
+           tandb += "%";
 
            text->set_text(il2cpp_utils::createcsstr(tandb));
        }
