@@ -45,15 +45,20 @@ void ClockMod::ClockUpdater::Update() {
        // Sets position
 //       text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 2.6));
         // Get current Battery Level
-       float batterylvl = GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel();
-       batterylvl = batterylvl * 100;
-       std::string tandb = timestr;
-       tandb += " ";
-       std::string batterylevel = std::to_string(batterylvl);
-       batterylevel.erase(batterylevel.find_last_not_of('0') + 1, std::string::npos);
-       batterylevel.erase(batterylevel.find_last_not_of('.') + 1, std::string::npos);
-       tandb += batterylevel;
-       tandb += "%";
+       if (getConfig().config["BattToggle"].GetBool() == true) {
+           float batterylvl = GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel();
+           batterylvl = batterylvl * 100;
+           std::string tandb = timestr;
+           tandb += " - ";
+           std::string batterylevel = std::to_string(batterylvl);
+           batterylevel.erase(batterylevel.find_last_not_of('0') + 1, std::string::npos);
+           batterylevel.erase(batterylevel.find_last_not_of('.') + 1, std::string::npos);
+           tandb += batterylevel;
+           tandb += "%";
 
-       text->set_text(il2cpp_utils::createcsstr(tandb));
+           text->set_text(il2cpp_utils::createcsstr(tandb));
+       }
+       else {
+           text->set_text(il2cpp_utils::createcsstr(timestr));
+       }
 }

@@ -164,6 +164,10 @@ extern "C" void setup(ModInfo & info) {
         getConfig().config.AddMember("FontSize", rapidjson::Value(0).SetFloat(4), allocator);
         getConfig().Write();
     }
+    if (!getConfig().config.HasMember("BattToggle")) {
+        getConfig().config.AddMember("BattToggle", rapidjson::Value(0).SetBool(false), allocator);
+        getConfig().Write();
+    }
 }
 
 // Called later on in the game loading - a good time to install function hooks

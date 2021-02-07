@@ -26,6 +26,9 @@ void SecToggle(ClockMod::ClockViewController* parent, bool newValue) {
 void SetFontSize(ClockMod::ClockViewController* parent, float newValue) {
 getConfig().config["FontSize"].SetFloat(newValue);
 }
+void BattToggle(ClockMod::ClockViewController* parent, bool newValue) {
+    getConfig().config["BattToggle"].SetBool(newValue);
+}
 
 void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     if (firstActivation) {
@@ -55,6 +58,12 @@ void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool added
             classof(UnityEngine::Events::UnityAction_1<float>*), this, SetFontSize);                                 //              Decimal places   Value Steps                              Min Value   Max Value
         QuestUI::IncrementSetting* FontIncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Font Size", 1, 0.1, getConfig().config["FontSize"].GetFloat(), 1.0f, 8.0f, onFontSizeChange);
         QuestUI::BeatSaberUI::AddHoverHint(FontIncrementObject->get_gameObject(), "Changes the Font Size of the Clock (Default: 4)");
+        // Show Seconds
+        auto onBattSettingChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<bool>*>(
+            classof(UnityEngine::Events::UnityAction_1<bool>*), this, BattToggle
+            );
+        UnityEngine::UI::Toggle* BattToggleObject = QuestUI::BeatSaberUI::CreateToggle(container->get_transform(), "Show Battery Percentage", getConfig().config["BattToggle"].GetBool(), onBattSettingChange);
+        QuestUI::BeatSaberUI::AddHoverHint(BattToggleObject->get_gameObject(), "Displays Battery percentage next to clock.");
     }
 }
 // Write config
