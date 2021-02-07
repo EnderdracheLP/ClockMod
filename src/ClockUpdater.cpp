@@ -30,7 +30,7 @@ void ClockMod::ClockUpdater::Update() {
             strftime(timestr, 20, "%H:%M", timeinfo);
         }
     }
-    else {      // If set to show 24 Hour Format
+    else {      // If set to show 12 Hour Format
         if (getConfig().config["SecToggle"].GetBool() == true) {    //Check if seconds should be shown
             strftime(timestr, 20, "%l:%M:%S %p", timeinfo);
         }
