@@ -137,7 +137,7 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
 MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_ActivateMultiplayerLobby(self);
 
-    layout->get_transform()->set_position(UnityEngine::Vector3(0, -0.45, 1.62));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, -0.05, 1.62));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
 }
 
