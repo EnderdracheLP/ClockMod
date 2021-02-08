@@ -5,6 +5,7 @@
 #include "UnityEngine/GameObject.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include <ctime>
+#include "GlobalNamespace/OVRPlugin_OVRP_1_1_0.hpp"
 using namespace UnityEngine;
 using namespace TMPro;
 
@@ -38,5 +39,27 @@ void ClockMod::ClockUpdater::Update() {
         };
     }
        auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
-       text->set_text(il2cpp_utils::createcsstr(timestr));
+       text->set_fontSize(fontsize);
+       // Sets position
+//       text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 2.6));
+        // Get current Battery Level
+       if (getConfig().config["BattToggle"].GetBool() == true) {
+           float batterylvl = GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel();
+           batterylvl = trunc(batterylvl * 100);
+           std::string batterylevel = string_format("%g", batterylvl);
+           std::string tandb = timestr;
+           tandb += " - ";
+//           std::string batterylevel = std::to_string(batterylvl);
+//           batterylevel.erase(batterylevel.find_last_not_of('0') + 1, std::string::npos);
+//           batterylevel.erase(batterylevel.find_last_not_of('.') + 1, std::string::npos);
+           tandb += batterylevel;
+           tandb += "%";
+
+           // Use  string_format("%g", batterylevel) Which will return a string of a float that is truncated as an int. Thanks to Sc2ad for the tip.
+
+           text->set_text(il2cpp_utils::createcsstr(tandb));
+       }
+       else {
+           text->set_text(il2cpp_utils::createcsstr(timestr));
+       }
 }

@@ -1,6 +1,8 @@
 #include "main.hpp"
 
-
+//#include "GlobalNamespace/PlayerHeightSettingsController.hpp"
+//#include "GlobalNamespace/PlayerHeightDetector.hpp"  // Added by me Temp
+#include "GlobalNamespace/ClientLobbySetupViewController.hpp"
 #include "GlobalNamespace/MainMenuViewController.hpp"
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/PauseMenuManager.hpp"
@@ -22,6 +24,7 @@ using namespace TMPro;
 #include "UnityEngine/RenderMode.hpp"
 #include "UnityEngine/UI/CanvasScaler.hpp"
 #include "UnityEngine/CanvasRenderer.hpp"
+#include "UnityEngine/MonoBehaviour.hpp"
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 
@@ -80,9 +83,11 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         layout->GetComponent<LayoutElement*>()->set_minWidth(7);
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
-        layout->get_transform()->set_position(UnityEngine::Vector3(0, -2.20, 3));
-        clock_text->set_fontSize(4);
-        clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 2.6));
+//        layout->set_(TMPro::TMP_Text::m_lineSpacing(0))
+        layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.7, 3.85));
+//        float fontsize = getConfig().config["FontSize"].GetFloat();
+
+        clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3.85));
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
     }
     canvas->get_gameObject()->SetActive(true);
@@ -124,11 +129,23 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
     }
 }
 
-MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
-    MultiplayerLobbyController_ActivateMultiplayerLobby(self);
+MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DidActivate, void, MultiplayerLobbyController* self) {
+    MultiplayerLobbyController_DidActivate(self);
+//    GlobalNamespace::MultiplayerOffsetPositionByLocalPlayerPosition*
+//    float pHeight = 0.0f;
+//    pHeight = GlobalNamespace::PlayerHeightDetector::get_playerHeight();
+
+// Resources::FindObjectsOfTypeAll
+//    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<ClientLobbySetupViewController*>()->get_transform()->get_position().y;
+//    auto MLobbyVCPosY = MLobbyVCPos.y;
+
+
+//    logger().info(debugMLobbyVCPos);
 
     layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.9, 3));
 }
+MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_ActivateMultiplayerLobby, void, ClientLobbySetupViewController* self) {
+    ClientLobbySetupViewController_ActivateMultiplayerLobby(self);
 
 MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_DeactivateMultiplayerLobby(self);
