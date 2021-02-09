@@ -38,6 +38,8 @@ void ClockMod::ClockUpdater::Update() {
             strftime(timestr, 20, "%l:%M %p", timeinfo);
         };
     }
+    // Sets the fontsize
+    float fontsize = getConfig().config["FontSize"].GetFloat();
        auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
        text->set_fontSize(fontsize);
        // Sets position
@@ -45,7 +47,7 @@ void ClockMod::ClockUpdater::Update() {
         // Get current Battery Level
        if (getConfig().config["BattToggle"].GetBool() == true) {
            float batterylvl = GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel();
-           batterylvl = trunc(batterylvl * 100);
+           batterylvl = batterylvl * 100;
            std::string batterylevel = string_format("%g", batterylvl);
            std::string tandb = timestr;
            tandb += " - ";
@@ -54,8 +56,6 @@ void ClockMod::ClockUpdater::Update() {
 //           batterylevel.erase(batterylevel.find_last_not_of('.') + 1, std::string::npos);
            tandb += batterylevel;
            tandb += "%";
-
-           // Use  string_format("%g", batterylevel) Which will return a string of a float that is truncated as an int. Thanks to Sc2ad for the tip.
 
            text->set_text(il2cpp_utils::createcsstr(tandb));
        }

@@ -1,18 +1,21 @@
 #include "main.hpp"
 
-//#include "GlobalNamespace/PlayerHeightSettingsController.hpp"
-//#include "GlobalNamespace/PlayerHeightDetector.hpp"  // Added by me Temp
-#include "GlobalNamespace/ClientLobbySetupViewController.hpp"
+
+
 #include "GlobalNamespace/MainMenuViewController.hpp"
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/PauseMenuManager.hpp"
 #include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
+#include "GlobalNamespace/HostLobbySetupViewController.hpp"
+#include "GlobalNamespace/ClientLobbySetupViewController.hpp"
+#include "GlobalNamespace/QuickPlaySetupViewController.hpp"
 using namespace GlobalNamespace;
 
 #include "TMPro/TextMeshPro.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "TMPro/TextAlignmentOptions.hpp"
+#include "TMPro/TMP_Text.hpp"
 using namespace TMPro;
 
 #include "UnityEngine/Canvas.hpp"
@@ -70,7 +73,7 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         auto canvas_renderer = canvas_object->AddComponent<CanvasRenderer*>();
 
         canvas_object->AddComponent<CurvedCanvasSettings*>();
-        canvas_object->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 2.6));
+        canvas_object->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3));
         canvas_object->get_transform()->set_localScale(UnityEngine::Vector3(0.1, 0.1, 0.1));
 
         Object::DontDestroyOnLoad(canvas_object);
@@ -82,6 +85,7 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
 
         layout->GetComponent<LayoutElement*>()->set_minWidth(7);
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
+//        layout->set_childAlignment(TMPro::TextAlignmentOptions::Center, TMPro::TMP_Text::m_lineSpacing(0));
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
 //        layout->set_(TMPro::TMP_Text::m_lineSpacing(0))
         layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.7, 3.85));
@@ -92,6 +96,11 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
     }
     canvas->get_gameObject()->SetActive(true);
 }
+
+//void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+//    UnityEngine::MonoBehaviour::Update();
+//    clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 12.6));
+//}
 
 MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
     AudioTimeSyncController_StartSong(self, startTimeOffset);
@@ -129,28 +138,50 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
     }
 }
 
-MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DidActivate, void, MultiplayerLobbyController* self) {
-    MultiplayerLobbyController_DidActivate(self);
-//    GlobalNamespace::MultiplayerOffsetPositionByLocalPlayerPosition*
-//    float pHeight = 0.0f;
-//    pHeight = GlobalNamespace::PlayerHeightDetector::get_playerHeight();
+// Multiplayer Lobby Specific Code
 
-// Resources::FindObjectsOfTypeAll
-//    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<ClientLobbySetupViewController*>()->get_transform()->get_position().y;
-//    auto MLobbyVCPosY = MLobbyVCPos.y;
+MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
+    MultiplayerLobbyController_ActivateMultiplayerLobby(self);
 
-
-//    logger().info(debugMLobbyVCPos);
-
-    layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.9, 3));
+ //   layout->get_transform()->set_position(UnityEngine::Vector3(0, -0.05, 1.62));
+ //   layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
 }
-MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_ActivateMultiplayerLobby, void, ClientLobbySetupViewController* self) {
-    ClientLobbySetupViewController_ActivateMultiplayerLobby(self);
+
+MAKE_HOOK_OFFSETLESS(QuickPlaySetupViewController_DidActivate, void, QuickPlaySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    QuickPlaySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
+    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
+    MLobbyVCPosY = MLobbyVCPosY - 1;
+    logger().debug("%g", MLobbyVCPosY);
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
+    layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
+}
+
+MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_DidActivate, void, ClientLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    ClientLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
+    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
+    MLobbyVCPosY = MLobbyVCPosY - 1;
+    logger().debug("%g", MLobbyVCPosY);
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
+    layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
+}
+
+MAKE_HOOK_OFFSETLESS(HostLobbySetupViewController_DidActivate, void, HostLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    HostLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
+        auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
+        MLobbyVCPosY = MLobbyVCPosY - 1;
+        logger().debug("%g", MLobbyVCPosY);
+        layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
+        layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
+}
 
 MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_DeactivateMultiplayerLobby(self);
 
-    layout->get_transform()->set_position(UnityEngine::Vector3(0, -2.2, 3));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.7, 3.85));
+    layout->get_transform()->set_localScale(UnityEngine::Vector3(1.0, 1.0, 1.0));
 }
 
 // Called at the early stages of game loading
@@ -164,7 +195,7 @@ extern "C" void setup(ModInfo & info) {
 
     rapidjson::Document::AllocatorType& allocator = getConfig().config.GetAllocator();
     if (!getConfig().config.HasMember("insong")) {
-        getConfig().config.AddMember("insong", rapidjson::Value(0).SetBool(false), allocator);
+        getConfig().config.AddMember("insong", rapidjson::Value(0).SetBool(true), allocator);
         getConfig().Write();
     }
     if (!getConfig().config.HasMember("12Toggle")) {
@@ -175,6 +206,26 @@ extern "C" void setup(ModInfo & info) {
         getConfig().config.AddMember("SecToggle", rapidjson::Value(0).SetBool(false), allocator);
         getConfig().Write();
     }
+    if (!getConfig().config.HasMember("FontSize")) {
+        getConfig().config.AddMember("FontSize", rapidjson::Value(0).SetFloat(4), allocator);
+        getConfig().Write();
+    }
+    if (!getConfig().config.HasMember("BattToggle")) {
+        getConfig().config.AddMember("BattToggle", rapidjson::Value(0).SetBool(false), allocator);
+        getConfig().Write();
+    }
+//    if (!getConfig().config.HasMember("ClockXOffset")) {
+//        getConfig().config.AddMember("ClockXOffset", rapidjson::Value(0).SetFloat(0), allocator);
+//        getConfig().Write();
+//    }
+//    if (!getConfig().config.HasMember("ClockYOffset")) {
+//        getConfig().config.AddMember("ClockYOffset", rapidjson::Value(0).SetFloat(0), allocator);
+//        getConfig().Write();
+//    }
+//    if (!getConfig().config.HasMember("ClockZOffset")) {
+//        getConfig().config.AddMember("ClockZOffset", rapidjson::Value(0).SetFloat(0), allocator);
+//        getConfig().Write();
+//    }
 }
 
 // Called later on in the game loading - a good time to install function hooks
@@ -195,7 +246,11 @@ extern "C" void load() {
     INSTALL_HOOK_OFFSETLESS(hookLogger, SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "SoloFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
     INSTALL_HOOK_OFFSETLESS(hookLogger, PauseMenuManager_ShowMenu, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "ShowMenu", 0));
     INSTALL_HOOK_OFFSETLESS(hookLogger, PauseMenuManager_StartResumeAnimation, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "StartResumeAnimation", 0));
-    INSTALL_HOOK_OFFSETLESS(hookLogger, MultiplayerLobbyController_ActivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "ActivateMultiplayerLobby", 0));
+//    INSTALL_HOOK_OFFSETLESS(hookLogger, MultiplayerLobbyController_ActivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "ActivateMultiplayerLobby", 0));
+    // Multiplayer specific Hooks
+    INSTALL_HOOK_OFFSETLESS(hookLogger, HostLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "HostLobbySetupViewController", "DidActivate", 3));
+    INSTALL_HOOK_OFFSETLESS(hookLogger, ClientLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "ClientLobbySetupViewController", "DidActivate", 3));
+    INSTALL_HOOK_OFFSETLESS(hookLogger, QuickPlaySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "QuickPlaySetupViewController", "DidActivate", 3));
     INSTALL_HOOK_OFFSETLESS(hookLogger, MultiplayerLobbyController_DeactivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "DeactivateMultiplayerLobby", 0));
 
     logger().info("Installed all ClockMod hooks!");
