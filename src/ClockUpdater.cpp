@@ -48,11 +48,12 @@ void ClockMod::ClockUpdater::Update() {
        if (getConfig().config["BattToggle"].GetBool() == true) {
            float batterylvl = GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel();
            batterylvl = batterylvl * 100;
+           std::string batterylevel = string_format("%g", batterylvl);
            std::string tandb = timestr;
            tandb += " - ";
-           std::string batterylevel = std::to_string(batterylvl);
-           batterylevel.erase(batterylevel.find_last_not_of('0') + 1, std::string::npos);
-           batterylevel.erase(batterylevel.find_last_not_of('.') + 1, std::string::npos);
+//           std::string batterylevel = std::to_string(batterylvl);
+//           batterylevel.erase(batterylevel.find_last_not_of('0') + 1, std::string::npos);
+//           batterylevel.erase(batterylevel.find_last_not_of('.') + 1, std::string::npos);
            tandb += batterylevel;
            tandb += "%";
 
