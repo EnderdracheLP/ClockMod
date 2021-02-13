@@ -6,6 +6,7 @@
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/PauseMenuManager.hpp"
 #include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
+#include "GlobalNamespace/PartyFreePlayFlowCoordinator.hpp" // Added by ELP
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
 #include "GlobalNamespace/HostLobbySetupViewController.hpp"
 #include "GlobalNamespace/ClientLobbySetupViewController.hpp"
@@ -59,6 +60,10 @@ Logger& logger() {
     static auto logger = new Logger(modInfo, LoggerOptions(false, true));
     return *logger;
 }
+// Clock Default Position
+float ClockX = 0;
+float ClockY = -1.7;
+float ClockZ = 3.85;
 
 UnityEngine::Canvas* canvas;
 UnityEngine::UI::VerticalLayoutGroup* layout;
@@ -95,11 +100,15 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
     }
     canvas->get_gameObject()->SetActive(true);
+    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
 }
 
 //void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-//    UnityEngine::MonoBehaviour::Update();
-//    clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 12.6));
+
+//        float fontsize = getConfig().config["FontSize"].GetFloat();
+//        auto clock_text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
+//        clock_text->set_fontSize(fontsize);
+        //    clock_text->get_transform()->set_position(UnityEngine::Vector3(0+ClockX, 1+ClockY, 12.6+ClockZ));
 //}
 
 MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
@@ -107,8 +116,13 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
 
     if (getConfig().config["insong"].GetBool() == false) {
         canvas->get_gameObject()->SetActive(false);
-        logger().info("SetActive");
+        logger().info("SetActive false");
     }
+    auto ClockXOff = getConfig().config["ClockXOffset"].GetFloat();
+    auto ClockYOff = getConfig().config["ClockYOffset"].GetFloat();
+    auto ClockZOff = getConfig().config["ClockZOffset"].GetFloat();
+    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX + ClockXOff, ClockY + ClockYOff, ClockZ + ClockZOff));
+    logger().debug("Object Coords", "%g", ClockXOff, ClockYOff, ClockZOff);
 }
 
 MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
@@ -116,8 +130,19 @@ MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowC
 
     if (getConfig().config["insong"].GetBool() == false) {
         canvas->get_gameObject()->SetActive(true);
-        logger().info("SetActive");
+        logger().info("SetActive true");
     }
+    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
+}
+
+MAKE_HOOK_OFFSETLESS(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, PartyFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
+    PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
+
+    if (getConfig().config["insong"].GetBool() == false) {
+        canvas->get_gameObject()->SetActive(true);
+        logger().info("SetActive true");
+    }
+    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
 }
 
 MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
@@ -125,7 +150,7 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
 
     if (getConfig().config["insong"].GetBool() == false) {
         canvas->get_gameObject()->SetActive(true);
-        logger().info("SetActive");
+        logger().info("SetActive true PauseMenu");
     }
 }
 
@@ -134,25 +159,25 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
 
     if (getConfig().config["insong"].GetBool() == false) {
         canvas->get_gameObject()->SetActive(false);
-        logger().info("SetActive");
+        logger().info("SetActive false PauseMenu");
     }
 }
 
 // Multiplayer Lobby Specific Code
 
-MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
-    MultiplayerLobbyController_ActivateMultiplayerLobby(self);
+//MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
+//    MultiplayerLobbyController_ActivateMultiplayerLobby(self);
 
  //   layout->get_transform()->set_position(UnityEngine::Vector3(0, -0.05, 1.62));
  //   layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
-}
+//}
 
 MAKE_HOOK_OFFSETLESS(QuickPlaySetupViewController_DidActivate, void, QuickPlaySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     QuickPlaySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
     MLobbyVCPosY = MLobbyVCPosY - 1;
-    logger().debug("%g", MLobbyVCPosY);
+//    logger().debug("%g", MLobbyVCPosY);
     layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
 }
@@ -162,7 +187,7 @@ MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_DidActivate, void, ClientLob
 
     auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
     MLobbyVCPosY = MLobbyVCPosY - 1;
-    logger().debug("%g", MLobbyVCPosY);
+//    logger().debug("%g", MLobbyVCPosY);
     layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
 }
@@ -172,7 +197,7 @@ MAKE_HOOK_OFFSETLESS(HostLobbySetupViewController_DidActivate, void, HostLobbySe
 
         auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
         MLobbyVCPosY = MLobbyVCPosY - 1;
-        logger().debug("%g", MLobbyVCPosY);
+//        logger().debug("%g", MLobbyVCPosY);
         layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
         layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
 }
@@ -180,7 +205,7 @@ MAKE_HOOK_OFFSETLESS(HostLobbySetupViewController_DidActivate, void, HostLobbySe
 MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_DeactivateMultiplayerLobby(self);
 
-    layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.7, 3.85));
+    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(1.0, 1.0, 1.0));
 }
 
@@ -214,18 +239,19 @@ extern "C" void setup(ModInfo & info) {
         getConfig().config.AddMember("BattToggle", rapidjson::Value(0).SetBool(false), allocator);
         getConfig().Write();
     }
-//    if (!getConfig().config.HasMember("ClockXOffset")) {
-//        getConfig().config.AddMember("ClockXOffset", rapidjson::Value(0).SetFloat(0), allocator);
-//        getConfig().Write();
-//    }
-//    if (!getConfig().config.HasMember("ClockYOffset")) {
-//        getConfig().config.AddMember("ClockYOffset", rapidjson::Value(0).SetFloat(0), allocator);
-//        getConfig().Write();
-//    }
-//    if (!getConfig().config.HasMember("ClockZOffset")) {
-//        getConfig().config.AddMember("ClockZOffset", rapidjson::Value(0).SetFloat(0), allocator);
-//        getConfig().Write();
-//    }
+    // Sets Clock Offset in Config
+    if (!getConfig().config.HasMember("ClockXOffset")) {
+        getConfig().config.AddMember("ClockXOffset", rapidjson::Value(0).SetFloat(0), allocator);
+        getConfig().Write();
+    }
+    if (!getConfig().config.HasMember("ClockYOffset")) {
+        getConfig().config.AddMember("ClockYOffset", rapidjson::Value(0).SetFloat(0), allocator);
+        getConfig().Write();
+    }
+    if (!getConfig().config.HasMember("ClockZOffset")) {
+        getConfig().config.AddMember("ClockZOffset", rapidjson::Value(0).SetFloat(0), allocator);
+        getConfig().Write();
+    }
 }
 
 // Called later on in the game loading - a good time to install function hooks
@@ -244,6 +270,8 @@ extern "C" void load() {
     INSTALL_HOOK_OFFSETLESS(hookLogger, MainMenuViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
     INSTALL_HOOK_OFFSETLESS(hookLogger, AudioTimeSyncController_StartSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StartSong", 1));
     INSTALL_HOOK_OFFSETLESS(hookLogger, SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "SoloFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
+    // Added by ELP
+    INSTALL_HOOK_OFFSETLESS(hookLogger, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "PartyFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
     INSTALL_HOOK_OFFSETLESS(hookLogger, PauseMenuManager_ShowMenu, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "ShowMenu", 0));
     INSTALL_HOOK_OFFSETLESS(hookLogger, PauseMenuManager_StartResumeAnimation, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "StartResumeAnimation", 0));
 //    INSTALL_HOOK_OFFSETLESS(hookLogger, MultiplayerLobbyController_ActivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "ActivateMultiplayerLobby", 0));

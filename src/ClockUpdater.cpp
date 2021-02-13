@@ -11,6 +11,16 @@ using namespace TMPro;
 
 DEFINE_CLASS(ClockMod::ClockUpdater);
 
+// Battery Percentage Formatting, thanks to RedBrumbler on #quest-mod-dev
+
+std::string getBatteryString(int level)
+{
+    std::string percent = string_format("%d%%", level);
+    if (level < 5) return string_format("<color=#ff0000>%s</color>", percent.c_str());
+    else if (level > 60) return string_format("<color=#00ff00>%s</color>", percent.c_str());
+    else return string_format("<color=#ff8800>%s</color>", percent.c_str());
+}
+
 // Updates the Clock.
 
 void ClockMod::ClockUpdater::Update() {
@@ -19,6 +29,18 @@ void ClockMod::ClockUpdater::Update() {
     struct tm* timeinfo;
     time(&rawtime);
     timeinfo = localtime(&rawtime);
+
+    // TODO: Change the clock code to:
+//    std::string getTimeString(timeInfo);
+//    std::string result = getTimeString();
+//
+//    if (batterytoggle)
+//    {
+//        result += " - ";
+//        result += getBatteryString(batterylvl);
+//    }
+//
+//    text->set_text(il2cpp_utils::createcsstr(result));
 
 // Checks config Settings for 12/24 Hour time and if Show Seconds is toggled on or off.
 
@@ -38,24 +60,21 @@ void ClockMod::ClockUpdater::Update() {
             strftime(timestr, 20, "%l:%M %p", timeinfo);
         };
     }
-    // Sets the fontsize
+
+    // Sets the fontsize 
+    //TODO: somehow manage to have that code only running while the player is in the config
     float fontsize = getConfig().config["FontSize"].GetFloat();
        auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
        text->set_fontSize(fontsize);
-       // Sets position
-//       text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 2.6));
+
         // Get current Battery Level
        if (getConfig().config["BattToggle"].GetBool() == true) {
            float batterylvl = GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel();
            batterylvl = batterylvl * 100;
-           std::string batterylevel = string_format("%g", batterylvl);
+           auto batterylevel = getBatteryString((int)batterylvl);
            std::string tandb = timestr;
            tandb += " - ";
-//           std::string batterylevel = std::to_string(batterylvl);
-//           batterylevel.erase(batterylevel.find_last_not_of('0') + 1, std::string::npos);
-//           batterylevel.erase(batterylevel.find_last_not_of('.') + 1, std::string::npos);
            tandb += batterylevel;
-           tandb += "%";
 
            text->set_text(il2cpp_utils::createcsstr(tandb));
        }

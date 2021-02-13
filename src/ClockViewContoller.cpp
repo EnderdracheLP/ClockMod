@@ -29,15 +29,16 @@ getConfig().config["FontSize"].SetFloat(newValue);
 void BattToggle(ClockMod::ClockViewController* parent, bool newValue) {
     getConfig().config["BattToggle"].SetBool(newValue);
 }
-//void SetClockXOffset(ClockMod::ClockViewController* parent, float newValue) {
-//getConfig().config["ClockXOffset"].SetFloat(newValue);
-//}
-//void SetClockYOffset(ClockMod::ClockViewController* parent, float newValue) {
-//getConfig().config["ClockYOffset"].SetFloat(newValue);
-//}
-//void SetClockZOffset(ClockMod::ClockViewController* parent, float newValue) {
-//getConfig().config["ClockZOffset"].SetFloat(newValue);
-//}
+// Code for Clock Offset
+void SetClockXOffset(ClockMod::ClockViewController* parent, float newValue) {
+getConfig().config["ClockXOffset"].SetFloat(newValue);
+}
+void SetClockYOffset(ClockMod::ClockViewController* parent, float newValue) {
+getConfig().config["ClockYOffset"].SetFloat(newValue);
+}
+void SetClockZOffset(ClockMod::ClockViewController* parent, float newValue) {
+getConfig().config["ClockZOffset"].SetFloat(newValue);
+}
 void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     if (firstActivation) {
 
@@ -72,21 +73,22 @@ void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool added
             );
         UnityEngine::UI::Toggle* BattToggleObject = QuestUI::BeatSaberUI::CreateToggle(container->get_transform(), "Show Battery Percentage", getConfig().config["BattToggle"].GetBool(), onBattSettingChange);
         QuestUI::BeatSaberUI::AddHoverHint(BattToggleObject->get_gameObject(), "Displays Battery percentage next to the clock.");
+        // Clock Offset Code
         // Change Pos X
-//        auto onClockXOffsetChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
-//            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetClockXOffset);                                 //              Decimal places   Value Steps                              Min Value   Max Value
-//        QuestUI::IncrementSetting* ClockXIncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Clock X Offset", 1, 0.1, getConfig().config["ClockXOffset"].GetFloat(), -10.0f, 10.0f, onClockXOffsetChange);
-//        QuestUI::BeatSaberUI::AddHoverHint(ClockXIncrementObject->get_gameObject(), "Offsets the X Position of the Clock");
+        auto onClockXOffsetChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
+            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetClockXOffset);                                 //              Decimal places   Value Steps                              Min Value   Max Value
+        QuestUI::IncrementSetting* ClockXIncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "In Song Clock X Offset", 1, 0.1, getConfig().config["ClockXOffset"].GetFloat(), -10.0f, 10.0f, onClockXOffsetChange);
+        QuestUI::BeatSaberUI::AddHoverHint(ClockXIncrementObject->get_gameObject(), "Offsets the X (Left/Right) Position of the Clock");
         // Change Pos Y
-//        auto onClockYOffsetChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
-//            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetClockYOffset);                                 //              Decimal places   Value Steps                              Min Value   Max Value
-//        QuestUI::IncrementSetting* ClockYIncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Clock Y Offset", 1, 0.1, getConfig().config["ClockYOffset"].GetFloat(), -10.0f, 10.0f, onClockYOffsetChange);
-//        QuestUI::BeatSaberUI::AddHoverHint(ClockYIncrementObject->get_gameObject(), "Offsets the Y Position of the Clock");
+        auto onClockYOffsetChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
+            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetClockYOffset);                                 //              Decimal places   Value Steps                              Min Value   Max Value
+        QuestUI::IncrementSetting* ClockYIncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "In Song Clock Y Offset", 1, 0.1, getConfig().config["ClockYOffset"].GetFloat(), -10.0f, 10.0f, onClockYOffsetChange);
+        QuestUI::BeatSaberUI::AddHoverHint(ClockYIncrementObject->get_gameObject(), "Offsets the Y (Up/Down) Position of the Clock");
                 // Change Pos Z
-//        auto onClockZOffsetChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
-//            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetClockZOffset);                                 //              Decimal places   Value Steps                              Min Value   Max Value
-//        QuestUI::IncrementSetting* ClockZIncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Clock Z Offset", 1, 0.1, getConfig().config["ClockZOffset"].GetFloat(), -10.0f, 10.0f, onClockZOffsetChange);
-//        QuestUI::BeatSaberUI::AddHoverHint(ClockZIncrementObject->get_gameObject(), "Offsets the Z Position of the Clock");
+        auto onClockZOffsetChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
+            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetClockZOffset);                                 //              Decimal places   Value Steps                              Min Value   Max Value
+        QuestUI::IncrementSetting* ClockZIncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "In Song Clock Z Offset", 1, 0.1, getConfig().config["ClockZOffset"].GetFloat(), -10.0f, 10.0f, onClockZOffsetChange);
+        QuestUI::BeatSaberUI::AddHoverHint(ClockZIncrementObject->get_gameObject(), "Offsets the Z (Forward/Backward) Position of the Clock");
     }
 }
 // Write config
