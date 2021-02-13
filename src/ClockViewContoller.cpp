@@ -26,7 +26,8 @@ DEFINE_CLASS(ClockMod::ClockViewController);
 QuestUI::IncrementSetting* redSetting;
 QuestUI::IncrementSetting* greenSetting;
 QuestUI::IncrementSetting* blueSetting;
-QuestUI::IncrementSetting* FontSizeSetting;
+// Part of Font Size Code
+QuestUI::IncrementSetting* FontIncrementObject;
 
 TextMeshProUGUI* clocktext;
 UnityEngine::Color clock_color;
@@ -53,13 +54,16 @@ void BattToggle(ClockMod::ClockViewController* parent, bool newValue) {
 
 // Code for Clock Offset
 void SetClockXOffset(ClockMod::ClockViewController* parent, float newValue) {
-getConfig().config["ClockXOffset"].SetFloat(newValue);
+        getConfig().config["ClockXOffset"].SetFloat(newValue);
+//        parent->ClockOffset();
 }
 void SetClockYOffset(ClockMod::ClockViewController* parent, float newValue) {
-getConfig().config["ClockYOffset"].SetFloat(newValue);
+        getConfig().config["ClockYOffset"].SetFloat(newValue);
+//        parent->ClockOffset();
 }
 void SetClockZOffset(ClockMod::ClockViewController* parent, float newValue) {
-getConfig().config["ClockZOffset"].SetFloat(newValue);
+        getConfig().config["ClockZOffset"].SetFloat(newValue);
+//        parent->ClockOffset();
 }
 
 // Code for color change
@@ -157,7 +161,7 @@ void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool added
         // Change Size
         auto onFontSizeChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
             classof(UnityEngine::Events::UnityAction_1<float>*), this, SetFontSize);                                 //              Decimal places   Value Steps                              Min Value   Max Value
-        QuestUI::IncrementSetting* FontIncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Font Size", 1, 0.1, getConfig().config["FontSize"].GetFloat(), 1.0f, 5.0f, onFontSizeChange);
+        FontIncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Font Size", 1, 0.1, getConfig().config["FontSize"].GetFloat(), 1.0f, 5.0f, onFontSizeChange);
         QuestUI::BeatSaberUI::AddHoverHint(FontIncrementObject->get_gameObject(), "Changes the Font Size of the Clock (Default: 4)");
         // Show Battery Percentage
         auto onBattSettingChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<bool>*>(

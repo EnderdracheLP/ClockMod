@@ -16,7 +16,7 @@ DECLARE_CLASS_CODEGEN(ClockMod, ClockViewController, HMUI::ViewController,
     DECLARE_INSTANCE_FIELD(QuestUI::IncrementSetting*, redSetting);
     DECLARE_INSTANCE_FIELD(QuestUI::IncrementSetting*, greenSetting);
     DECLARE_INSTANCE_FIELD(QuestUI::IncrementSetting*, blueSetting);
-    DECLARE_INSTANCE_FIELD(QuestUI::IncrementSetting*, FontSizeSetting);
+    DECLARE_INSTANCE_FIELD(QuestUI::IncrementSetting*, FontIncrementObject);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, clocktext);
     DECLARE_INSTANCE_FIELD(UnityEngine::Color, clock_color);
 
@@ -25,10 +25,11 @@ DECLARE_CLASS_CODEGEN(ClockMod, ClockViewController, HMUI::ViewController,
         REGISTER_METHOD(DidDeactivate);
         REGISTER_METHOD(ClockColor);
         REGISTER_METHOD(ClockSize);
+//        REGISTER_METHOD(ClockOffset);
         REGISTER_FIELD(redSetting);
         REGISTER_FIELD(greenSetting);
         REGISTER_FIELD(blueSetting);
-        REGISTER_FIELD(FontSizeSetting);
+        REGISTER_FIELD(FontIncrementObject);
         REGISTER_FIELD(clocktext);
         REGISTER_FIELD(clock_color);
         // TODO: Get Clock Offest implemented here (I'm too lazy right now)
