@@ -62,10 +62,10 @@ void ClockMod::ClockUpdater::Update() {
     }
 
     // Sets the fontsize 
-    //TODO: somehow manage to have that code only running while the player is in the config
-    float fontsize = getConfig().config["FontSize"].GetFloat();
+    //TODO: somehow manage to have that code only running while the player is in the config or only updating the values when the player changes them in the config
+//    float fontsize = getConfig().config["FontSize"].GetFloat();
        auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
-       text->set_fontSize(fontsize);
+//       text->set_fontSize(fontsize);
 
         // Get current Battery Level
        if (getConfig().config["BattToggle"].GetBool() == true) {

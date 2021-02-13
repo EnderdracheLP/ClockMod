@@ -90,14 +90,19 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
 
         layout->GetComponent<LayoutElement*>()->set_minWidth(7);
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
-//        layout->set_childAlignment(TMPro::TextAlignmentOptions::Center, TMPro::TMP_Text::m_lineSpacing(0));
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
-//        layout->set_(TMPro::TMP_Text::m_lineSpacing(0))
         layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.7, 3.85));
 //        float fontsize = getConfig().config["FontSize"].GetFloat();
+        clock_text->set_fontSize(getConfig().config["FontSize"].GetFloat());
 
         clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3.85));
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
+
+        auto clock_color = UnityEngine::Color::get_white();
+        clock_color.r = getConfig().config["r"].GetFloat();
+        clock_color.g = getConfig().config["g"].GetFloat();
+        clock_color.b = getConfig().config["b"].GetFloat();
+        clock_text->set_color(clock_color);
     }
     canvas->get_gameObject()->SetActive(true);
     layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
@@ -175,7 +180,7 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
 MAKE_HOOK_OFFSETLESS(QuickPlaySetupViewController_DidActivate, void, QuickPlaySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     QuickPlaySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
+    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<QuickPlaySetupViewController*>()->get_transform()->get_position().y;
     MLobbyVCPosY = MLobbyVCPosY - 1;
 //    logger().debug("%g", MLobbyVCPosY);
     layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
@@ -185,7 +190,7 @@ MAKE_HOOK_OFFSETLESS(QuickPlaySetupViewController_DidActivate, void, QuickPlaySe
 MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_DidActivate, void, ClientLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     ClientLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
+    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<ClientLobbySetupViewController*>()->get_transform()->get_position().y;
     MLobbyVCPosY = MLobbyVCPosY - 1;
 //    logger().debug("%g", MLobbyVCPosY);
     layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
@@ -221,37 +226,39 @@ extern "C" void setup(ModInfo & info) {
     rapidjson::Document::AllocatorType& allocator = getConfig().config.GetAllocator();
     if (!getConfig().config.HasMember("insong")) {
         getConfig().config.AddMember("insong", rapidjson::Value(0).SetBool(true), allocator);
-        getConfig().Write();
     }
     if (!getConfig().config.HasMember("12Toggle")) {
         getConfig().config.AddMember("12Toggle", rapidjson::Value(0).SetBool(false), allocator);
-        getConfig().Write();
     }
     if (!getConfig().config.HasMember("SecToggle")) {
         getConfig().config.AddMember("SecToggle", rapidjson::Value(0).SetBool(false), allocator);
-        getConfig().Write();
     }
     if (!getConfig().config.HasMember("FontSize")) {
         getConfig().config.AddMember("FontSize", rapidjson::Value(0).SetFloat(4), allocator);
-        getConfig().Write();
     }
     if (!getConfig().config.HasMember("BattToggle")) {
         getConfig().config.AddMember("BattToggle", rapidjson::Value(0).SetBool(false), allocator);
-        getConfig().Write();
     }
     // Sets Clock Offset in Config
     if (!getConfig().config.HasMember("ClockXOffset")) {
         getConfig().config.AddMember("ClockXOffset", rapidjson::Value(0).SetFloat(0), allocator);
-        getConfig().Write();
     }
     if (!getConfig().config.HasMember("ClockYOffset")) {
         getConfig().config.AddMember("ClockYOffset", rapidjson::Value(0).SetFloat(0), allocator);
-        getConfig().Write();
     }
     if (!getConfig().config.HasMember("ClockZOffset")) {
         getConfig().config.AddMember("ClockZOffset", rapidjson::Value(0).SetFloat(0), allocator);
-        getConfig().Write();
     }
+    if (!getConfig().config.HasMember("r")) {
+        getConfig().config.AddMember("r", rapidjson::Value().SetFloat(1), getConfig().config.GetAllocator());
+    }
+    if (!getConfig().config.HasMember("g")) {
+        getConfig().config.AddMember("g", rapidjson::Value().SetFloat(1), getConfig().config.GetAllocator());
+    }
+    if (!getConfig().config.HasMember("b")) {
+        getConfig().config.AddMember("b", rapidjson::Value().SetFloat(1), getConfig().config.GetAllocator());
+    }
+    getConfig().Write();
 }
 
 // Called later on in the game loading - a good time to install function hooks
