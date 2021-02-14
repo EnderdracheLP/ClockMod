@@ -2,6 +2,9 @@
 #include "ClockViewController.hpp"
 
 #include "ClockUpdater.hpp"
+
+#include "ClockModConfig.hpp"
+
 #include "UnityEngine/GameObject.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include <ctime>
@@ -44,8 +47,8 @@ void ClockMod::ClockUpdater::Update() {
 
 // Checks config Settings for 12/24 Hour time and if Show Seconds is toggled on or off.
 
-    if (getConfig().config["12Toggle"].GetBool() == false) {
-        if (getConfig().config["SecToggle"].GetBool() == true) {    //Check if seconds should be shown
+    if (!getModConfig().TwelveToggle.GetValue()) {
+        if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
             strftime(timestr, 20, "%H:%M:%S", timeinfo);
         }
         else {
@@ -53,7 +56,7 @@ void ClockMod::ClockUpdater::Update() {
         }
     }
     else {      // If set to show 24 Hour Format
-        if (getConfig().config["SecToggle"].GetBool() == true) {    //Check if seconds should be shown
+        if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
             strftime(timestr, 20, "%l:%M:%S %p", timeinfo);
         }
         else {
@@ -68,7 +71,7 @@ void ClockMod::ClockUpdater::Update() {
 //       text->set_fontSize(fontsize);
 
         // Get current Battery Level
-       if (getConfig().config["BattToggle"].GetBool() == true) {
+       if (getModConfig().BattToggle.GetValue()) {
            float batterylvl = GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel();
            batterylvl = batterylvl * 100;
            auto batterylevel = getBatteryString((int)batterylvl);
@@ -81,4 +84,7 @@ void ClockMod::ClockUpdater::Update() {
        else {
            text->set_text(il2cpp_utils::createcsstr(timestr));
        }
+
+       text->set_color(getModConfig().ClockColor.GetValue());
+       text->set_fontSize(getModConfig().FontSize.GetValue());
 }

@@ -10,32 +10,13 @@
   },
   "dependencies": [
     {
-      "id": "beatsaber-hook",
-      "versionRange": "1.0.12",
-      "additionalData": {
-        "extraFiles": [
-          "src/inline-hook"
-        ]
-      }
-    },
-    {
-      "id": "codegen",
-      "versionRange": "*",
-      "additionalData": {}
-    },
-    {
-      "id": "libil2cpp",
-      "versionRange": "*",
-      "additionalData": {}
-    },
-    {
       "id": "questui",
-      "versionRange": "*",
+      "versionRange": "^0.4.4",
       "additionalData": {}
     },
     {
       "id": "config-utils",
-      "versionRange": "0.2.1",
+      "versionRange": "^0.2.1",
       "additionalData": {}
     }
   ],
