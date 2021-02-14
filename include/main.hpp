@@ -11,3 +11,11 @@
 
 // Define these functions here so that we can easily read configuration and log information from other files
 Logger& logger();
+
+struct Config_t {
+	bool InMPLobby = false;
+	// other values
+};
+extern Config_t Config;
+
+// extern bool InMPLobby;

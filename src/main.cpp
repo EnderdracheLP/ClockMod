@@ -46,6 +46,8 @@ using namespace custom_types;
 
 #include "ClockModConfig.hpp"
 
+Config_t Config;
+
 ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
 // Returns a logger, useful for printing debug messages
@@ -58,12 +60,17 @@ Logger& logger() {
 DEFINE_CONFIG(ModConfig);
 
 // Clock Default Position
-float ClockX = 0;
-float ClockY = -1.7;
-float ClockZ = 3.85;
+float ClockX = getModConfig().ClockX.GetValue();
+float ClockY = getModConfig().ClockY.GetValue();
+float ClockZ = getModConfig().ClockZ.GetValue();
 
 UnityEngine::Canvas* canvas;
 UnityEngine::UI::VerticalLayoutGroup* layout;
+
+// Clock Offset
+//void Update() {
+//    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX + getModConfig().ClockXOffset.GetValue(), ClockY + getModConfig().ClockYOffset.GetValue(), ClockZ + getModConfig().ClockZOffset.GetValue()));
+//}
 
 MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
@@ -94,22 +101,15 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         layout->GetComponent<LayoutElement*>()->set_minWidth(7);
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
-        layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.7, 3.85));
+        layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
 
-        clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3.85));
+//        clock_text->get_transform()->set_position(UnityEngine::Vector3(0 + getModConfig().ClockXOffset.GetValue(), 0.5 + getModConfig().ClockYOffset.GetValue(), 3.85 + getModConfig().ClockZOffset.GetValue()));
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
     }
+
     canvas->get_gameObject()->SetActive(true);
-    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
+//    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
 }
-
-//void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-
-//        float fontsize = getConfig().config["FontSize"].GetFloat();
-//        auto clock_text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
-//        clock_text->set_fontSize(fontsize);
-        //    clock_text->get_transform()->set_position(UnityEngine::Vector3(0+ClockX, 1+ClockY, 12.6+ClockZ));
-//}
 
 MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
     AudioTimeSyncController_StartSong(self, startTimeOffset);
@@ -117,12 +117,11 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
     if (!getModConfig().InSong.GetValue()) {
         canvas->get_gameObject()->SetActive(false);
         logger().info("SetActive false");
+        Config.InMPLobby = false;
     }
-    auto clockXOffset = getModConfig().ClockXOffset.GetValue();
-    auto clockYOffset = getModConfig().ClockYOffset.GetValue();
-    auto clockZOffset = getModConfig().ClockZOffset.GetValue();
-    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX + clockXOffset, ClockY + clockYOffset, ClockZ + clockZOffset));
-    logger().debug("Object Coords", "%g", clockXOffset, clockYOffset, clockZOffset);
+//    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
+    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
+//    logger().debug("Object Coords", "%g", clockXOffset, clockYOffset, clockZOffset);
 }
 
 MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
@@ -177,6 +176,7 @@ MAKE_HOOK_OFFSETLESS(QuickPlaySetupViewController_DidActivate, void, QuickPlaySe
 
     auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<QuickPlaySetupViewController*>()->get_transform()->get_position().y;
     MLobbyVCPosY = MLobbyVCPosY - 1;
+    Config.InMPLobby = true;
 //    logger().debug("%g", MLobbyVCPosY);
     layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
@@ -187,6 +187,7 @@ MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_DidActivate, void, ClientLob
 
     auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<ClientLobbySetupViewController*>()->get_transform()->get_position().y;
     MLobbyVCPosY = MLobbyVCPosY - 1;
+    Config.InMPLobby = true;
 //    logger().debug("%g", MLobbyVCPosY);
     layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
@@ -197,6 +198,7 @@ MAKE_HOOK_OFFSETLESS(HostLobbySetupViewController_DidActivate, void, HostLobbySe
 
         auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
         MLobbyVCPosY = MLobbyVCPosY - 1;
+        Config.InMPLobby = true;
 //        logger().debug("%g", MLobbyVCPosY);
         layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
         layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
@@ -207,6 +209,7 @@ MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DeactivateMultiplayerLobby, void
 
     layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(1.0, 1.0, 1.0));
+    Config.InMPLobby = false;
 }
 
 // Called at the early stages of game loading
