@@ -1,6 +1,4 @@
 #include "main.hpp"
-#include "ClockModConfig.hpp"
-
 
 #include "GlobalNamespace/MainMenuViewController.hpp"
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
@@ -46,14 +44,9 @@ using namespace ClockMod;
 #include "custom-types/shared/register.hpp"
 using namespace custom_types;
 
-ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
+#include "ClockModConfig.hpp"
 
-// Loads the config from disk using our modInfo, then returns it for use
-Configuration& getConfig() {
-    static Configuration config(modInfo);
-    config.Load();
-    return config;
-}
+ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
 // Returns a logger, useful for printing debug messages
 Logger& logger() {
@@ -102,17 +95,9 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
         layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.7, 3.85));
-//        float fontsize = getConfig().config["FontSize"].GetFloat();
-        clock_text->set_fontSize(getConfig().config["FontSize"].GetFloat());
 
         clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3.85));
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
-
-        auto clock_color = UnityEngine::Color::get_white();
-        clock_color.r = getConfig().config["r"].GetFloat();
-        clock_color.g = getConfig().config["g"].GetFloat();
-        clock_color.b = getConfig().config["b"].GetFloat();
-        clock_text->set_color(clock_color);
     }
     canvas->get_gameObject()->SetActive(true);
     layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
@@ -129,21 +114,21 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
 MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
     AudioTimeSyncController_StartSong(self, startTimeOffset);
 
-    if (getConfig().config["insong"].GetBool() == false) {
+    if (!getModConfig().InSong.GetValue()) {
         canvas->get_gameObject()->SetActive(false);
         logger().info("SetActive false");
     }
-    auto ClockXOff = getConfig().config["ClockXOffset"].GetFloat();
-    auto ClockYOff = getConfig().config["ClockYOffset"].GetFloat();
-    auto ClockZOff = getConfig().config["ClockZOffset"].GetFloat();
-    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX + ClockXOff, ClockY + ClockYOff, ClockZ + ClockZOff));
-    logger().debug("Object Coords", "%g", ClockXOff, ClockYOff, ClockZOff);
+    auto clockXOffset = getModConfig().ClockXOffset.GetValue();
+    auto clockYOffset = getModConfig().ClockYOffset.GetValue();
+    auto clockZOffset = getModConfig().ClockZOffset.GetValue();
+    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX + clockXOffset, ClockY + clockYOffset, ClockZ + clockZOffset));
+    logger().debug("Object Coords", "%g", clockXOffset, clockYOffset, clockZOffset);
 }
 
 MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
 
-    if (getConfig().config["insong"].GetBool() == false) {
+    if (!getModConfig().InSong.GetValue()) {
         canvas->get_gameObject()->SetActive(true);
         logger().info("SetActive true");
     }
@@ -153,7 +138,7 @@ MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowC
 MAKE_HOOK_OFFSETLESS(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, PartyFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
 
-    if (getConfig().config["insong"].GetBool() == false) {
+    if (!getModConfig().InSong.GetValue()) {
         canvas->get_gameObject()->SetActive(true);
         logger().info("SetActive true");
     }
@@ -163,7 +148,7 @@ MAKE_HOOK_OFFSETLESS(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlow
 MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
     PauseMenuManager_ShowMenu(self);
 
-    if (getConfig().config["insong"].GetBool() == false) {
+    if (!getModConfig().InSong.GetValue()) {
         canvas->get_gameObject()->SetActive(true);
         logger().info("SetActive true PauseMenu");
     }
@@ -172,7 +157,7 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
 MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManager* self) {
     PauseMenuManager_StartResumeAnimation(self);
 
-    if (getConfig().config["insong"].GetBool() == false) {
+    if (!getModConfig().InSong.GetValue()) {
         canvas->get_gameObject()->SetActive(false);
         logger().info("SetActive false PauseMenu");
     }
@@ -230,49 +215,10 @@ extern "C" void setup(ModInfo & info) {
     info.version = VERSION;
     modInfo = info;
 
-    getConfig().Load(); // Load the config file
-
     //Init/Load Config
     getModConfig().Init(modInfo);
 
     logger().info("Completed setup!");
-
-    rapidjson::Document::AllocatorType& allocator = getConfig().config.GetAllocator();
-    if (!getConfig().config.HasMember("insong")) {
-        getConfig().config.AddMember("insong", rapidjson::Value(0).SetBool(true), allocator);
-    }
-    if (!getConfig().config.HasMember("12Toggle")) {
-        getConfig().config.AddMember("12Toggle", rapidjson::Value(0).SetBool(false), allocator);
-    }
-    if (!getConfig().config.HasMember("SecToggle")) {
-        getConfig().config.AddMember("SecToggle", rapidjson::Value(0).SetBool(false), allocator);
-    }
-    if (!getConfig().config.HasMember("FontSize")) {
-        getConfig().config.AddMember("FontSize", rapidjson::Value(0).SetFloat(4), allocator);
-    }
-    if (!getConfig().config.HasMember("BattToggle")) {
-        getConfig().config.AddMember("BattToggle", rapidjson::Value(0).SetBool(false), allocator);
-    }
-    // Sets Clock Offset in Config
-    if (!getConfig().config.HasMember("ClockXOffset")) {
-        getConfig().config.AddMember("ClockXOffset", rapidjson::Value(0).SetFloat(0), allocator);
-    }
-    if (!getConfig().config.HasMember("ClockYOffset")) {
-        getConfig().config.AddMember("ClockYOffset", rapidjson::Value(0).SetFloat(0), allocator);
-    }
-    if (!getConfig().config.HasMember("ClockZOffset")) {
-        getConfig().config.AddMember("ClockZOffset", rapidjson::Value(0).SetFloat(0), allocator);
-    }
-    if (!getConfig().config.HasMember("r")) {
-        getConfig().config.AddMember("r", rapidjson::Value().SetFloat(1), getConfig().config.GetAllocator());
-    }
-    if (!getConfig().config.HasMember("g")) {
-        getConfig().config.AddMember("g", rapidjson::Value().SetFloat(1), getConfig().config.GetAllocator());
-    }
-    if (!getConfig().config.HasMember("b")) {
-        getConfig().config.AddMember("b", rapidjson::Value().SetFloat(1), getConfig().config.GetAllocator());
-    }
-    getConfig().Write();
 }
 
 // Called later on in the game loading - a good time to install function hooks
