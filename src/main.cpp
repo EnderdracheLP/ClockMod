@@ -1,5 +1,5 @@
 #include "main.hpp"
-
+#include "ClockModConfig.hpp"
 
 
 #include "GlobalNamespace/MainMenuViewController.hpp"
@@ -60,6 +60,10 @@ Logger& logger() {
     static auto logger = new Logger(modInfo, LoggerOptions(false, true));
     return *logger;
 }
+
+//Define Config
+DEFINE_CONFIG(ModConfig);
+
 // Clock Default Position
 float ClockX = 0;
 float ClockY = -1.7;
@@ -76,6 +80,12 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         canvas = canvas_object->AddComponent<UnityEngine::Canvas*>();
         auto canvas_scaler = canvas_object->AddComponent<CanvasScaler*>();
         auto canvas_renderer = canvas_object->AddComponent<CanvasRenderer*>();
+
+        // For reference on adding Button to clock
+        //        UnityEngine::UI::Button* button = QuestUI::BeatSaberUI::CreateUIButton(rectTransform, "", "SettingsButton", il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, +[](Il2CppObject* obj, UnityEngine::UI::Button* button){}));
+        //button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, OnQosmeticsButtonClick));
+        //
+        // button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, OnQosmeticsButtonClick));
 
         canvas_object->AddComponent<CurvedCanvasSettings*>();
         canvas_object->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3));
@@ -172,7 +182,7 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
 
 //MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
 //    MultiplayerLobbyController_ActivateMultiplayerLobby(self);
-
+//
  //   layout->get_transform()->set_position(UnityEngine::Vector3(0, -0.05, 1.62));
  //   layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
 //}
@@ -221,6 +231,10 @@ extern "C" void setup(ModInfo & info) {
     modInfo = info;
 
     getConfig().Load(); // Load the config file
+
+    //Init/Load Config
+    getModConfig().Init(modInfo);
+
     logger().info("Completed setup!");
 
     rapidjson::Document::AllocatorType& allocator = getConfig().config.GetAllocator();

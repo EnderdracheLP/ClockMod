@@ -1,5 +1,6 @@
 #include "ClockViewController.hpp"
 #include "main.hpp"
+#include "ClockModConfig.hpp"
 
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
@@ -14,10 +15,13 @@
 #include "HMUI/ScrollView.hpp"
 
 #include "TMPro/TextMeshProUGUI.hpp" // Added for color change
+
+#include "GlobalNamespace/ColorChangeUIEventType.hpp" // Added for Colorpicker
 using namespace UnityEngine::UI;
 using namespace UnityEngine;
 using namespace HMUI;
 using namespace TMPro; // Added for color change
+using namespace GlobalNamespace; // Added for Colorpicker
 
 
 DEFINE_CLASS(ClockMod::ClockViewController);
@@ -67,54 +71,89 @@ void SetClockZOffset(ClockMod::ClockViewController* parent, float newValue) {
 }
 
 // Code for color change
-void SetRed(ClockMod::ClockViewController* parent, float newValue) {
+//void SetRed(ClockMod::ClockViewController* parent, float newValue) {
+//    if (newValue < 0) {
+//        parent->redSetting->CurrentValue = 0;
+//        parent->redSetting->UpdateValue();
+//        getConfig().config["r"].SetFloat(0);
+//
+//        parent->clock_color.r = 0;
+//    }
+//    if (newValue > 1) {
+//        parent->redSetting->CurrentValue = 1;
+//        parent->redSetting->UpdateValue();
+//        getConfig().config["r"].SetFloat(1);
+//
+//        parent->clock_color.r = 1;
+//    }
+//    else {
+//        getConfig().config["r"].SetFloat(newValue);
+//
+//        parent->clock_color.r = newValue;
+//    }
+//    parent->ClockColor();
+//}
+
+//void SetGreen(ClockMod::ClockViewController* parent, float newValue) {
+//    if (newValue < 0) {
+//        parent->greenSetting->CurrentValue = 0;
+//        parent->greenSetting->UpdateValue();
+//        getConfig().config["g"].SetFloat(0);
+//
+//        parent->clock_color.g = 0;
+//    }
+//    if (newValue > 1) {
+//        parent->greenSetting->CurrentValue = 1;
+//        parent->greenSetting->UpdateValue();
+//        getConfig().config["g"].SetFloat(1);
+//
+//        parent->clock_color.g = 1;
+//    }
+//    else {
+//        getConfig().config["g"].SetFloat(newValue);
+//
+//        parent->clock_color.r = newValue;
+//    }
+//    parent->ClockColor();
+//}
+
+//void SetBlue(ClockMod::ClockViewController* parent, float newValue) {
+//    if (newValue < 0) {
+//        parent->blueSetting->CurrentValue = 0;
+//        parent->blueSetting->UpdateValue();
+//        getConfig().config["b"].SetFloat(0);
+//
+//        parent->clock_color.b = 0;
+//    }
+//    if (newValue > 1) {
+//        parent->blueSetting->CurrentValue = 1;
+//        parent->blueSetting->UpdateValue();
+//        getConfig().config["b"].SetFloat(1);
+//
+//        parent->clock_color.b = 1;
+//    }
+//    else {
+//        getConfig().config["b"].SetFloat(newValue);
+//
+//        parent->clock_color.b = newValue;
+//    }
+//    parent->ClockColor();
+//}
+
+void SetColour(ClockMod::ClockViewController* parent, float newValue) {
     if (newValue < 0) {
         parent->redSetting->CurrentValue = 0;
         parent->redSetting->UpdateValue();
         getConfig().config["r"].SetFloat(0);
 
         parent->clock_color.r = 0;
-    }
-    if (newValue > 1) {
-        parent->redSetting->CurrentValue = 1;
-        parent->redSetting->UpdateValue();
-        getConfig().config["r"].SetFloat(1);
 
-        parent->clock_color.r = 1;
-    }
-    else {
-        getConfig().config["r"].SetFloat(newValue);
-
-        parent->clock_color.r = newValue;
-    }
-    parent->ClockColor();
-}
-
-void SetGreen(ClockMod::ClockViewController* parent, float newValue) {
-    if (newValue < 0) {
         parent->greenSetting->CurrentValue = 0;
         parent->greenSetting->UpdateValue();
         getConfig().config["g"].SetFloat(0);
 
         parent->clock_color.g = 0;
-    }
-    if (newValue > 1) {
-        parent->greenSetting->CurrentValue = 1;
-        parent->greenSetting->UpdateValue();
-        getConfig().config["g"].SetFloat(1);
 
-        parent->clock_color.g = 1;
-    }
-    else {
-        getConfig().config["g"].SetFloat(newValue);
-
-        parent->clock_color.r = newValue;
-    }
-    parent->ClockColor();
-}
-
-void SetBlue(ClockMod::ClockViewController* parent, float newValue) {
-    if (newValue < 0) {
         parent->blueSetting->CurrentValue = 0;
         parent->blueSetting->UpdateValue();
         getConfig().config["b"].SetFloat(0);
@@ -122,6 +161,18 @@ void SetBlue(ClockMod::ClockViewController* parent, float newValue) {
         parent->clock_color.b = 0;
     }
     if (newValue > 1) {
+        parent->redSetting->CurrentValue = 1;
+        parent->redSetting->UpdateValue();
+        getConfig().config["r"].SetFloat(1);
+
+        parent->clock_color.r = 1;
+
+        parent->greenSetting->CurrentValue = 1;
+        parent->greenSetting->UpdateValue();
+        getConfig().config["g"].SetFloat(1);
+
+        parent->clock_color.g = 1;
+
         parent->blueSetting->CurrentValue = 1;
         parent->blueSetting->UpdateValue();
         getConfig().config["b"].SetFloat(1);
@@ -129,8 +180,13 @@ void SetBlue(ClockMod::ClockViewController* parent, float newValue) {
         parent->clock_color.b = 1;
     }
     else {
-        getConfig().config["b"].SetFloat(newValue);
+        getConfig().config["r"].SetFloat(newValue);
+        parent->clock_color.r = newValue;
 
+        getConfig().config["g"].SetFloat(newValue);
+        parent->clock_color.r = newValue;
+
+        getConfig().config["b"].SetFloat(newValue);
         parent->clock_color.b = newValue;
     }
     parent->ClockColor();
@@ -186,15 +242,22 @@ void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool added
         QuestUI::IncrementSetting* ClockZIncrementObject = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "In Song Clock Z Offset", 1, 0.1, getConfig().config["ClockZOffset"].GetFloat(), -10.0f, 10.0f, onClockZOffsetChange);
         QuestUI::BeatSaberUI::AddHoverHint(ClockZIncrementObject->get_gameObject(), "Offsets the Z (Forward/Backward) Position of the Clock");
         // Code for setting Color
-        auto redChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
-            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetRed
-            );
-        auto greenChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
-            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetGreen
-            );
-        auto blueChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
-            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetBlue
-            );
+//        auto redChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
+//            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetRed
+//            );
+//        auto greenChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
+//            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetGreen
+//            );
+//        auto blueChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
+//            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetBlue
+//            );
+//        auto onColourChange = il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction_1<float>*>(
+//            classof(UnityEngine::Events::UnityAction_1<float>*), this, SetColour
+//            );
+        UnityEngine::GameObject* ClockColourPick = QuestUI::BeatSaberUI::CreateColorPicker(container->get_transform(), "ClockColorPicker", UnityEngine::Color::get_white(),
+            [](UnityEngine::Color clock_color, GlobalNamespace::ColorChangeUIEventType eventType) {
+                logger().info("questui TestColorPicker: %f %f %f %d", clock_color.r, clock_color.g, clock_color.b, eventType);
+            });
 
         clocktext = UnityEngine::GameObject::Find(il2cpp_utils::createcsstr("Canvas"))->GetComponentInChildren<TextMeshProUGUI*>();
         clock_color = clocktext->m_Color;
@@ -203,10 +266,12 @@ void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool added
         clock_color.b = getConfig().config["b"].GetFloat();
         clocktext->set_color(clock_color);
 
-        redSetting = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Red", 2, 0.05, getConfig().config["r"].GetFloat(), redChange);
-        greenSetting = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Green", 2, 0.05, getConfig().config["g"].GetFloat(), greenChange);
-        blueSetting = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Blue", 2, 0.05, getConfig().config["b"].GetFloat(), blueChange);
+//        redSetting = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Red", 2, 0.05, getConfig().config["r"].GetFloat(), redChange);
+//        greenSetting = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Green", 2, 0.05, getConfig().config["g"].GetFloat(), greenChange);
+//        blueSetting = QuestUI::BeatSaberUI::CreateIncrementSetting(container->get_transform(), "Blue", 2, 0.05, getConfig().config["b"].GetFloat(), blueChange);
 
+        // Config-Utils Stuff
+        AddConfigValueColorPicker(container->get_transform(), getModConfig().ModClockColor);
     }
 }
 // Write config
@@ -214,6 +279,7 @@ void ClockMod::ClockViewController::DidDeactivate(bool removedFromHierarchy, boo
     getConfig().Write();
 }
 
+// For color changing
 void ClockMod::ClockViewController::ClockColor() {
     clock_color.r = getConfig().config["r"].GetFloat();
     clock_color.g = getConfig().config["g"].GetFloat();
@@ -221,6 +287,8 @@ void ClockMod::ClockViewController::ClockColor() {
     clocktext->set_color(clock_color);
 }
 
+// For FontSize Changing
 void ClockMod::ClockViewController::ClockSize() {
     clocktext->set_fontSize(getConfig().config["FontSize"].GetFloat());
 }
+
