@@ -67,7 +67,7 @@ float ClockZ = getModConfig().ClockZ.GetValue();
 UnityEngine::Canvas* canvas;
 UnityEngine::UI::VerticalLayoutGroup* layout;
 
-// Clock Offset
+// Clock Offset (moved to ClockUpdater)
 //void Update() {
 //    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX + getModConfig().ClockXOffset.GetValue(), ClockY + getModConfig().ClockYOffset.GetValue(), ClockZ + getModConfig().ClockZOffset.GetValue()));
 //}

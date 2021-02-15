@@ -7,6 +7,7 @@ DECLARE_CONFIG(ModConfig,
     DECLARE_VALUE(TwelveToggle, bool, "24/12 Toggle", false);
     DECLARE_VALUE(SecToggle, bool, "Show Seconds", false);
     DECLARE_VALUE(BattToggle, bool, "Show Battery Percentage", false);
+    DECLARE_VALUE(RainbowClock, bool, "Rainbowify it", false);
     DECLARE_VALUE(FontSize, double, "Font Size", 3.5);
 
     DECLARE_VALUE(ClockXOffset, double, "Clock X Offset", 0);
@@ -23,6 +24,7 @@ DECLARE_CONFIG(ModConfig,
         INIT_VALUE(TwelveToggle);
         INIT_VALUE(SecToggle);
         INIT_VALUE(BattToggle);
+        INIT_VALUE(RainbowClock);
         INIT_VALUE(FontSize);
         INIT_VALUE(ClockXOffset);
         INIT_VALUE(ClockYOffset);

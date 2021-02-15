@@ -37,6 +37,8 @@ void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool added
 
         BeatSaberUI::AddHoverHint(AddConfigValueToggle(parent, getModConfig().BattToggle)->get_gameObject(), "Displays Battery percentage next to the clock.");
 
+        BeatSaberUI::AddHoverHint(AddConfigValueToggle(parent, getModConfig().RainbowClock)->get_gameObject(), "Makes the Clock beautiful.");
+
         BeatSaberUI::AddHoverHint(AddConfigValueIncrementFloat(parent, getModConfig().FontSize, 1, 0.1f, 1.0f, 5.0f)->get_gameObject(), "Changes the Font Size of the Clock (Default: 3.5)");
 
         BeatSaberUI::AddHoverHint(AddConfigValueIncrementFloat(parent, getModConfig().ClockXOffset, 1, 0.1f, -10.0f, 10.0f)->get_gameObject(), "Offsets the X (Left/Right) Position of the Clock");
