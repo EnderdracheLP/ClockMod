@@ -41,7 +41,7 @@ std::string RainbowClock::rainbowify(std::string input)
 }
 
 // Updates the Clock.
- int wait = 20; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
+ int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
 
  void ClockMod::ClockUpdater::Update() {
      time_t rawtime;
@@ -51,7 +51,7 @@ std::string RainbowClock::rainbowify(std::string input)
      timeinfo = localtime(&rawtime);
 
      // Yes all the "wait" stuff here is for slowing it down
-     if (wait == 20) {
+     if (wait == 18) {
               // TODO: Change the clock code to:
           //    std::string getTimeString(timeInfo);
           //    std::string result = getTimeString();
@@ -161,7 +161,7 @@ std::string RainbowClock::rainbowify(std::string input)
                  }
                  else {
                      // Otherwise it will do this.
-                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.7, 4.6));
+                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.7, 5.6));
                      text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(-10, 0, 0));
                      text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
                      //logger().debug("In Normal Map set to Top");
@@ -169,14 +169,14 @@ std::string RainbowClock::rainbowify(std::string input)
              }
              else if (getModConfig().ClockPosition.GetValue()) {
                      // If set to be at the Bottom do this.
-                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.26, 0));
-                     text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(60, 0, 0));
-                     text->get_transform()->set_localScale(UnityEngine::Vector3(0.6, 0.6, 0.6));
+//                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.26, 0));
+                     text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(40, 0, 0));
+                     text->get_transform()->set_localScale(UnityEngine::Vector3(0.8, 0.8, 0.8));
                      //logger().debug("In 360 Map set to Bottom");
              }
                  else {
                      // Otherwise it will do this.
-//                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.7, 0)); // Z= 4.6
+//                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.7, 0)); // Y= -1.7    Z= 4.6
 //                     text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(-10, 0, 0));
                      text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
                      //logger().debug("In 360 Map set to Top");

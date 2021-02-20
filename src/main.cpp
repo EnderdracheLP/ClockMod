@@ -5,6 +5,7 @@
 #include "GlobalNamespace/PauseMenuManager.hpp"
 #include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
 #include "GlobalNamespace/PartyFreePlayFlowCoordinator.hpp"
+#include "GlobalNamespace/CampaignFlowCoordinator.hpp"          // For setting clock in Campaign back to normal
 #include "GlobalNamespace/CoreGameHUDController.hpp"            // For checking if in Map.
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"          // For checking the characteristic 360/90.
 #include "GlobalNamespace/GameplayCoreInstaller.hpp"            // Also part of the check.
@@ -124,9 +125,9 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
         canvas->get_gameObject()->SetActive(false);
         logger().info("SetActive false");
     }
-    if (Config.InRotationMap) {
-        if (getModConfig().ClockPosition.GetValue()) {
-            layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5));
+    if (Config.InRotationMap) { // Checks if in a map with RotationEvents (360/90)
+        if (getModConfig().ClockPosition.GetValue()) { // Then checks if the clock is set to be at the Top or the Bottom
+            layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY-1, Config.ClockZ + 0.2));
         }
         else { layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5)); }
     }
@@ -146,18 +147,36 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
 
 //MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StopSong, void, AudioTimeSyncController* self) {
 //    AudioTimeSyncController_StopSong(self);
-//    layout->get_transform()->SetParent(nullptr);
 //    Config.IsInSong = false;
+//    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
 //}
 
-MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
-    SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
+MAKE_HOOK_OFFSETLESS(CampaignFlowCoordinator_DidActivate, void, CampaignFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    CampaignFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-    //if (!getModConfig().InSong.GetValue()) {
-    //    canvas->get_gameObject()->SetActive(true);
-    //    logger().info("SetActive true");
-    //}
+    if (!getModConfig().InSong.GetValue()) {
         canvas->get_gameObject()->SetActive(true);
+    }
+    if (Config.noTextAndHUD) {
+        canvas->get_gameObject()->SetActive(true);
+    }
+
+    Config.IsInSong = false;
+    Config.InRotationMap = false;
+    layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
+}
+
+MAKE_HOOK_OFFSETLESS(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, PartyFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
+    PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
+
+    if (!getModConfig().InSong.GetValue()) {
+        canvas->get_gameObject()->SetActive(true);
+    //    logger().info("SetActive true");
+    }
+    if (Config.noTextAndHUD){
+        canvas->get_gameObject()->SetActive(true);
+    }
 
     Config.IsInSong = false;
     Config.InRotationMap = false;
@@ -166,18 +185,18 @@ MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowC
     layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
 }
 
-MAKE_HOOK_OFFSETLESS(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, PartyFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
-    PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
+MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
+    SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
 
-    //if (!getModConfig().InSong.GetValue()) {
-    //    canvas->get_gameObject()->SetActive(true);
-    //    logger().info("SetActive true");
-    //}
+    if (!getModConfig().InSong.GetValue()) {
+        canvas->get_gameObject()->SetActive(true);
+        logger().info("SetActive true");
+    }
     canvas->get_gameObject()->SetActive(true);
 
     Config.IsInSong = false;
     Config.InRotationMap = false;
-//    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
+    //    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
     layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
     layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
 }
@@ -218,14 +237,14 @@ MAKE_HOOK_OFFSETLESS(BeatmapObjectCallbackController_SetNewBeatmapData, void, Be
        	if (RotationEvents > 0) { 
             logger().debug("Loaded 360/90 Map");
             Config.InRotationMap = true;
-            if (getModConfig().ClockPosition.GetValue()) {
-                layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5));
-            } else { layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5)); }
+//            if (getModConfig().ClockPosition.GetValue()) {
+//                layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 10));
+//            } else { layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5)); }
         }
     	else { 
             logger().debug("Loaded Normal Map");
             Config.InRotationMap = false;
-            layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5));
+//            layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5));
         }
         //if (Config.noTextAndHUD) {
         //    canvas->get_gameObject()->SetActive(false);
@@ -337,11 +356,12 @@ extern "C" void load() {
     QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
 
     INSTALL_HOOK_OFFSETLESS(hkLog, MainMenuViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
+    INSTALL_HOOK_OFFSETLESS(hkLog, CampaignFlowCoordinator_DidActivate, il2cpp_utils::FindMethodUnsafe("", "CampaignFlowCoordinator", "DidActivate", 3));
     INSTALL_HOOK_OFFSETLESS(hkLog, AudioTimeSyncController_StartSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StartSong", 1));
     // Third attempt at clock rotation
 //    INSTALL_HOOK_OFFSETLESS(hkLog, BeatmapObjectManager_SpawnBasicNote, il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectManager", "SpawnBasicNote", 4));
 //    INSTALL_HOOK_OFFSETLESS(hkLog, NoteController_Update, il2cpp_utils::FindMethodUnsafe("", "NoteController", "Update", 0));
-//    INSTALL_HOOK_OFFSETLESS(hkLog, AudioTimeSyncController_StopSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StopSong", 0));
+    //INSTALL_HOOK_OFFSETLESS(hkLog, AudioTimeSyncController_StopSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StopSong", 0));
     INSTALL_HOOK_OFFSETLESS(hkLog, SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "SoloFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
     // Added by ELP
     INSTALL_HOOK_OFFSETLESS(hkLog, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "PartyFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
