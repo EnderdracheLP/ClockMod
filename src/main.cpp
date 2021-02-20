@@ -4,11 +4,16 @@
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/PauseMenuManager.hpp"
 #include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
-#include "GlobalNamespace/PartyFreePlayFlowCoordinator.hpp" // Added by ELP
+#include "GlobalNamespace/PartyFreePlayFlowCoordinator.hpp"
+#include "GlobalNamespace/CoreGameHUDController.hpp"            // For checking if in Map.
+#include "GlobalNamespace/BeatmapCharacteristicSO.hpp"          // For checking the characteristic 360/90.
+#include "GlobalNamespace/GameplayCoreInstaller.hpp"            // Also part of the check.
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
 #include "GlobalNamespace/HostLobbySetupViewController.hpp"
 #include "GlobalNamespace/ClientLobbySetupViewController.hpp"
 #include "GlobalNamespace/QuickPlaySetupViewController.hpp"
+#include "GlobalNamespace/BeatmapObjectCallbackController.hpp"  // For checking characteristic
+#include "GlobalNamespace/IReadonlyBeatmapData.hpp"             // To read the BeatmapData
 using namespace GlobalNamespace;
 
 #include "TMPro/TextMeshPro.hpp"
@@ -21,6 +26,7 @@ using namespace TMPro;
 #include "unityEngine/CanvasRenderer.hpp"
 #include "UnityEngine/Vector3.hpp"
 #include "UnityEngine/Vector2.hpp"
+#include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
 #include "UnityEngine/RenderMode.hpp"
@@ -39,6 +45,7 @@ using namespace HMUI;
 
 #include "ClockUpdater.hpp"
 #include "ClockViewController.hpp"
+#include "ClockRotationUpdater.hpp"  // Added for 360/90 Rotation Update
 using namespace ClockMod;
 
 #include "custom-types/shared/register.hpp"
@@ -46,6 +53,7 @@ using namespace custom_types;
 
 #include "ClockModConfig.hpp"
 
+// Clock Default Position and other stuff stored there
 Config_t Config;
 
 ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
@@ -59,18 +67,9 @@ Logger& logger() {
 //Define Config
 DEFINE_CONFIG(ModConfig);
 
-// Clock Default Position
-float ClockX = getModConfig().ClockX.GetValue();
-float ClockY = getModConfig().ClockY.GetValue();
-float ClockZ = getModConfig().ClockZ.GetValue();
 
 UnityEngine::Canvas* canvas;
 UnityEngine::UI::VerticalLayoutGroup* layout;
-
-// Clock Offset (moved to ClockUpdater)
-//void Update() {
-//    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX + getModConfig().ClockXOffset.GetValue(), ClockY + getModConfig().ClockYOffset.GetValue(), ClockZ + getModConfig().ClockZOffset.GetValue()));
-//}
 
 MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
@@ -83,14 +82,17 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
 
         // For reference on adding Button to clock
         //        UnityEngine::UI::Button* button = QuestUI::BeatSaberUI::CreateUIButton(rectTransform, "", "SettingsButton", il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, +[](Il2CppObject* obj, UnityEngine::UI::Button* button){}));
-        //button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, OnQosmeticsButtonClick));
+        //button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, OnClockButtonClick));
         //
-        // button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, OnQosmeticsButtonClick));
+        // button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, OnClockButtonClick));
 
         canvas_object->AddComponent<CurvedCanvasSettings*>();
-        canvas_object->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3));
+        canvas_object->AddComponent<ClockMod::ClockRotationUpdater*>();         // This will add the Componnent from ClockRotationUpdater to the Clock Canvas_object
+        canvas_object->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
+        canvas_object->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 0)); // 0, 0.5, 3
         canvas_object->get_transform()->set_localScale(UnityEngine::Vector3(0.1, 0.1, 0.1));
 
+        // This makes sure, the Clock isn't deleted when the scene changes.
         Object::DontDestroyOnLoad(canvas_object);
 
         canvas->set_renderMode(UnityEngine::RenderMode::WorldSpace);
@@ -101,12 +103,16 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         layout->GetComponent<LayoutElement*>()->set_minWidth(7);
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
-        layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
+        layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
 
-//        clock_text->get_transform()->set_position(UnityEngine::Vector3(0 + getModConfig().ClockXOffset.GetValue(), 0.5 + getModConfig().ClockYOffset.GetValue(), 3.85 + getModConfig().ClockZOffset.GetValue()));
+//        clock_text->get_transform()->set_position(UnityEngine::Vector3(0 + getModConfig().ClockXOffset.GetValue(),Config.ClockY + getModConfig().ClockYOffset.GetValue(), Config.ClockZ + getModConfig().ClockZOffset.GetValue()));
+//        clock_text->get_transform()->set_position(UnityEngine::Vector3(ClockX + getModConfig().ClockXOffset.GetValue(), ClockY + getModConfig().ClockYOffset.GetValue(), ClockZ + getModConfig().ClockZOffset.GetValue()));
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
+        Config.IsInSong = false;
+        Config.InMPLobby = false;
     }
-
+    layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
+    // Enables the Clock, I mean what did you expect?
     canvas->get_gameObject()->SetActive(true);
 //    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
 }
@@ -117,31 +123,63 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
     if (!getModConfig().InSong.GetValue()) {
         canvas->get_gameObject()->SetActive(false);
         logger().info("SetActive false");
-        Config.InMPLobby = false;
     }
+    if (Config.InRotationMap) {
+        if (getModConfig().ClockPosition.GetValue()) {
+            layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5));
+        }
+        else { layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5)); }
+    }
+    layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
+    Config.InMPLobby = false;
+    Config.IsInSong = true;
+//    if (UnityEngine::Object::FindObjectOfType<GlobalNamespace::BeatmapCharacteristicSO*>()->get_containsRotationEvents) {
+//        logger().debug("In 360/90 Mode");
+//    layout->get_transform()->SetParent(UnityEngine::Object::FindObjectOfType<CoreGameHUDController*>()->get_transform());
+//    };
 //    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
-    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
+//    UnityEngine::Object::FindObjectOfType<CoreGameHUDController*>()->get_transform()->SetParent(layout->get_transform());
+
 //    logger().debug("Object Coords", "%g", clockXOffset, clockYOffset, clockZOffset);
 }
+
+
+//MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StopSong, void, AudioTimeSyncController* self) {
+//    AudioTimeSyncController_StopSong(self);
+//    layout->get_transform()->SetParent(nullptr);
+//    Config.IsInSong = false;
+//}
 
 MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
 
-    if (!getModConfig().InSong.GetValue()) {
+    //if (!getModConfig().InSong.GetValue()) {
+    //    canvas->get_gameObject()->SetActive(true);
+    //    logger().info("SetActive true");
+    //}
         canvas->get_gameObject()->SetActive(true);
-        logger().info("SetActive true");
-    }
-    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
+
+    Config.IsInSong = false;
+    Config.InRotationMap = false;
+//    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
+    layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
 }
 
 MAKE_HOOK_OFFSETLESS(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, PartyFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
 
-    if (!getModConfig().InSong.GetValue()) {
-        canvas->get_gameObject()->SetActive(true);
-        logger().info("SetActive true");
-    }
-    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
+    //if (!getModConfig().InSong.GetValue()) {
+    //    canvas->get_gameObject()->SetActive(true);
+    //    logger().info("SetActive true");
+    //}
+    canvas->get_gameObject()->SetActive(true);
+
+    Config.IsInSong = false;
+    Config.InRotationMap = false;
+//    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
+    layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
 }
 
 MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
@@ -151,6 +189,12 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
         canvas->get_gameObject()->SetActive(true);
         logger().info("SetActive true PauseMenu");
     }
+    //if (Config.noTextAndHUD) {
+    //    canvas->get_gameObject()->SetActive(false);
+    //    logger().info("SetActive false (NoTextAndHUD)");
+    //}
+//    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
+//    Config.IsInSong = false;
 }
 
 MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManager* self) {
@@ -160,7 +204,38 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
         canvas->get_gameObject()->SetActive(false);
         logger().info("SetActive false PauseMenu");
     }
+//    if (Config.InRotationMap) {
+//        layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY+2, Config.ClockZ+5));
+//    }
+//    Config.IsInSong = true;
 }
+
+// TODO: Use the below information wisely
+// Check if it there are RotationEvents within the map, and if there are, declare it a 360/90 Map.
+MAKE_HOOK_OFFSETLESS(BeatmapObjectCallbackController_SetNewBeatmapData, void, BeatmapObjectCallbackController* self, IReadonlyBeatmapData* beatmapData) {
+    BeatmapObjectCallbackController_SetNewBeatmapData(self, beatmapData);
+    int RotationEvents = beatmapData->get_spawnRotationEventsCount();
+       	if (RotationEvents > 0) { 
+            logger().debug("Loaded 360/90 Map");
+            Config.InRotationMap = true;
+            if (getModConfig().ClockPosition.GetValue()) {
+                layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5));
+            } else { layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5)); }
+        }
+    	else { 
+            logger().debug("Loaded Normal Map");
+            Config.InRotationMap = false;
+            layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5));
+        }
+        //if (Config.noTextAndHUD) {
+        //    canvas->get_gameObject()->SetActive(false);
+        //    logger().info("SetActive false (NoTextAndHUD)");
+        //}
+}
+
+//MAKE_HOOK_OFFSETLESS(CoreGameHUDController_Start, void, GlobalNamespace::CoreGameHUDController* self) {
+//    CoreGameHUDController_Start(self);
+//}
 
 // Multiplayer Lobby Specific Code
 
@@ -174,42 +249,65 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
 MAKE_HOOK_OFFSETLESS(QuickPlaySetupViewController_DidActivate, void, QuickPlaySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     QuickPlaySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
+        canvas->get_gameObject()->SetActive(true);
+
     auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<QuickPlaySetupViewController*>()->get_transform()->get_position().y;
     MLobbyVCPosY = MLobbyVCPosY - 1;
     Config.InMPLobby = true;
+    Config.IsInSong = false;
+    Config.InRotationMap = false;
 //    logger().debug("%g", MLobbyVCPosY);
     layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
+    layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
 }
 
 MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_DidActivate, void, ClientLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     ClientLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
+        canvas->get_gameObject()->SetActive(true);
+
     auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<ClientLobbySetupViewController*>()->get_transform()->get_position().y;
     MLobbyVCPosY = MLobbyVCPosY - 1;
     Config.InMPLobby = true;
+    Config.IsInSong = false;
+    Config.InRotationMap = false;
 //    logger().debug("%g", MLobbyVCPosY);
     layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
+    layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
 }
 
 MAKE_HOOK_OFFSETLESS(HostLobbySetupViewController_DidActivate, void, HostLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     HostLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-        auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
-        MLobbyVCPosY = MLobbyVCPosY - 1;
-        Config.InMPLobby = true;
-//        logger().debug("%g", MLobbyVCPosY);
-        layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
-        layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
+    if (!getModConfig().InSong.GetValue()) {
+        canvas->get_gameObject()->SetActive(true);
+        logger().info("SetActive true");
+    }
+    if (!Config.noTextAndHUD) {
+        canvas->get_gameObject()->SetActive(true);
+    }
+
+    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
+    MLobbyVCPosY = MLobbyVCPosY - 1;
+    Config.InMPLobby = true;
+    Config.IsInSong = false;
+    Config.InRotationMap = false;
+//  logger().debug("%g", MLobbyVCPosY);
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
+    layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
+    layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
 }
 
 MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_DeactivateMultiplayerLobby(self);
 
-    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(1.0, 1.0, 1.0));
     Config.InMPLobby = false;
+    Config.IsInSong = false;
+    layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
 }
 
 // Called at the early stages of game loading
@@ -231,25 +329,32 @@ extern "C" void load() {
 
     logger().info("Installing Clockmod hooks...");
 
-    Logger& hookLogger = logger();
+    Logger& hkLog = logger();
 
     custom_types::Register::RegisterType<ClockMod::ClockUpdater>();
+    custom_types::Register::RegisterType<ClockMod::ClockRotationUpdater>();
     custom_types::Register::RegisterType<ClockMod::ClockViewController>();
     QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
 
-    INSTALL_HOOK_OFFSETLESS(hookLogger, MainMenuViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
-    INSTALL_HOOK_OFFSETLESS(hookLogger, AudioTimeSyncController_StartSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StartSong", 1));
-    INSTALL_HOOK_OFFSETLESS(hookLogger, SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "SoloFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
+    INSTALL_HOOK_OFFSETLESS(hkLog, MainMenuViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
+    INSTALL_HOOK_OFFSETLESS(hkLog, AudioTimeSyncController_StartSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StartSong", 1));
+    // Third attempt at clock rotation
+//    INSTALL_HOOK_OFFSETLESS(hkLog, BeatmapObjectManager_SpawnBasicNote, il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectManager", "SpawnBasicNote", 4));
+//    INSTALL_HOOK_OFFSETLESS(hkLog, NoteController_Update, il2cpp_utils::FindMethodUnsafe("", "NoteController", "Update", 0));
+//    INSTALL_HOOK_OFFSETLESS(hkLog, AudioTimeSyncController_StopSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StopSong", 0));
+    INSTALL_HOOK_OFFSETLESS(hkLog, SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "SoloFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
     // Added by ELP
-    INSTALL_HOOK_OFFSETLESS(hookLogger, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "PartyFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
-    INSTALL_HOOK_OFFSETLESS(hookLogger, PauseMenuManager_ShowMenu, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "ShowMenu", 0));
-    INSTALL_HOOK_OFFSETLESS(hookLogger, PauseMenuManager_StartResumeAnimation, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "StartResumeAnimation", 0));
+    INSTALL_HOOK_OFFSETLESS(hkLog, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "PartyFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
+    INSTALL_HOOK_OFFSETLESS(hkLog, PauseMenuManager_ShowMenu, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "ShowMenu", 0));
+    INSTALL_HOOK_OFFSETLESS(hkLog, PauseMenuManager_StartResumeAnimation, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "StartResumeAnimation", 0));
+    INSTALL_HOOK_OFFSETLESS(hkLog, BeatmapObjectCallbackController_SetNewBeatmapData, il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectCallbackController", "SetNewBeatmapData", 1));
+//    INSTALL_HOOK_OFFSETLESS(hkLog, CoreGameHUDController_Start, il2cpp_utils::FindMethodUnsafe("", "CoreGameHUDController", "Start", 0));
 //    INSTALL_HOOK_OFFSETLESS(hookLogger, MultiplayerLobbyController_ActivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "ActivateMultiplayerLobby", 0));
     // Multiplayer specific Hooks
-    INSTALL_HOOK_OFFSETLESS(hookLogger, HostLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "HostLobbySetupViewController", "DidActivate", 3));
-    INSTALL_HOOK_OFFSETLESS(hookLogger, ClientLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "ClientLobbySetupViewController", "DidActivate", 3));
-    INSTALL_HOOK_OFFSETLESS(hookLogger, QuickPlaySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "QuickPlaySetupViewController", "DidActivate", 3));
-    INSTALL_HOOK_OFFSETLESS(hookLogger, MultiplayerLobbyController_DeactivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "DeactivateMultiplayerLobby", 0));
+    INSTALL_HOOK_OFFSETLESS(hkLog, HostLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "HostLobbySetupViewController", "DidActivate", 3));
+    INSTALL_HOOK_OFFSETLESS(hkLog, ClientLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "ClientLobbySetupViewController", "DidActivate", 3));
+    INSTALL_HOOK_OFFSETLESS(hkLog, QuickPlaySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "QuickPlaySetupViewController", "DidActivate", 3));
+    INSTALL_HOOK_OFFSETLESS(hkLog, MultiplayerLobbyController_DeactivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "DeactivateMultiplayerLobby", 0));
 
     logger().info("Installed all ClockMod hooks!");
 }
