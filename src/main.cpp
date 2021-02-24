@@ -96,6 +96,7 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         // This makes sure, the Clock isn't deleted when the scene changes.
         Object::DontDestroyOnLoad(canvas_object);
 
+        // Makes the clock visible for every camera in the scene, if there ever should be more than one.
         canvas->set_renderMode(UnityEngine::RenderMode::WorldSpace);
 
         layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(canvas_object->get_transform());
@@ -109,9 +110,10 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
 //        clock_text->get_transform()->set_position(UnityEngine::Vector3(0 + getModConfig().ClockXOffset.GetValue(),Config.ClockY + getModConfig().ClockYOffset.GetValue(), Config.ClockZ + getModConfig().ClockZOffset.GetValue()));
 //        clock_text->get_transform()->set_position(UnityEngine::Vector3(ClockX + getModConfig().ClockXOffset.GetValue(), ClockY + getModConfig().ClockYOffset.GetValue(), ClockZ + getModConfig().ClockZOffset.GetValue()));
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
-        Config.IsInSong = false;
-        Config.InMPLobby = false;
     }
+    Config.IsInSong = false;
+    Config.InMPLobby = false;
+    // Resets Rotation, IDK why I used set_rotation instead of set_eulerAngles, but that doesn't matter here.
     layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
     // Enables the Clock, I mean what did you expect?
     canvas->get_gameObject()->SetActive(true);
@@ -125,11 +127,19 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
         canvas->get_gameObject()->SetActive(false);
         logger().info("SetActive false");
     }
+    // TODO: Tweak values
     if (Config.InRotationMap) { // Checks if in a map with RotationEvents (360/90)
         if (getModConfig().ClockPosition.GetValue()) { // Then checks if the clock is set to be at the Top or the Bottom
-            layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY-1, Config.ClockZ + 0.2));
+            layout->get_transform()->set_position(UnityEngine::Vector3(0, -0.4, 1.8)); // Y = -2.26 Z = 0.2
+            layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(-40, 0, 0)); // X=40
+            layout->get_transform()->set_localScale(UnityEngine::Vector3(0.8, 0.8, 0.8));   // Scale 0.8
         }
-        else { layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY + 2, Config.ClockZ + 5)); }
+        else { layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY+1.3, Config.ClockZ + 5)); // Y =  + 2
+        layout->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
+        }
+    }
+    else { // When in a normal Map do this.
+
     }
     layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
     Config.InMPLobby = false;
@@ -199,6 +209,7 @@ MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowC
     //    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
     layout->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
     layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
+    layout->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
 }
 
 MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
