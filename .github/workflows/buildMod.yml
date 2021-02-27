@@ -60,7 +60,6 @@ jobs:
     - name: QPM Restore
       run: |
         chmod +x ./QPM/QPM
-        ./QPM/QPM clear
         ./QPM/QPM restore
     - name: test
       run: |
