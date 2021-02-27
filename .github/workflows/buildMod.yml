@@ -83,6 +83,7 @@ jobs:
 #       if: steps.cache-qpm-deps.outputs.cache-hit != 'true'
       run: |
         chmod +x ./QPM/QPM
+        ./QPM/QPM clear
         ./QPM/QPM restore
     - name: test
       run: |
