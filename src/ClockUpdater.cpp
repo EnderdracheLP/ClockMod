@@ -45,12 +45,13 @@ std::string getTimeString(struct tm* timeinfo) {
 std::string getBatteryString(int level)
 {
     std::string percent = string_format("%d%%", level);
-    if (level < 10) return string_format("<color=#ff0000>%s</color>", percent.c_str());
+    if (level < 15) return string_format("<color=#ff0000>%s</color>", percent.c_str());
     else if (level > 49) return string_format("<color=#00ff00>%s</color>", percent.c_str());
     else return string_format("<color=#ff8800>%s</color>", percent.c_str());
 }
 // */
 
+// /*
 // RGB Clock gives more FPS, Gamers will love that.
 std::string RainbowClock::rainbowify(std::string input)
 {
@@ -66,31 +67,20 @@ std::string RainbowClock::rainbowify(std::string input)
 
     return result;
 }
+// */
 
 // Updates the Clock.
  int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
 
  void ClockMod::ClockUpdater::Update() {
      time_t rawtime;
-     //char timechar[20];
      struct tm* timeinfo;
      time(&rawtime);
      timeinfo = localtime(&rawtime);
+     auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
 
      // Yes all the "wait" stuff here is for slowing it down
      if (wait == 18) {
-              // TODO: Change the clock code to something like:
-          //    std::string getTimeString(timeInfo);
-          //    std::string result = getTimeString();
-          //
-          //    if (batterytoggle)
-          //    {
-          //        result += " - ";
-          //        result += getBatteryString(batterylvl);
-          //    }
-          //
-          //    text->set_text(il2cpp_utils::createcsstr(result));
-
           // Gets the time using the function at the top.
          auto clockresult = getTimeString((struct tm*)timeinfo);
          wait = 0;
@@ -110,28 +100,30 @@ std::string RainbowClock::rainbowify(std::string input)
          }
 
          // This is where the Text and Clock Position is set.
-         auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
          text->set_text(il2cpp_utils::createcsstr(clockresult));        // This sets the Text
          text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
          text->set_fontSize(getModConfig().FontSize.GetValue());
-                //text->get_transform()->set_position(UnityEngine::Vector3(0 + getModConfig().ClockXOffset.GetValue(), 0.5 + getModConfig().ClockYOffset.GetValue(), 3.85 + getModConfig().ClockZOffset.GetValue()));
-         if (Config.InMPLobby == false) {
-             // TODO: Get Position Offset working. Trying to set the Position offset here, messes with the 360/90 Map stuff. 
-             //get_transform()->set_localPosition(UnityEngine::Vector3(getModConfig().ClockXOffset.GetValue(), getModConfig().ClockYOffset.GetValue(), getModConfig().ClockZOffset.GetValue()));
-             if (Config.IsInSong == false) {
-                 // Checks if the clock should be at the Top or Bottom
-                 if (getModConfig().ClockPosition.GetValue()) {
-                     // If set to be at the Bottom do this.
-                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.26, 0));
-                     text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(60, 0, 0));
-                     text->get_transform()->set_localScale(UnityEngine::Vector3(0.6, 0.6, 0.6));
-                 }
-                 else {
-                     // Otherwise it will do this.
-                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.7, 4.6));
-                     text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(-10, 0, 0));
-                     text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-                 }
+
+     } else { wait++; }
+
+     // Temp Code for updating Position.
+     if (Config.InMPLobby == false) {
+         // TODO: Get Position Offset working. Trying to set the Position offset here, messes with the 360/90 Map stuff. 
+         //get_transform()->set_localPosition(UnityEngine::Vector3(getModConfig().ClockXOffset.GetValue(), getModConfig().ClockYOffset.GetValue(), getModConfig().ClockZOffset.GetValue()));
+         if (Config.IsInSong == false) {
+             // Checks if the clock should be at the Top or Bottom
+             if (getModConfig().ClockPosition.GetValue()) {
+                 // If set to be at the Bottom do this.
+                 get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.26, 0));
+                 text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(60, 0, 0));
+                 text->get_transform()->set_localScale(UnityEngine::Vector3(0.6, 0.6, 0.6));
+             }
+             else {
+                 // Otherwise it will do this.
+                 get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.7, 4.6));
+                 text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(-10, 0, 0));
+                 text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
+             }
              //                     text->get_transform()->set_position(UnityEngine::Vector3(0+getModConfig().ClockXOffset.GetValue(), Config.ClockY+getModConfig().ClockYOffset.GetValue(), Config.ClockZ+getModConfig().ClockZOffset.GetValue()));
              //                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0 + getModConfig().ClockXOffset.GetValue(), Config.ClockY + getModConfig().ClockYOffset.GetValue(), Config.ClockZ + getModConfig().ClockZOffset.GetValue()));
              //                     get_transform()->set_position(UnityEngine::Vector3(getModConfig().ClockXOffset.GetValue(), getModConfig().ClockYOffset.GetValue(), getModConfig().ClockZOffset.GetValue()));
@@ -143,31 +135,30 @@ std::string RainbowClock::rainbowify(std::string input)
              //                     text->get_transform()->LookAt(get_transform()->GetParent());
 
              //                     text->get_transform()->GetParent()->GetParent()->set_localEulerAngles(UnityEngine::Vector3(getModConfig().ClockYOffset.GetValue() * 10-5, 0, 0));
-             }  
-             // TODO: Reduce the amount of code here, like make stuff a variable or a function
-             //            When not in a Map with RotationEvents (360/90).
-             else if (Config.InRotationMap == false) {
-                 if (getModConfig().ClockPosition.GetValue()) {
-                     // If set to be at the Bottom do this.
-                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -4.45, 2));
-                     text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(45, 0, 0));
-                     text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-                     //logger().debug("In Normal Map set to Bottom");
-                 }
-                 else {
-                     // Otherwise it will do this.
-                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.7, 5.6));
-                     text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(-10, 0, 0));
-                     text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-                     //logger().debug("In Normal Map set to Top");
-                 }
+         }
+         // TODO: Reduce the amount of code here, like make stuff a variable or a function
+         //            When not in a Map with RotationEvents (360/90).
+         else if (Config.InRotationMap == false) {
+             if (getModConfig().ClockPosition.GetValue()) {
+                 // If set to be at the Bottom do this.
+                 get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -4.45, 2));
+                 text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(45, 0, 0));
+                 text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
+                 //logger().debug("In Normal Map set to Bottom");
+             }
+             else {
+                 // Otherwise it will do this.
+                 get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.7, 5.6));
+                 text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(-10, 0, 0));
+                 text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
+                 //logger().debug("In Normal Map set to Top");
              }
          }
-         else { // If in MP Lobby, unset all this.
-             text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-             text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-         }
-     } else { wait++; }
+     }
+     else { // If in MP Lobby, unset all this.
+         text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
+         text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
+     }
  }
 
 

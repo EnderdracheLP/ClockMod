@@ -1,15 +1,27 @@
+
+
+
+/*
+
+THIS IS NO LONGER USED IN THE CODE, ANYTHING WRITTEN IN HERE WILL HAVE NO EFFECT!
+
+*/
+
+
+
 #include "main.hpp"
 #include "ClockRotationUpdater.hpp" // Part of making this a class
 #include "ClockModConfig.hpp"		// Just the config
 using namespace ClockMod;
 
+#include "GlobalNamespace/FlyingGameHUDRotation.hpp"					// Take rotation from this instead lol
 #include "GlobalNamespace/CoreGameHUDController.hpp"  // Just take the damn rotation from CoreGameHUDController, and it'll rotate smooth as fuck.
 #include "GlobalNamespace/PlayerDataModel.hpp"					// For checking if noTextandHUDs is enabled
 #include "GlobalNamespace/PlayerData.hpp"						// For checking if noTextandHUDs is enabled
 #include "GlobalNamespace/PlayerSpecificSettings.hpp"			// For checking if noTextandHUDs is enabled
 using namespace GlobalNamespace;
 
-// Needed for the Transform stuff.
+// Needed for the Transform stuff and the Canvas.
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Transform.hpp"
@@ -28,11 +40,17 @@ void ClockMod::ClockRotationUpdater::Update() {
 		if (NoTextAndHUD == false) {
 			Config.noTextAndHUD = false;
 			// This will get an instance of CoreGameHUDController
-			auto coreGameHUDController = UnityEngine::Object::FindObjectOfType<CoreGameHUDController*>();
+			// Get Rotation from FlyingGameHUDRotation instead of coreGameHUDController
+			//auto coreGameHUDController = UnityEngine::Object::FindObjectOfType<CoreGameHUDController*>();
+			auto flyingGameHUD = UnityEngine::Object::FindObjectOfType<FlyingGameHUDRotation*>();
 			// Checks if the CoreGameHUDControlller exists, and will run the following code.
-			if (coreGameHUDController) {
+			float YAngle = flyingGameHUD->yAngle;
+			if (flyingGameHUD) {
 				if (Config.InRotationMap) {
-					get_transform()->set_rotation(coreGameHUDController->get_transform()->get_rotation());
+					//get_transform()->set_rotation(flyingGameHUD->yAngle);
+					logger().debug("GameHUD Y Angle %f", YAngle);
+					get_transform()->set_eulerAngles(UnityEngine::Vector3(0, YAngle, 0));
+					//get_transform()->set_rotation(coreGameHUDController->get_transform()->get_rotation());
 				}
 				//			else if (getModConfig().ClockPosition.GetValue()) {
 				//				get_transform()->set_eulerAngles(UnityEngine::Vector3(60, 0, 0));
