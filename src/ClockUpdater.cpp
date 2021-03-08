@@ -45,7 +45,7 @@ std::string getTimeString(struct tm* timeinfo) {
 std::string getBatteryString(int level)
 {
     std::string percent = string_format("%d%%", level);
-    if (level < 15) return string_format("<color=#ff0000>%s</color>", percent.c_str());
+    if (level < 16) return string_format("<color=#ff0000>%s</color>", percent.c_str());
     else if (level > 49) return string_format("<color=#00ff00>%s</color>", percent.c_str());
     else return string_format("<color=#ff8800>%s</color>", percent.c_str());
 }
@@ -68,98 +68,100 @@ std::string RainbowClock::rainbowify(std::string input)
 }
 // */
 
+// Function for updating the Clock Position, temp
+void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* text, UnityEngine::Vector3 Pos, UnityEngine::Vector3 Angle, UnityEngine::Vector3 Scale) {
+    ClockParent->set_position(Pos);
+    text->get_transform()->set_localEulerAngles(Angle);
+    text->get_transform()->set_localScale(Scale);
+}
+
 // Updates the Clock.
  int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
 
  void ClockMod::ClockUpdater::Update() {
-     time_t rawtime;
-     struct tm* timeinfo;
-     time(&rawtime);
-     timeinfo = localtime(&rawtime);
-     auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
+     if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
+         time_t rawtime;
+         struct tm* timeinfo;
+         time(&rawtime);
+         timeinfo = localtime(&rawtime);
+         auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
+         auto clockParent = get_transform()->GetParent();
 
-     // Yes all the "wait" stuff here is for slowing it down
-     if (wait == 18) {
-          // Gets the time using the function at the top.
-         auto clockresult = getTimeString((struct tm*)timeinfo);
-         wait = 0;
+         // Yes all the "wait" stuff here is for slowing it down
+         if (wait == 18) {
+             // Gets the time using the function at the top.
+             auto clockresult = getTimeString((struct tm*)timeinfo);
+             wait = 0;
 
-         // TODO: Fix this rainbow stuff
-         // Checks, if the clock is set to rainbowify
-         if (getModConfig().RainbowClock.GetValue()) {
-             clockresult = RainbowClock::rainbowify(clockresult);
-         };
+             // TODO: Fix this rainbow stuff
+             // Checks, if the clock is set to rainbowify
+             if (getModConfig().RainbowClock.GetValue()) {
+                 clockresult = RainbowClock::rainbowify(clockresult);
+             };
 
-         // Checks, the below condition and if it retunrs true, gets the current Battery Percentage Level and adds it to the clockresult variable.
-         if (getModConfig().BattToggle.GetValue()) {
-             // Gets the Battery Percentage as float 1.00, multiplies it by 100, and then uses the getBatteryString function defined above to format the percentage.
-             auto battery = getBatteryString((int)(GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel() * 100)); 
-             clockresult += " - ";                // Adds  -  to it with spaces, before and after the - .
-             clockresult += battery;         // Here is where the Battery gets added to the tandb string.
+             // Checks, the below condition and if it retunrs true, gets the current Battery Percentage Level and adds it to the clockresult variable.
+             if (getModConfig().BattToggle.GetValue()) {
+                 // Gets the Battery Percentage as float 1.00, multiplies it by 100, and then uses the getBatteryString function defined above to format the percentage.
+                 auto battery = getBatteryString((int)(GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel() * 100));
+                 clockresult += " - ";                // Adds  -  to it with spaces, before and after the - .
+                 clockresult += battery;         // Here is where the Battery gets added to the tandb string.
+             }
+
+             // This is where the Text and Clock Position is set.
+             text->set_text(il2cpp_utils::createcsstr(clockresult));        // This sets the Text
+             text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
+             text->set_fontSize(getModConfig().FontSize.GetValue());
+
          }
+         else { wait++; }
 
-         // This is where the Text and Clock Position is set.
-         text->set_text(il2cpp_utils::createcsstr(clockresult));        // This sets the Text
-         text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
-         text->set_fontSize(getModConfig().FontSize.GetValue());
-
-     } else { wait++; }
-
-     // Temp Code for updating Position.
-     if (Config.InMPLobby == false) {
-         // TODO: Get Position Offset working. Trying to set the Position offset here, messes with the 360/90 Map stuff. 
-         //get_transform()->set_localPosition(UnityEngine::Vector3(getModConfig().ClockXOffset.GetValue(), getModConfig().ClockYOffset.GetValue(), getModConfig().ClockZOffset.GetValue()));
-         if (Config.IsInSong == false) {
-             // Checks if the clock should be at the Top or Bottom
-             if (getModConfig().ClockPosition.GetValue()) {
-                 // If set to be at the Bottom do this.
-                 get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.26, 0));
-                 text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(60, 0, 0));
-                 text->get_transform()->set_localScale(UnityEngine::Vector3(0.6, 0.6, 0.6));
+         // Temp Code for updating Position.
+         if (Config.InMPLobby == false) {
+             // TODO: Get Position Offset working. Trying to set the Position offset here, messes with the 360/90 Map stuff. 
+             if (Config.IsInSong == false) {
+                 // Checks if the clock should be at the Top or Bottom
+                 if (getModConfig().ClockPosition.GetValue()) {
+                     // If set to be at the Bottom do this.
+                     auto Pos = UnityEngine::Vector3(0, -1.26, 0);
+                     auto Angle = UnityEngine::Vector3(60, 0, 0);
+                     auto Scale = UnityEngine::Vector3(0.6, 0.6, 0.6);
+                     SetClockPos(clockParent, text, Pos, Angle, Scale);
+                 }
+                 else {
+                     // Otherwise it will do this.
+                     auto Pos = UnityEngine::Vector3(0, -1.7, 4.6);
+                     auto Angle = UnityEngine::Vector3(-10, 0, 0);
+                     auto Scale = UnityEngine::Vector3(1, 1, 1);
+                     SetClockPos(clockParent, text, Pos, Angle, Scale);
+                 }
              }
-             else {
-                 // Otherwise it will do this.
-                 get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.7, 4.6));
-                 text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(-10, 0, 0));
-                 text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-             }
-             //                     text->get_transform()->set_position(UnityEngine::Vector3(0+getModConfig().ClockXOffset.GetValue(), Config.ClockY+getModConfig().ClockYOffset.GetValue(), Config.ClockZ+getModConfig().ClockZOffset.GetValue()));
-             //                     get_transform()->GetParent()->set_position(UnityEngine::Vector3(0 + getModConfig().ClockXOffset.GetValue(), Config.ClockY + getModConfig().ClockYOffset.GetValue(), Config.ClockZ + getModConfig().ClockZOffset.GetValue()));
-             //                     get_transform()->set_position(UnityEngine::Vector3(getModConfig().ClockXOffset.GetValue(), getModConfig().ClockYOffset.GetValue(), getModConfig().ClockZOffset.GetValue()));
-             //                      Gets the parent objects X, Y, and Z coordinates so, they can be used when setting the offset, there are surely better ways of doing it.
-             //                     auto ClockX = get_transform()->GetParent()->get_position().x;
-             //                     auto ClockY = get_transform()->GetParent()->get_position().y;
-             //                     auto ClockZ = get_transform()->GetParent()->get_position().z;
-             //                     text->get_transform()->set_position(UnityEngine::Vector3(ClockX+getModConfig().ClockXOffset.GetValue(), ClockY+getModConfig().ClockYOffset.GetValue(), ClockZ+getModConfig().ClockZOffset.GetValue()));
-             //                     text->get_transform()->LookAt(get_transform()->GetParent());
-
-             //                     text->get_transform()->GetParent()->GetParent()->set_localEulerAngles(UnityEngine::Vector3(getModConfig().ClockYOffset.GetValue() * 10-5, 0, 0));
-         }
-         // TODO: Reduce the amount of code here, like make stuff a variable or a function
-         //            When not in a Map with RotationEvents (360/90).
-         else if (Config.InRotationMap == false) {
-             if (getModConfig().ClockPosition.GetValue()) {
-                 // If set to be at the Bottom do this.
-                 get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -4.45, 2));
-                 text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(45, 0, 0));
-                 text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-                 //logger().debug("In Normal Map set to Bottom");
-             }
-             else {
-                 // Otherwise it will do this.
-                 get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, -1.7, 5.6));
-                 text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(-10, 0, 0));
-                 text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-                 //logger().debug("In Normal Map set to Top");
+             // TODO: Reduce the amount of code here, like make stuff a variable or a function
+             //            When not in a Map with RotationEvents (360/90).
+             else if (Config.InRotationMap == false && Config.InMP == false) {
+                 if (getModConfig().ClockPosition.GetValue()) {
+                     // If set to be at the Bottom do this.
+                     auto Pos = UnityEngine::Vector3(0, -4.45, 2);
+                     auto Angle = UnityEngine::Vector3(45, 0, 0);
+                     auto Scale = UnityEngine::Vector3(1, 1, 1);
+                     SetClockPos(clockParent, text, Pos, Angle, Scale);
+                     //logger().debug("In Normal Map set to Bottom");
+                 }
+                 else {
+                     // Otherwise it will do this.
+                     auto Pos = UnityEngine::Vector3(0, -1.7, 5.6);
+                     auto Angle = UnityEngine::Vector3(-10, 0, 0);
+                     auto Scale = UnityEngine::Vector3(1, 1, 1);
+                     SetClockPos(clockParent, text, Pos, Angle, Scale);
+                     //logger().debug("In Normal Map set to Top");
+                 }
              }
          }
-     }
-     else { // If in MP Lobby, unset all this.
-         text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-         text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
+         else { // If in MP Lobby, unset all this.
+             text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
+             text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
+         }
      }
  }
-
 
 //if (Config.InRotationMap == false) {
 //    if (getModConfig().ClockPosition.GetValue()) {
