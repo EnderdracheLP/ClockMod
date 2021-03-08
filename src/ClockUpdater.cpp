@@ -13,34 +13,34 @@
 using namespace UnityEngine;
 using namespace TMPro;
 
-DEFINE_CLASS(ClockMod::ClockUpdater);               // Here the class is defined, look inside ClockUpdater.hpp for more stuff.
-
-// /*         
+DEFINE_CLASS(ClockMod::ClockUpdater);               // Here is where the class is defined, look inside ClockUpdater.hpp for more stuff.
+       
 // Function for getting time. Checks config Settings for 12/24 Hour time and if Show Seconds is toggled on or off.
 std::string getTimeString(struct tm* timeinfo) {
     char time[20];
+    const char* TFormat;
 
+                // If set to show 24 Hour Format
     if (!getModConfig().TwelveToggle.GetValue()) {
         if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
-            strftime(time, 20, "%H:%M:%S", timeinfo);
+            TFormat = "%H:%M:%S";       // Time in 24 Hour Format with Seconds
         }
         else {
-            strftime(time, 20, "%H:%M", timeinfo);
+            TFormat = "%H:%M";          // Time in 24 Hour Format without Seconds
         }
     }
     else {      // If set to show 12 Hour Format
         if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
-            strftime(time, 20, "%l:%M:%S %p", timeinfo);
+            TFormat = "%l:%M:%S %p";    // Time in 24 Hour Format with Seconds
         }
         else {
-            strftime(time, 20, "%l:%M %p", timeinfo);
+            TFormat = "%l:%M %p";       // Time in 24 Hour Format without Seconds
         }
     }
+    strftime(time, sizeof(time), TFormat, timeinfo);
     return time;
 }
-// */
 
-// /*
 // Battery Percentage Formatting, thanks to RedBrumbler on #quest-mod-dev
 std::string getBatteryString(int level)
 {
@@ -49,7 +49,6 @@ std::string getBatteryString(int level)
     else if (level > 49) return string_format("<color=#00ff00>%s</color>", percent.c_str());
     else return string_format("<color=#ff8800>%s</color>", percent.c_str());
 }
-// */
 
 // /*
 // RGB Clock gives more FPS, Gamers will love that.
