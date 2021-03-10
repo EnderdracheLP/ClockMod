@@ -7,7 +7,6 @@
 #include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
 #include "GlobalNamespace/PartyFreePlayFlowCoordinator.hpp"
 #include "GlobalNamespace/CampaignFlowCoordinator.hpp"          // For setting clock in Campaign back to normal
-//#include "GlobalNamespace/CoreGameHUDController.hpp"            // For checking if in Map.
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"          // For checking the characteristic 360/90.
 #include "GlobalNamespace/GameplayCoreInstaller.hpp"            // Also part of the check.
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
@@ -27,7 +26,6 @@ using namespace GlobalNamespace;
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "TMPro/TextAlignmentOptions.hpp"
 #include "TMPro/TMP_Text.hpp"
-//#include "TMPro/TMP_FontAsset.hpp"                  // Temp until QuestUI Update
 using namespace TMPro;
 
 #include "UnityEngine/Canvas.hpp"
@@ -41,29 +39,22 @@ using namespace TMPro;
 #include "UnityEngine/UI/CanvasScaler.hpp"
 #include "UnityEngine/CanvasRenderer.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
-//#include "UnityEngine/UI/VerticalLayoutGroup.hpp"   // Temp until QuestUI Update
-//#include "UnityEngine/Resources.hpp"                // Temp until QuestUI Update
-//#include "UnityEngine/RectTransform.hpp"            // Temp until QuestUI Update
-//#include "UnityEngine/Transform.hpp"                // Temp until QuestUI Update
-//#include "UnityEngine/UI/ContentSizeFitter.hpp"     // Temp until QuestUI Update
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 
-//#include "questui/shared/BeatSaberUI.hpp"
-//#include "questui/shared/QuestUI.hpp"
-//using namespace QuestUI;
+#include "questui/shared/BeatSaberUI.hpp"
+#include "questui/shared/QuestUI.hpp"
+using namespace QuestUI;
 
 #include "HMUI/CurvedCanvasSettings.hpp"
 #include "HMUI/CurvedTextMeshPro.hpp"               // Temp until QuestUI Update
 using namespace HMUI;
 
 #include "ClockUpdater.hpp"
-//#include "ArrayUtil.hpp"                            // Temp until QuestUI Update
-//#include "ClockViewController.hpp"
+#include "ClockViewController.hpp"
 //#include "ClockRotationUpdater.hpp"  // Added for 360/90 Rotation Update [NO LONGER USED IN THE CODE! REPLACED WITH A HOOK]
 using namespace ClockMod;
 
-//#include "Backgroundable.hpp"                       // Temp until QuestUI Update
 #include "custom-types/shared/register.hpp"
 using namespace custom_types;
 
@@ -89,67 +80,10 @@ DEFINE_CONFIG(ModConfig);
 UnityEngine::Canvas* canvas;
 UnityEngine::UI::VerticalLayoutGroup* layout;
 
-//TextMeshProUGUI* CreateText2(Transform* parent, std::string text, bool italic, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta);
-//
-//TMP_FontAsset* mainTextFont = nullptr;
-//TMP_FontAsset* GetMainTextFont() {
-//    if (!mainTextFont)
-//        mainTextFont = ClockMod::ArrayUtil::First(Resources::FindObjectsOfTypeAll<TMP_FontAsset*>(), [](TMP_FontAsset* x) { return to_utf8(csstrtostr(x->get_name())) == "Teko-Medium SDF No Glow"; });
-//    if (!mainTextFont)
-//        logger().error("MainFont not found");
-//    return mainTextFont;
-//}
-//
-//TMPro::TextMeshProUGUI* CreateText(UnityEngine::Transform* parent, std::string text) {
-//    return CreateText2(parent, text, true, UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector2(60.0f, 10.0f));
-//}
-//
-//TextMeshProUGUI* CreateText2(Transform* parent, std::string text, bool italic, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta) {
-//    static auto name = il2cpp_utils::createcsstr("QuestUIText", il2cpp_utils::StringType::Manual);
-//    GameObject* gameObj = GameObject::New_ctor(name);
-//    gameObj->SetActive(false);
-//
-//    CurvedTextMeshPro* textMesh = gameObj->AddComponent<CurvedTextMeshPro*>();
-//    RectTransform* rectTransform = textMesh->get_rectTransform();
-//    rectTransform->SetParent(parent, false);
-//    textMesh->set_font(GetMainTextFont());
-//    textMesh->set_text(il2cpp_utils::createcsstr(italic ? ("<i>" + text + "</i>") : text));
-//    textMesh->set_fontSize(4.0f);
-//    textMesh->set_color(UnityEngine::Color::get_white());
-//    textMesh->set_richText(true);
-//    rectTransform->set_anchorMin(UnityEngine::Vector2(0.5f, 0.5f));
-//    rectTransform->set_anchorMax(UnityEngine::Vector2(0.5f, 0.5f));
-//    rectTransform->set_anchoredPosition(anchoredPosition);
-//    rectTransform->set_sizeDelta(sizeDelta);
-//
-//    gameObj->AddComponent<LayoutElement*>();
-//
-//    gameObj->SetActive(true);
-//    return textMesh;
-//}
-//
-//VerticalLayoutGroup* CreateVerticalLayoutGroup(Transform* parent) {
-//    static auto name = il2cpp_utils::createcsstr("ClockModVerticalLayoutGroup", il2cpp_utils::StringType::Manual);
-//    GameObject* gameObject = GameObject::New_ctor(name);
-//    VerticalLayoutGroup* layout = gameObject->AddComponent<UnityEngine::UI::VerticalLayoutGroup*>();
-//    gameObject->AddComponent<Backgroundable*>();
-//
-//    ContentSizeFitter* contentSizeFitter = gameObject->AddComponent<ContentSizeFitter*>();
-//    contentSizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
-//
-//    RectTransform* rectTransform = gameObject->GetComponent<RectTransform*>();
-//    rectTransform->SetParent(parent, false);
-//    rectTransform->set_anchorMin(UnityEngine::Vector2(0.0f, 0.0f));
-//    rectTransform->set_anchorMax(UnityEngine::Vector2(1.0f, 1.0f));
-//    rectTransform->set_sizeDelta(UnityEngine::Vector2(0.0f, 0.0f));
-//
-//    gameObject->AddComponent<LayoutElement*>();
-//    return layout;
-//}
 
 // Function that sets the ClockPosition for Multiplayer Lobbies.
 void MPLobbyClockPos(float MLobbyVCPosY) {
-    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY-1, 1.62));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
     layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
@@ -191,6 +125,18 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
 
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
+
+        // Check all Mod Config Values
+
+        if (getModConfig().InSong.GetValue()) { logger().debug("InSong true"); } else { logger().debug("InSong false"); }
+        if (getModConfig().SecToggle.GetValue()) { logger().debug("SecToggle true"); } else { logger().debug("SecToggle false"); }
+        if (getModConfig().FontSize.GetValue()) { logger().debug("FontSize true value %s", getModConfig().FontSize.GetValue()); } else { logger().debug("FontSize false"); }
+        if (getModConfig().BattToggle.GetValue()) { logger().debug("BattToggle true"); } else { logger().debug("BattToggle false"); }
+        if (getModConfig().TwelveToggle.GetValue()) { logger().debug("TwelveToggle true"); } else { logger().debug("TwelveToggle false"); }
+        if (getModConfig().RainbowClock.GetValue()) { logger().debug("RainbowClock true"); } else { logger().debug("RainbowClock false"); }
+        //if (getModConfig().ClockColor.GetValue()) { logger().debug("ClockColor true"); } else { logger().debug("ClockColor false"); }
+        if (getModConfig().ClockPosition.GetValue()) { logger().debug("ClockPosition bottom"); } else { logger().debug("ClockPosition top"); }
+
     }
     Config.IsInSong = false;
     Config.InMPLobby = false;
@@ -365,7 +311,6 @@ MAKE_HOOK_OFFSETLESS(BeatmapObjectCallbackController_SetNewBeatmapData, void, Be
     }
 }
 
-// Wait for reply from Replay Mod Creator
 MAKE_HOOK_OFFSETLESS(FlyingGameHUDRotation_FixedUpdate, void, GlobalNamespace::FlyingGameHUDRotation* self) {
     float YAngle = self->yAngle;
     layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, YAngle, 0));
@@ -393,8 +338,7 @@ MAKE_HOOK_OFFSETLESS(QuickPlaySetupViewController_DidActivate, void, QuickPlaySe
         logger().info("SetActive true QuickPlayLobby");
     }
 
-    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<QuickPlaySetupViewController*>()->get_transform()->get_position().y;
-    MLobbyVCPosY = MLobbyVCPosY - 1;
+    auto MLobbyVCPosY = self->get_transform()->get_position().y;
     Config.InMPLobby = true;
     Config.IsInSong = false;
     Config.InMP = true;
@@ -413,8 +357,8 @@ MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_DidActivate, void, ClientLob
     }
 
 
-    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<ClientLobbySetupViewController*>()->get_transform()->get_position().y;
-    MLobbyVCPosY = MLobbyVCPosY - 1;
+    //auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<ClientLobbySetupViewController*>()->get_transform()->get_position().y;
+    auto MLobbyVCPosY = self->get_transform()->get_position().y;
     Config.InMPLobby = true;
     Config.IsInSong = false;
     Config.InMP = true;
@@ -433,8 +377,7 @@ MAKE_HOOK_OFFSETLESS(HostLobbySetupViewController_DidActivate, void, HostLobbySe
     }
 
 
-    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
-    MLobbyVCPosY = MLobbyVCPosY - 1;
+    auto MLobbyVCPosY = self->get_transform()->get_position().y;
     Config.InMPLobby = true;
     Config.IsInSong = false;
     Config.InMP = true;
@@ -479,7 +422,7 @@ extern "C" void setup(ModInfo & info) {
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
-    //QuestUI::Init();
+    QuestUI::Init();
 
     logger().info("Installing Clockmod hooks...");
 
@@ -487,8 +430,8 @@ extern "C" void load() {
 
     custom_types::Register::RegisterType<ClockMod::ClockUpdater>();
     //custom_types::Register::RegisterType<ClockMod::ClockRotationUpdater>();
-    //custom_types::Register::RegisterType<ClockMod::ClockViewController>();
-    //QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
+    custom_types::Register::RegisterType<ClockMod::ClockViewController>();
+    QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
 
     INSTALL_HOOK_OFFSETLESS(hkLog, MainMenuViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
     INSTALL_HOOK_OFFSETLESS(hkLog, CampaignFlowCoordinator_DidActivate, il2cpp_utils::FindMethodUnsafe("", "CampaignFlowCoordinator", "DidActivate", 3));

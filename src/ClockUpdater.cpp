@@ -1,4 +1,5 @@
 #include "main.hpp"                                 // Well the main.hpp what else, this wouldn't be the same without.
+#include "ClockValues.hpp"
 //#include "ClockViewController.hpp"                  // Part of the config. Do I actually need this in here? idk.
 
 #include "ClockUpdater.hpp"                         // For the ClockUpdater, like the stuff you see down there
