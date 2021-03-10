@@ -1,10 +1,11 @@
 #include "main.hpp"                                 // Well the main.hpp what else, this wouldn't be the same without.
-#include "ClockViewController.hpp"                  // Part of the config. Do I actually need this in here? idk.
+//#include "ClockViewController.hpp"                  // Part of the config. Do I actually need this in here? idk.
 
 #include "ClockUpdater.hpp"                         // For the ClockUpdater, like the stuff you see down there
 
 #include "ClockModConfig.hpp"                       // Just the Config
 
+#include "UnityEngine/Transform.hpp"
 #include "UnityEngine/GameObject.hpp"               // For GameObject Stuff
 #include "TMPro/TextMeshProUGUI.hpp"                // For Text Stuff.
 #include <ctime>                                    // For Time stuff, idk if I actually need it.

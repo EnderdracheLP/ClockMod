@@ -27,6 +27,7 @@ using namespace GlobalNamespace;
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "TMPro/TextAlignmentOptions.hpp"
 #include "TMPro/TMP_Text.hpp"
+//#include "TMPro/TMP_FontAsset.hpp"                  // Temp until QuestUI Update
 using namespace TMPro;
 
 #include "UnityEngine/Canvas.hpp"
@@ -40,21 +41,29 @@ using namespace TMPro;
 #include "UnityEngine/UI/CanvasScaler.hpp"
 #include "UnityEngine/CanvasRenderer.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
+//#include "UnityEngine/UI/VerticalLayoutGroup.hpp"   // Temp until QuestUI Update
+//#include "UnityEngine/Resources.hpp"                // Temp until QuestUI Update
+//#include "UnityEngine/RectTransform.hpp"            // Temp until QuestUI Update
+//#include "UnityEngine/Transform.hpp"                // Temp until QuestUI Update
+//#include "UnityEngine/UI/ContentSizeFitter.hpp"     // Temp until QuestUI Update
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/QuestUI.hpp"
-using namespace QuestUI;
+//#include "questui/shared/BeatSaberUI.hpp"
+//#include "questui/shared/QuestUI.hpp"
+//using namespace QuestUI;
 
 #include "HMUI/CurvedCanvasSettings.hpp"
+#include "HMUI/CurvedTextMeshPro.hpp"               // Temp until QuestUI Update
 using namespace HMUI;
 
 #include "ClockUpdater.hpp"
-#include "ClockViewController.hpp"
+//#include "ArrayUtil.hpp"                            // Temp until QuestUI Update
+//#include "ClockViewController.hpp"
 //#include "ClockRotationUpdater.hpp"  // Added for 360/90 Rotation Update [NO LONGER USED IN THE CODE! REPLACED WITH A HOOK]
 using namespace ClockMod;
 
+//#include "Backgroundable.hpp"                       // Temp until QuestUI Update
 #include "custom-types/shared/register.hpp"
 using namespace custom_types;
 
@@ -79,6 +88,64 @@ DEFINE_CONFIG(ModConfig);
 
 UnityEngine::Canvas* canvas;
 UnityEngine::UI::VerticalLayoutGroup* layout;
+
+//TextMeshProUGUI* CreateText2(Transform* parent, std::string text, bool italic, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta);
+//
+//TMP_FontAsset* mainTextFont = nullptr;
+//TMP_FontAsset* GetMainTextFont() {
+//    if (!mainTextFont)
+//        mainTextFont = ClockMod::ArrayUtil::First(Resources::FindObjectsOfTypeAll<TMP_FontAsset*>(), [](TMP_FontAsset* x) { return to_utf8(csstrtostr(x->get_name())) == "Teko-Medium SDF No Glow"; });
+//    if (!mainTextFont)
+//        logger().error("MainFont not found");
+//    return mainTextFont;
+//}
+//
+//TMPro::TextMeshProUGUI* CreateText(UnityEngine::Transform* parent, std::string text) {
+//    return CreateText2(parent, text, true, UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector2(60.0f, 10.0f));
+//}
+//
+//TextMeshProUGUI* CreateText2(Transform* parent, std::string text, bool italic, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta) {
+//    static auto name = il2cpp_utils::createcsstr("QuestUIText", il2cpp_utils::StringType::Manual);
+//    GameObject* gameObj = GameObject::New_ctor(name);
+//    gameObj->SetActive(false);
+//
+//    CurvedTextMeshPro* textMesh = gameObj->AddComponent<CurvedTextMeshPro*>();
+//    RectTransform* rectTransform = textMesh->get_rectTransform();
+//    rectTransform->SetParent(parent, false);
+//    textMesh->set_font(GetMainTextFont());
+//    textMesh->set_text(il2cpp_utils::createcsstr(italic ? ("<i>" + text + "</i>") : text));
+//    textMesh->set_fontSize(4.0f);
+//    textMesh->set_color(UnityEngine::Color::get_white());
+//    textMesh->set_richText(true);
+//    rectTransform->set_anchorMin(UnityEngine::Vector2(0.5f, 0.5f));
+//    rectTransform->set_anchorMax(UnityEngine::Vector2(0.5f, 0.5f));
+//    rectTransform->set_anchoredPosition(anchoredPosition);
+//    rectTransform->set_sizeDelta(sizeDelta);
+//
+//    gameObj->AddComponent<LayoutElement*>();
+//
+//    gameObj->SetActive(true);
+//    return textMesh;
+//}
+//
+//VerticalLayoutGroup* CreateVerticalLayoutGroup(Transform* parent) {
+//    static auto name = il2cpp_utils::createcsstr("ClockModVerticalLayoutGroup", il2cpp_utils::StringType::Manual);
+//    GameObject* gameObject = GameObject::New_ctor(name);
+//    VerticalLayoutGroup* layout = gameObject->AddComponent<UnityEngine::UI::VerticalLayoutGroup*>();
+//    gameObject->AddComponent<Backgroundable*>();
+//
+//    ContentSizeFitter* contentSizeFitter = gameObject->AddComponent<ContentSizeFitter*>();
+//    contentSizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
+//
+//    RectTransform* rectTransform = gameObject->GetComponent<RectTransform*>();
+//    rectTransform->SetParent(parent, false);
+//    rectTransform->set_anchorMin(UnityEngine::Vector2(0.0f, 0.0f));
+//    rectTransform->set_anchorMax(UnityEngine::Vector2(1.0f, 1.0f));
+//    rectTransform->set_sizeDelta(UnityEngine::Vector2(0.0f, 0.0f));
+//
+//    gameObject->AddComponent<LayoutElement*>();
+//    return layout;
+//}
 
 // Function that sets the ClockPosition for Multiplayer Lobbies.
 void MPLobbyClockPos(float MLobbyVCPosY) {
@@ -115,7 +182,9 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         canvas->set_renderMode(UnityEngine::RenderMode::WorldSpace);
 
         layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(canvas_object->get_transform());
+        //layout = CreateVerticalLayoutGroup(canvas_object->get_transform());
         auto clock_text = QuestUI::BeatSaberUI::CreateText(layout->get_rectTransform(), "");
+        //auto clock_text = CreateText(layout->get_rectTransform(), "");
 
         layout->GetComponent<LayoutElement*>()->set_minWidth(7);
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
@@ -410,7 +479,7 @@ extern "C" void setup(ModInfo & info) {
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
-    QuestUI::Init();
+    //QuestUI::Init();
 
     logger().info("Installing Clockmod hooks...");
 
@@ -418,8 +487,8 @@ extern "C" void load() {
 
     custom_types::Register::RegisterType<ClockMod::ClockUpdater>();
     //custom_types::Register::RegisterType<ClockMod::ClockRotationUpdater>();
-    custom_types::Register::RegisterType<ClockMod::ClockViewController>();
-    QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
+    //custom_types::Register::RegisterType<ClockMod::ClockViewController>();
+    //QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
 
     INSTALL_HOOK_OFFSETLESS(hkLog, MainMenuViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
     INSTALL_HOOK_OFFSETLESS(hkLog, CampaignFlowCoordinator_DidActivate, il2cpp_utils::FindMethodUnsafe("", "CampaignFlowCoordinator", "DidActivate", 3));

@@ -22,11 +22,11 @@ rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 include $(CLEAR_VARS)
 LOCAL_MODULE := 
 include $(CLEAR_VARS)
-# Creating prebuilt for dependency: beatsaber-hook - version: 1.0.12
+# Creating prebuilt for dependency: beatsaber-hook - version: 1.1.6
 include $(CLEAR_VARS)
-LOCAL_MODULE := beatsaber-hook_1_0_12
+LOCAL_MODULE := beatsaber-hook_1_1_6
 LOCAL_EXPORT_C_INCLUDES := extern/beatsaber-hook
-LOCAL_SRC_FILES := extern/libbeatsaber-hook_1_0_12.so
+LOCAL_SRC_FILES := extern/libbeatsaber-hook_1_1_6.so
 LOCAL_CPP_FEATURES += exceptions
 include $(PREBUILT_SHARED_LIBRARY)
 # Creating prebuilt for dependency: codegen - version: 0.6.2
@@ -35,13 +35,7 @@ LOCAL_MODULE := codegen_0_6_2
 LOCAL_EXPORT_C_INCLUDES := extern/codegen
 LOCAL_SRC_FILES := extern/libcodegen_0_6_2.so
 include $(PREBUILT_SHARED_LIBRARY)
-# Creating prebuilt for dependency: questui - version: 0.4.4
-include $(CLEAR_VARS)
-LOCAL_MODULE := questui
-LOCAL_EXPORT_C_INCLUDES := extern/questui
-LOCAL_SRC_FILES := extern/libquestui.so
-include $(PREBUILT_SHARED_LIBRARY)
-# Creating prebuilt for dependency: custom-types - version: 0.4.4
+# Creating prebuilt for dependency: custom-types - version: 0.5.0
 include $(CLEAR_VARS)
 LOCAL_MODULE := custom-types
 LOCAL_EXPORT_C_INCLUDES := extern/custom-types
@@ -53,6 +47,12 @@ LOCAL_MODULE := modloader
 LOCAL_EXPORT_C_INCLUDES := extern/modloader
 LOCAL_SRC_FILES := extern/libmodloader.so
 include $(PREBUILT_SHARED_LIBRARY)
+# Creating prebuilt for dependency: questui - version: 0.4.4
+include $(CLEAR_VARS)
+LOCAL_MODULE := questui
+LOCAL_EXPORT_C_INCLUDES := extern/questui
+LOCAL_SRC_FILES := extern/libquestui.so
+include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := clockmod
@@ -60,12 +60,13 @@ LOCAL_SRC_FILES += $(call rwildcard,src/,*.cpp)
 LOCAL_SRC_FILES += $(call rwildcard,extern/beatsaber-hook/src/inline-hook,*.cpp)
 LOCAL_SRC_FILES += $(call rwildcard,extern/beatsaber-hook/src/inline-hook,*.c)
 LOCAL_SHARED_LIBRARIES += modloader
-LOCAL_SHARED_LIBRARIES += beatsaber-hook_1_0_12
+LOCAL_SHARED_LIBRARIES += beatsaber-hook_1_1_6
 LOCAL_SHARED_LIBRARIES += codegen_0_6_2
-LOCAL_SHARED_LIBRARIES += questui
 LOCAL_SHARED_LIBRARIES += custom-types
+LOCAL_SHARED_LIBRARIES += questui
 LOCAL_LDLIBS += -llog
 LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"clockmod"' -DVERSION='"1.4.0"' -I'./shared' -I'./extern' -isystem'extern/codegen/include'
 LOCAL_CPPFLAGS += -std=c++2a
 LOCAL_C_INCLUDES += ./include ./src
+#LOCAL_SHARED_LIBRARIES += questui
 include $(BUILD_SHARED_LIBRARY)

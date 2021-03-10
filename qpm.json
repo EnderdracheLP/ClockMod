@@ -10,13 +10,17 @@
   },
   "dependencies": [
     {
-      "id": "questui",
-      "versionRange": "^0.4.4",
-      "additionalData": {}
+      "id": "beatsaber-hook",
+      "versionRange": "^1.1.6",
+      "additionalData": {
+        "extraFiles": [
+          "src/inline-hook"
+        ]
+      }
     },
     {
-      "id": "config-utils",
-      "versionRange": "^0.2.1",
+      "id": "custom-types",
+      "versionRange": "*",
       "additionalData": {}
     }
   ],

@@ -1,0 +1,24 @@
+{
+  "sharedDir": "shared",
+  "dependenciesDir": "extern",
+  "info": {
+    "name": "Clock Mod",
+    "id": "clockmod",
+    "version": "1.4.0",
+    "url": null,
+    "additionalData": {}
+  },
+  "dependencies": [
+    {
+      "id": "questui",
+      "versionRange": "^0.4.4",
+      "additionalData": {}
+    },
+    {
+      "id": "config-utils",
+      "versionRange": "^0.2.1",
+      "additionalData": {}
+    }
+  ],
+  "additionalData": {}
+}
