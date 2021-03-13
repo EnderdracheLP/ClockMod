@@ -8,7 +8,7 @@ DECLARE_CONFIG(ModConfig,
     DECLARE_VALUE(SecToggle, bool, "Show Seconds", false);
     DECLARE_VALUE(BattToggle, bool, "Show Battery Percentage", false);
     DECLARE_VALUE(RainbowClock, bool, "Rainbowify it", false);
-    DECLARE_VALUE(FontSize, double, "Font Size", 3.5);
+    DECLARE_VALUE(FontSize, float, "Font Size", 3.5);
 
 //    DECLARE_VALUE(ClockXOffset, double, "Clock X Offset", 0);
 //    DECLARE_VALUE(ClockYOffset, double, "Clock Y Offset", 0);

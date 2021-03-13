@@ -42,7 +42,7 @@ void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool added
 
         BeatSaberUI::AddHoverHint(AddConfigValueToggle(parent, getModConfig().RainbowClock)->get_gameObject(), "Makes the Clock beautiful.");
 
-        BeatSaberUI::AddHoverHint(AddConfigValueIncrementFloat(parent, getModConfig().FontSize, 1, 0.1f, 1.0f, 5.0f)->get_gameObject(), "Changes the Font Size of the Clock (Default: 3.5)");
+        BeatSaberUI::AddHoverHint(AddConfigValueIncrementFloat(parent, getModConfig().FontSize, 1.0f, 0.1f, 1.0f, 5.0f)->get_gameObject(), "Changes the Font Size of the Clock (Default: 3.5)");
 
         BeatSaberUI::AddHoverHint(AddConfigValueToggle(parent, getModConfig().ClockPosition)->get_gameObject(), "If the Clock should be at the Top or the Bottom while in the Menu");
 

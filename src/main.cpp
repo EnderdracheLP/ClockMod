@@ -120,8 +120,8 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         auto clock_text = QuestUI::BeatSaberUI::CreateText(layout->get_rectTransform(), "");
         //auto clock_text = CreateText(layout->get_rectTransform(), "");
 
-        layout->GetComponent<LayoutElement*>()->set_minWidth(7);
-        layout->GetComponent<LayoutElement*>()->set_minHeight(80);
+        layout->GetComponent<LayoutElement*>()->set_minWidth_NEW(7);
+        layout->GetComponent<LayoutElement*>()->set_minHeight_NEW(80);
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
 
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
@@ -152,11 +152,12 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
 
 MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
     // Instance of PlayerDataModel the noTextAndHUDs variable specifically
-    bool NoTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->playerSpecificSettings->noTextsAndHuds;
-    if (NoTextAndHUD) {
-        Config.noTextAndHUD = true;
-    }
-    else { Config.noTextAndHUD = false; }
+    Config.noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->playerSpecificSettings->noTextsAndHuds;
+    //bool NoTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->playerSpecificSettings->noTextsAndHuds;
+    //if (NoTextAndHUD) {
+    //    Config.noTextAndHUD = true;
+    //}
+    //else { Config.noTextAndHUD = false; }
 
     Config.InMPLobby = false;
     Config.IsInSong = true;
@@ -291,7 +292,7 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
 MAKE_HOOK_OFFSETLESS(BeatmapObjectCallbackController_SetNewBeatmapData, void, BeatmapObjectCallbackController* self, IReadonlyBeatmapData* beatmapData) {
     BeatmapObjectCallbackController_SetNewBeatmapData(self, beatmapData);
     if (beatmapData) {
-        int RotationEvents = beatmapData->get_spawnRotationEventsCount();
+        int RotationEvents = beatmapData->get_spawnRotationEventsCount_NEW();
         if (RotationEvents > 0) {
             logger().debug("Loaded 360/90 Map");
             Config.InRotationMap = true;
@@ -413,16 +414,26 @@ extern "C" void setup(ModInfo & info) {
     info.version = VERSION;
     modInfo = info;
 
-    //Init/Load Config
-    getModConfig().Init(modInfo);
+    //logger().debug("config path is %s", Modloader::getApplicationId());
 
-    logger().info("Completed setup!");
+    std::string DD = getDataDir(modInfo);
+    logger().debug("DataDir path is %s", DD.c_str());
+
+    std::string CFP = Configuration::getConfigFilePath(modInfo);
+    logger().debug("Config path is %s", CFP.c_str());
+
+
+    logger().info("Completed ClockMod setup!");
 }
 
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
     QuestUI::Init();
+
+    //Init/Load Config
+    getModConfig().Init(modInfo);
+
 
     logger().info("Installing Clockmod hooks...");
 
@@ -454,6 +465,7 @@ extern "C" void load() {
     INSTALL_HOOK_OFFSETLESS(hkLog, ClientLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "ClientLobbySetupViewController", "DidActivate", 3));
     INSTALL_HOOK_OFFSETLESS(hkLog, QuickPlaySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "QuickPlaySetupViewController", "DidActivate", 3));
     INSTALL_HOOK_OFFSETLESS(hkLog, MultiplayerLobbyController_DeactivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "DeactivateMultiplayerLobby", 0));
+
 
     //INSTALL_HOOK_OFFSETLESS(hkLog, MultiplayerLevelScenesTransitionSetupDataSO_Init, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLevelScenesTransitionSetupDataSO", "Init", 10));
 
