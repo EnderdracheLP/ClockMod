@@ -52,6 +52,18 @@ std::string getBatteryString(int level)
     else return string_format("<color=#ff8800>%s</color>", percent.c_str());
 }
 
+/*
+std::string RainbowClock::rainbowify(std::string input) {
+    for(char& c : input) {
+        std::string result
+        result += string_format("<color=%s>%c</color>", colors[rainbowIndex].c_str(), c);
+        rainbowIndex++;
+        rainbowIndex %= colors.size();
+    }
+return result;
+}
+*/
+
 // /*
 // RGB Clock gives more FPS, Gamers will love that.
 std::string RainbowClock::rainbowify(std::string input)
@@ -88,6 +100,7 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
          timeinfo = localtime(&rawtime);
          auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
          auto clockParent = get_transform()->GetParent();
+         //auto clockParent = get_transform();
 
          // Yes all the "wait" stuff here is for slowing it down
          if (wait == 18) {
@@ -113,14 +126,13 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
              text->set_text(il2cpp_utils::createcsstr(clockresult));        // This sets the Text
              text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
              text->set_fontSize(getModConfig().FontSize.GetValue());
-
          }
          else { wait++; }
 
          // Temp Code for updating Position.
-         if (Config.InMPLobby == false) {
+         if (Config.IsInSong == false && Config.InMPLobby == false) {
              // TODO: Get Position Offset working. Trying to set the Position offset here, messes with the 360/90 Map stuff. 
-             if (Config.IsInSong == false) {
+             //if (Config.IsInSong == false) {
                  // Checks if the clock should be at the Top or Bottom
                  if (getModConfig().ClockPosition.GetValue()) {
                      // If set to be at the Bottom do this.
@@ -136,29 +148,30 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
                      auto Scale = UnityEngine::Vector3(1, 1, 1);
                      SetClockPos(clockParent, text, Pos, Angle, Scale);
                  }
-             }
+             //}
              // TODO: Reduce the amount of code here, like make stuff a variable or a function
              //            When not in a Map with RotationEvents (360/90).
-             else if (Config.InRotationMap == false && Config.InMP == false) {
-                 if (getModConfig().ClockPosition.GetValue()) {
-                     // If set to be at the Bottom do this.
-                     auto Pos = UnityEngine::Vector3(0, -4.45, 2);
-                     auto Angle = UnityEngine::Vector3(45, 0, 0);
-                     auto Scale = UnityEngine::Vector3(1, 1, 1);
-                     SetClockPos(clockParent, text, Pos, Angle, Scale);
-                     //logger().debug("In Normal Map set to Bottom");
-                 }
-                 else {
-                     // Otherwise it will do this.
-                     auto Pos = UnityEngine::Vector3(0, -1.7, 5.6);
-                     auto Angle = UnityEngine::Vector3(-10, 0, 0);
-                     auto Scale = UnityEngine::Vector3(1, 1, 1);
-                     SetClockPos(clockParent, text, Pos, Angle, Scale);
-                     //logger().debug("In Normal Map set to Top");
-                 }
-             }
+             //else if (Config.InRotationMap == false && Config.InMP == false) {
+             //    if (getModConfig().ClockPosition.GetValue()) {
+             //        // If set to be at the Bottom do this.
+             //        auto Pos = UnityEngine::Vector3(0, -4.45, 2);
+             //        auto Angle = UnityEngine::Vector3(45, 0, 0);
+             //        auto Scale = UnityEngine::Vector3(1, 1, 1);
+             //        SetClockPos(clockParent, text, Pos, Angle, Scale);
+             //        //logger().debug("In Normal Map set to Bottom");
+             //    }
+             //    else {
+             //        // Otherwise it will do this.
+             //        auto Pos = UnityEngine::Vector3(0, -1.7, 5.6);
+             //        auto Angle = UnityEngine::Vector3(-10, 0, 0);
+             //        auto Scale = UnityEngine::Vector3(1, 1, 1);
+             //        SetClockPos(clockParent, text, Pos, Angle, Scale);
+             //        //logger().debug("In Normal Map set to Top");
+             //    }
+             //}
          }
-         else { // If in MP Lobby, unset all this.
+         else { // If in MP Lobby or a Song, unset all this.
+             //clockParent->set_position(UnityEngine::Vector3(0, 0, 0));
              text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
              text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
          }

@@ -7,13 +7,7 @@
 class RainbowClock
 {
 public:
-    //static bool shouldRainbow(std::string name);
-
-    //static bool shouldRainbow(UnityEngine::Color color);
-
     static std::string rainbowify(std::string);
-
-    //static std::string toLower(std::string in);
 private:
     static inline int rainbowIndex = rand() % 12;
     static inline const std::vector<std::string> colors = {

@@ -1,8 +1,8 @@
 #include "custom-types/shared/macros.hpp"
 #include "HMUI/ViewController.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "TMPro/TextMeshProUGUI.hpp"
-#include "UnityEngine/Color.hpp"
+//#include "questui/shared/BeatSaberUI.hpp"
+//#include "TMPro/TextMeshProUGUI.hpp"
+//#include "UnityEngine/Color.hpp"
 
 DECLARE_CLASS_CODEGEN(ClockMod, ClockViewController, HMUI::ViewController,
 

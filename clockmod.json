@@ -5,15 +5,11 @@
     "Show Battery Percentage": true,
     "Rainbowify it": true,
     "Font Size": 3.5,
-    "Clock X Offset": -7.450580596923828e-8,
-    "Clock Y Offset": -4.321336746215822e-7,
-    "Clock Z Offset": -7.450580596923828e-8,
+    "In-Menu Clock Position (Top/Bottom)": false,
     "Clock Color": {
         "r": 255.0,
         "g": 255.0,
         "b": 255.0,
         "a": 255.0
-    },
-    "Clock Position (Top/Bottom)": true,
-    "In-Menu Clock Position (Top/Bottom)": true
+    }
 }
