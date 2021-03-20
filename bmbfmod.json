@@ -9,7 +9,7 @@
   "coverImageFilename": "Cover.png",
   "icon": "Cover.png",
   "category": "Other",
-  "gameVersion": "1.13.2",
+  "gameVersion": "1.14.0",
   "platform": "Quest",
   "components": [
     {
