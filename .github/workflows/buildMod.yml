@@ -2,9 +2,9 @@ name: NDK build
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main, dev, 1.14.0 ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [ main, dev, 1.14.0 ]
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
     
     - name: Install Android NDK
       env:
-        ndkname: android-ndk-r21
+        ndkname: android-ndk-r22
       run: |
         wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
         unzip -q ndk.zip
@@ -46,7 +46,6 @@ jobs:
     - name: QPM Restore
       run: |
         chmod +x ./QPM/QPM
-        ./QPM/QPM clear
         ./QPM/QPM restore
     - name: test
       run: |
