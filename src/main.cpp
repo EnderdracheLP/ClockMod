@@ -19,7 +19,7 @@ using namespace GlobalNamespace;
 using namespace TMPro;
 
 #include "UnityEngine/Canvas.hpp"
-#include "unityEngine/CanvasRenderer.hpp"
+#include "UnityEngine/CanvasRenderer.hpp"
 #include "UnityEngine/Vector3.hpp"
 #include "UnityEngine/Vector2.hpp"
 #include "UnityEngine/GameObject.hpp"
