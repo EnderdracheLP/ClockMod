@@ -2,10 +2,10 @@ name: NDK build
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ 1.13.2-ClockMod ]
   pull_request:
-    branches: [ main, dev ]
-
+    branches: [ 1.13.2-ClockMod ]
+    
 jobs:
   build:
     env:
@@ -26,7 +26,7 @@ jobs:
       uses: actions/cache@v2
       env:
         cache-name: cache-ndk
-        ndkname: android-ndk-r21
+        ndkname: android-ndk-r22
       with:
         path: ndk
         key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
@@ -36,7 +36,7 @@ jobs:
     - name: Install Android NDK
       if: steps.cache-ndk.outputs.cache-hit != 'true'
       env:
-        ndkname: android-ndk-r21
+        ndkname: android-ndk-r22
       run: |
         wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
         unzip -q ndk.zip
@@ -46,18 +46,6 @@ jobs:
       run: |
         cd ndk
         pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
-        
-#     - name: Cache QPM
-#       id: cache-qpm
-#       uses: actions/cache@v2
-#       env:
-#         cache-name: cache-qpm
-#       with:
-#         path: QPM
-#         key: ${{ runner.os }}-${{ env.cache-name }}-2
-#         restore-keys: |
-#           ${{ runner.os }}-${{ env.cache-name }}-2
-
     - name: Get QPM
       if: steps.cache-qpm.outputs.cache-hit != 'true'
       uses: dawidd6/action-download-artifact@v2
@@ -67,23 +55,10 @@ jobs:
         name: QPM-ubuntu-x64
         path: QPM
         repo: sc2ad/QuestPackageManager
-        
-#     - name: QPM Dependencies Cache
-#       id: cache-qpm-deps
-#       uses: actions/cache@v2
-#       env:
-#         cache-name: cache-qpm-deps
-#       with:
-#         path: ~/.config/QPM
-#         key: ${{ runner.os }}-${{ env.cache-name }}
-#         restore-keys: |
-#           ${{ runner.os }}-${{ env.cache-name }}
       
     - name: QPM Restore
-#       if: steps.cache-qpm-deps.outputs.cache-hit != 'true'
       run: |
         chmod +x ./QPM/QPM
-        ./QPM/QPM clear
         ./QPM/QPM restore
     - name: test
       run: |
@@ -111,4 +86,3 @@ jobs:
         name: debug_${{ steps.libname.outputs.NAME }}
         path: ./obj/local/arm64-v8a/${{ steps.libname.outputs.NAME }}
         if-no-files-found: error
-    # TODO: Add auto-populating releases, auto update versions, auto publish package on release
