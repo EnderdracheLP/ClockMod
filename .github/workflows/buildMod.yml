@@ -34,7 +34,6 @@ jobs:
           ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
     
     - name: Install Android NDK
-      if: steps.cache-ndk.outputs.cache-hit != 'true'
       env:
         ndkname: android-ndk-r22
       run: |
@@ -48,7 +47,6 @@ jobs:
         pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
 
     - name: Get QPM
-      if: steps.cache-qpm.outputs.cache-hit != 'true'
       uses: dawidd6/action-download-artifact@v2
       with:
         github_token: ${{secrets.GITHUB_TOKEN}}
