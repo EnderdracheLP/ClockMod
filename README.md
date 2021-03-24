@@ -1,6 +1,6 @@
 # Clock Mod
 
-Displays the time in the menus.
+Displays the time and optionally the battery percentage in the game.
 
 ## Credits
 
