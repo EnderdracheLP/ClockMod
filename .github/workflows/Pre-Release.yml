@@ -1,16 +1,14 @@
-name: NDK build Mod
-
 on:
   workflow_dispatch:
-  push:
-    branches: [ main, dev, 1.14.0 ]
-  pull_request:
-    branches: [ main, dev, 1.14.0 ]
-    
+
+name: Pre-Release Mod
+
 jobs:
   build:
     env:
      module_id: clockmod
+     version: v1.4.0-Pre1
+     BSVersion: 1.14.0
     runs-on: ubuntu-latest
     
     steps:
@@ -83,27 +81,34 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}
         pwsh -Command ./buildBMBF.ps1 --package
-    - name: Upload non-debug artifact
-      uses: actions/upload-artifact@v2
+    - name: Create Release
+      id: create_pre-release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: ${{ steps.libname.outputs.NAME }}
-        path: ./libs/arm64-v8a/${{ steps.libname.outputs.NAME }}
-        if-no-files-found: error
-    - name: Upload debug artifact
-      uses: actions/upload-artifact@v2
+        tag_name: ${{ env.version }}
+        release_name: ${{ env.module_id }} ${{ env.version }} for Beat Saber ${{ env.BSVersion }}
+        body_path: ./pre-rl-notes
+        draft: false
+        prerelease: true
+    - name: Upload BMBF Pre-Release Asset
+      id: upload-prerelease-BMBFMod
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: debug_${{ steps.libname.outputs.NAME }}
-        path: ./obj/local/arm64-v8a/${{ steps.libname.outputs.NAME }}
-        if-no-files-found: error
-    - name: Upload QMOD
-      uses: actions/upload-artifact@v2
+        upload_url: ${{ steps.create_pre-release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./${{ env.module_id }}.zip
+        asset_name: ${{ env.module_id }}.zip
+        asset_content_type: application/zip
+    - name: Upload QMOD Pre-Release Asset
+      id: upload-prerelease-QMOD 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: ${{ env.module_id }}.qmod
-        path: ./${{ env.module_id }}.qmod
-        if-no-files-found: warn
-    - name: Upload BMBFMod
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ env.module_id }}.zip
-        path: ./${{ env.module_id }}.zip
-        if-no-files-found: warn
+        upload_url: ${{ steps.create_pre-release.outputs.upload_url }}
+        asset_path: ./${{ env.module_id }}.qmod
+        asset_name: ${{ env.module_id }}.qmod
+        asset_content_type: application/qmod

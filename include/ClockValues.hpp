@@ -7,18 +7,20 @@ struct ClockPos_t {
 	// Clock InMenu Positions Top
 	UnityEngine::Vector3 MenuPosTop = UnityEngine::Vector3(0.0f, -1.7f, 3.85f);
 	// Clock InMenu Positions Bottom	// UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ)
-	float MenuXdown = 0;
-	float MenuYdown = 0;
-	float MenuZdown = 0;
+	//float MenuXdown = 0;
+	//float MenuYdown = 0;
+	//float MenuZdown = 0;
+
 
 	// Clock InNormalSong Positions Top 0, Config.ClockY + 1.3, Config.ClockZ + 5
 	UnityEngine::Vector3 NormalSongPosTop = UnityEngine::Vector3(0.0f, -2.5f, 7.5f); // 0, -2, 8 // 0, -1.7, 5.6
 	float NormalSongScaleTop = 1;
 	UnityEngine::Vector3 NormalSongRotationTop = UnityEngine::Vector3(-10.0f, 0.0f, 0.0f);
 	// Clock InNormalSong Positions Bottom
-	UnityEngine::Vector3 NormalSongPosDown = UnityEngine::Vector3(0.0f, -1.0f, 1.65f); // 0, -2.5, 6.65 	// 0, -4.45, 2 // 0.0f, -3.5f, 6.65f
+	UnityEngine::Vector3 NormalSongPosDown = UnityEngine::Vector3(0.0f, -0.3f, 1.65f); // 0, -2.5, 6.65 	// 0, -4.45, 2 // 0.0f, -3.5f, 6.65f
 	float NormalSongScaleDown = 0.4f;
-	UnityEngine::Vector3 NormalSongRotationDown = UnityEngine::Vector3(30, 0, 0); // 45, 0, 0
+	UnityEngine::Vector3 NormalSongRotationDown = UnityEngine::Vector3(40.0f, 0, 0); // 45, 0, 0
+
 
 	// Clock In360/90 Song Positions Top
 	UnityEngine::Vector3 RotateSongPosTop = UnityEngine::Vector3(0, 0.5f, 10);
