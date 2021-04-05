@@ -15,14 +15,14 @@ Logger& logger();
 
 // Defining values here, so I can use them wherever the fuck I want to.
 struct Config_t {
-	bool InMPLobby = false;    // Checks if in MPLobby
-	bool InMP = false;    	// Checks if in MP
-	float ClockY = -1.7;
-	float ClockZ = 3.85;
-	bool IsInSong = false;    // Checks if in a Song
-//	bool InSettings = false;
-	bool InRotationMap = false; // Checks if in a 360/90 Map
-	bool noTextAndHUD = false;
+    bool InMPLobby = false;    // Checks if in MPLobby
+    bool InMP = false;        // Checks if in MP
+    float ClockY = -1.7;
+    float ClockZ = 3.85;
+    bool IsInSong = false;    // Checks if in a Song
+//    bool InSettings = false;
+    bool InRotationMap = false; // Checks if in a 360/90 Map
+    bool noTextAndHUD = false;
 };
 extern Config_t Config;
 

@@ -15,10 +15,10 @@
 #include "GlobalNamespace/QuickPlaySetupViewController.hpp"
 #include "GlobalNamespace/BeatmapObjectCallbackController.hpp"  // For checking characteristic
 #include "GlobalNamespace/IReadonlyBeatmapData.hpp"             // To read the BeatmapData
-#include "GlobalNamespace/FlyingGameHUDRotation.hpp"        	// Take rotation from this instead lol
-#include "GlobalNamespace/PlayerDataModel.hpp"        	// For checking if noTextandHUDs is enabled
+#include "GlobalNamespace/FlyingGameHUDRotation.hpp"            // Take rotation from this instead lol
+#include "GlobalNamespace/PlayerDataModel.hpp"            // For checking if noTextandHUDs is enabled
 #include "GlobalNamespace/PlayerData.hpp"            // For checking if noTextandHUDs is enabled
-#include "GlobalNamespace/PlayerSpecificSettings.hpp"    	// For checking if noTextandHUDs is enabled
+#include "GlobalNamespace/PlayerSpecificSettings.hpp"        // For checking if noTextandHUDs is enabled
 #include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp"  // For checking it it's an MP Song
 #include "GlobalNamespace/MultiplayerResultsViewController.hpp"
 using namespace GlobalNamespace;
