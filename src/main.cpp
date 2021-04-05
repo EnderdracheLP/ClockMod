@@ -40,6 +40,7 @@ using namespace TMPro;
 #include "UnityEngine/UI/CanvasScaler.hpp"
 #include "UnityEngine/CanvasRenderer.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
+#include "UnityEngine/SceneManagement/Scene.hpp"
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 
@@ -93,7 +94,7 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if (firstActivation) {
-        auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::createcsstr("Canvas"));
+        auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::createcsstr("Canvas"/*, il2cpp_utils::StringType::Manual*/));
         canvas = canvas_object->AddComponent<UnityEngine::Canvas*>();
         auto canvas_scaler = canvas_object->AddComponent<CanvasScaler*>();
         auto canvas_renderer = canvas_object->AddComponent<CanvasRenderer*>();
@@ -161,6 +162,7 @@ void SetClockPos(UnityEngine::Vector3 Pos, UnityEngine::Vector3 Angle, float Sca
     layout->get_transform()->set_localScale(UnityEngine::Vector3(ScaleFloat, ScaleFloat, ScaleFloat));
 }
 
+// TODO: Use a different hook, this one is too small and causes issues
 MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
     // Instance of PlayerDataModel the noTextAndHUDs variable specifically
     Config.noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->playerSpecificSettings->noTextsAndHuds;
@@ -227,6 +229,76 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
     } 
 }
 
+//MAKE_HOOK_OFFSETLESS(SceneManager_Internal_ActiveSceneChanged, void, UnityEngine::SceneManagement::Scene prevScene, UnityEngine::SceneManagement::Scene nextScene) {
+//    SceneManager_Internal_ActiveSceneChanged(prevScene, nextScene);
+//    if (nextScene.IsValid()) {
+//        std::string sceneName = to_utf8(csstrtostr(nextScene.get_name()));
+//        logger().info("Scene found: %s", sceneName.data());
+//        if (sceneName.find("GameCore") != std::string::npos) {
+//            // Instance of PlayerDataModel the noTextAndHUDs variable specifically
+//            Config.noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->playerSpecificSettings->noTextsAndHuds;
+//
+//            float LayoutClockPosX = layout->get_transform()->get_position().x;
+//            float LayoutClockPosY = layout->get_transform()->get_position().y;
+//            float LayoutClockPosZ = layout->get_transform()->get_position().z;
+//            float LayoutClockRotX = layout->get_transform()->get_eulerAngles().x;
+//            logger().debug("ClockPos before X %f", LayoutClockPosX);
+//            logger().debug("ClockPos before Y %f", LayoutClockPosY);
+//            logger().debug("ClockPos before Z %f", LayoutClockPosZ);
+//            logger().debug("ClockRot before X %f", LayoutClockRotX);
+//
+//            Config.InMPLobby = false;
+//            Config.IsInSong = true;
+//
+//            if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
+//                canvas->get_gameObject()->SetActive(false);
+//                logger().info("SetActive false");
+//            }
+//            // TODO: Tweak values
+//            if (/*Config.InMP ||*/ Config.InRotationMap) { // Checks if in a map with RotationEvents (360/90) or in a MP Song.
+//                if (getModConfig().ClockPosition.GetValue()) { // Then checks if the clock is set to be at the Top or the Bottom
+//                    SetClockPos(ClockPos.RotateSongPosDown, ClockPos.RotateSongRotationDown, ClockPos.RotateSongScaleDown);
+//                    logger().debug("SetPos 360/MP Bottom");
+//                }
+//                else {
+//                    logger().debug("SetPos 360/MP Top");
+//                    SetClockPos(ClockPos.RotateSongPosTop, ClockPos.RotateSongRotationTop, ClockPos.RotateSongScaleTop);
+//
+//                    LayoutClockPosX = layout->get_transform()->get_position().x;
+//                    LayoutClockPosY = layout->get_transform()->get_position().y;
+//                    LayoutClockPosZ = layout->get_transform()->get_position().z;
+//                    logger().debug("ClockPos X %f", LayoutClockPosX);
+//                    logger().debug("ClockPos Y %f", LayoutClockPosY);
+//                    logger().debug("ClockPos Z %f", LayoutClockPosZ);
+//                }
+//            }
+//            else if (getModConfig().ClockPosition.GetValue()) { // When in a normal Map do this.
+//                // If set to be at the Bottom do this.
+//                //auto Pos = UnityEngine::Vector3(0, -4.45, 2);
+//                //auto Angle = UnityEngine::Vector3(45, 0, 0);
+//                //auto Scale = UnityEngine::Vector3(ClockPos.NormalSongScaleDown, ClockPos.NormalSongScaleDown, ClockPos.NormalSongScaleDown);
+//                SetClockPos(ClockPos.NormalSongPosDown, ClockPos.NormalSongRotationDown, ClockPos.NormalSongScaleDown);
+//                LayoutClockPosX = layout->get_transform()->get_position().x;
+//                LayoutClockPosY = layout->get_transform()->get_position().y;
+//                LayoutClockPosZ = layout->get_transform()->get_position().z;
+//                LayoutClockRotX = layout->get_transform()->get_eulerAngles().x;
+//                logger().debug("ClockPos after X %f", LayoutClockPosX);
+//                logger().debug("ClockPos after Y %f", LayoutClockPosY);
+//                logger().debug("ClockPos after Z %f", LayoutClockPosZ);
+//                logger().debug("ClockRot after X %f", LayoutClockRotX);
+//                //logger().debug("In Normal Map set to Bottom");
+//            }
+//            else {
+//                // Otherwise it will do this.
+//                //auto Pos = UnityEngine::Vector3(0, -1.7, 5.6);
+//                //auto Angle = UnityEngine::Vector3(-10, 0, 0);
+//                //auto Scale = UnityEngine::Vector3(1, 1, 1);
+//                SetClockPos(ClockPos.NormalSongPosTop, ClockPos.NormalSongRotationTop, ClockPos.NormalSongScaleTop);
+//                //logger().debug("In Normal Map set to Top");
+//            }
+//        }
+//    }
+//}
 
 //MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StopSong, void, AudioTimeSyncController* self) {
 //    AudioTimeSyncController_StopSong(self);
@@ -495,6 +567,7 @@ extern "C" void load() {
     INSTALL_HOOK_OFFSETLESS(hkLog, MainMenuViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
     INSTALL_HOOK_OFFSETLESS(hkLog, CampaignFlowCoordinator_DidActivate, il2cpp_utils::FindMethodUnsafe("", "CampaignFlowCoordinator", "DidActivate", 3));
     INSTALL_HOOK_OFFSETLESS(hkLog, AudioTimeSyncController_StartSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StartSong", 1));
+    //INSTALL_HOOK_OFFSETLESS(hkLog, SceneManager_Internal_ActiveSceneChanged, il2cpp_utils::FindMethodUnsafe("UnityEngine.SceneManagement", "SceneManager", "Internal_ActiveSceneChanged", 2));
     // Third attempt at clock rotation
 //    INSTALL_HOOK_OFFSETLESS(hkLog, BeatmapObjectManager_SpawnBasicNote, il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectManager", "SpawnBasicNote", 4));
 //    INSTALL_HOOK_OFFSETLESS(hkLog, NoteController_Update, il2cpp_utils::FindMethodUnsafe("", "NoteController", "Update", 0));

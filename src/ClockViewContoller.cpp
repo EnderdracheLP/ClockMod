@@ -32,28 +32,22 @@ void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool added
         GameObject* container = BeatSaberUI::CreateScrollableSettingsContainer(get_transform());
         Transform* parent = container->get_transform();
 
-        BeatSaberUI::AddHoverHint(AddConfigValueToggle(parent, getModConfig().InSong)->get_gameObject(), "If the Clock should be shown while playing a Beatmap.");
-
-        BeatSaberUI::AddHoverHint(AddConfigValueToggle(parent, getModConfig().TwelveToggle)->get_gameObject(), "If time should be in 12 or 24 Hour format.");
-
-        BeatSaberUI::AddHoverHint(AddConfigValueToggle(parent, getModConfig().SecToggle)->get_gameObject(), "If Seconds should be displayed.");
-
-        BeatSaberUI::AddHoverHint(AddConfigValueToggle(parent, getModConfig().BattToggle)->get_gameObject(), "Displays Battery percentage next to the clock.");
-
-        BeatSaberUI::AddHoverHint(AddConfigValueToggle(parent, getModConfig().RainbowClock)->get_gameObject(), "Makes the Clock beautiful.");
-
-        BeatSaberUI::AddHoverHint(AddConfigValueIncrementFloat(parent, getModConfig().FontSize, 1.0f, 0.1f, 1.0f, 5.0f)->get_gameObject(), "Changes the Font Size of the Clock (Default: 3.5)");
-
-        BeatSaberUI::AddHoverHint(AddConfigValueToggle(parent, getModConfig().ClockPosition)->get_gameObject(), "If the Clock should be at the Top or the Bottom while in the Menu");
+        AddConfigValueToggle(parent, getModConfig().InSong);
+        AddConfigValueToggle(parent, getModConfig().TwelveToggle);
+        AddConfigValueToggle(parent, getModConfig().SecToggle);
+        AddConfigValueToggle(parent, getModConfig().BattToggle);
+        AddConfigValueToggle(parent, getModConfig().RainbowClock);
+        AddConfigValueIncrementFloat(parent, getModConfig().FontSize, 1.0f, 0.1f, 1.0f, 5.0f);
+        AddConfigValueToggle(parent, getModConfig().ClockPosition);
 
 //        BeatSaberUI::AddHoverHint(AddConfigValueIncrementFloat(parent, getModConfig().ClockXOffset, 1, 0.1f, -10.0f, 10.0f)->get_gameObject(), "Offsets the X (Left/Right) Position of the Clock");
 //        BeatSaberUI::AddHoverHint(AddConfigValueIncrementFloat(parent, getModConfig().ClockYOffset, 1, 0.1f, -10.0f, 10.0f)->get_gameObject(), "Offsets the Y (Up/Down) Position of the Clock");
 //        BeatSaberUI::AddHoverHint(AddConfigValueIncrementFloat(parent, getModConfig().ClockZOffset, 1, 0.1f, -10.0f, 10.0f)->get_gameObject(), "Offsets the Z (Forward/Backward) Position of the Clock");
 
-        BeatSaberUI::AddHoverHint(BeatSaberUI::CreateColorPicker(parent, getModConfig().ClockColor.GetName(), getModConfig().ClockColor.GetValue(),
+        BeatSaberUI::CreateColorPicker(parent, getModConfig().ClockColor.GetName(), getModConfig().ClockColor.GetValue(),
             [](UnityEngine::Color value, GlobalNamespace::ColorChangeUIEventType eventType) {
                 getModConfig().ClockColor.SetValue(value);
-            }), "The color of the clock text.");
+            });
     }
 }
 //void ClockMod::ClockViewController::DidDeactivate(bool removedFromHierarchy, bool systemScreenDisabling) {
