@@ -94,7 +94,7 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if (firstActivation) {
-        auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::createcsstr("Canvas"/*, il2cpp_utils::StringType::Manual*/));
+        auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::createcsstr("Canvas"));
         canvas = canvas_object->AddComponent<UnityEngine::Canvas*>();
         auto canvas_scaler = canvas_object->AddComponent<CanvasScaler*>();
         auto canvas_renderer = canvas_object->AddComponent<CanvasRenderer*>();
@@ -130,14 +130,14 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
 
         // Check all Mod Config Values
 
-        if (getModConfig().InSong.GetValue()) { logger().debug("InSong true"); } else { logger().debug("InSong false"); }
-        if (getModConfig().SecToggle.GetValue()) { logger().debug("SecToggle true"); } else { logger().debug("SecToggle false"); }
-        if (getModConfig().FontSize.GetValue()) { logger().debug("FontSize true value %s", getModConfig().FontSize.GetValue()); } else { logger().debug("FontSize false"); }
-        if (getModConfig().BattToggle.GetValue()) { logger().debug("BattToggle true"); } else { logger().debug("BattToggle false"); }
-        if (getModConfig().TwelveToggle.GetValue()) { logger().debug("TwelveToggle true"); } else { logger().debug("TwelveToggle false"); }
-        if (getModConfig().RainbowClock.GetValue()) { logger().debug("RainbowClock true"); } else { logger().debug("RainbowClock false"); }
-        //if (getModConfig().ClockColor.GetValue()) { logger().debug("ClockColor true"); } else { logger().debug("ClockColor false"); }
-        if (getModConfig().ClockPosition.GetValue()) { logger().debug("ClockPosition bottom"); } else { logger().debug("ClockPosition top"); }
+        //if (getModConfig().InSong.GetValue()) { logger().debug("InSong true"); } else { logger().debug("InSong false"); }
+        //if (getModConfig().SecToggle.GetValue()) { logger().debug("SecToggle true"); } else { logger().debug("SecToggle false"); }
+        //if (getModConfig().FontSize.GetValue()) { logger().debug("FontSize true value %s", getModConfig().FontSize.GetValue()); } else { logger().debug("FontSize false"); }
+        //if (getModConfig().BattToggle.GetValue()) { logger().debug("BattToggle true"); } else { logger().debug("BattToggle false"); }
+        //if (getModConfig().TwelveToggle.GetValue()) { logger().debug("TwelveToggle true"); } else { logger().debug("TwelveToggle false"); }
+        //if (getModConfig().RainbowClock.GetValue()) { logger().debug("RainbowClock true"); } else { logger().debug("RainbowClock false"); }
+        ////if (getModConfig().ClockColor.GetValue()) { logger().debug("ClockColor true"); } else { logger().debug("ClockColor false"); }
+        //if (getModConfig().ClockPosition.GetValue()) { logger().debug("ClockPosition bottom"); } else { logger().debug("ClockPosition top"); }
 
     }
     Config.IsInSong = false;

@@ -108,12 +108,13 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
              auto clockresult = getTimeString((struct tm*)timeinfo);
              wait = 0;
 
+             // /*
              // TODO: Fix this rainbow stuff
              // Checks, if the clock is set to rainbowify
              if (getModConfig().RainbowClock.GetValue()) {
                  clockresult = RainbowClock::rainbowify(clockresult);
              };
-
+             // */
              // Checks, the below condition and if it retunrs true, gets the current Battery Percentage Level and adds it to the clockresult variable.
              if (getModConfig().BattToggle.GetValue()) {
                  // Gets the Battery Percentage as float 1.00, multiplies it by 100, and then uses the getBatteryString function defined above to format the percentage.

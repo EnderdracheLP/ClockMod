@@ -13,5 +13,4 @@ DECLARE_CLASS_CODEGEN(ClockMod, ClockViewController, HMUI::ViewController,
         REGISTER_METHOD(DidActivate);
 //        REGISTER_METHOD(DidDeactivate);
     )
-
 );

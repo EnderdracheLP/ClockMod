@@ -1,3 +1,4 @@
+// /*
 // Rainbow Clock thanks to Redbrumbler
 #pragma once
 #include <string>
@@ -25,3 +26,4 @@ private:
         "#ff60a0"
     };
 };
+// */
