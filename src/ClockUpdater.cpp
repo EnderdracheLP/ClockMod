@@ -15,7 +15,7 @@
 using namespace UnityEngine;
 using namespace TMPro;
 
-DEFINE_CLASS(ClockMod::ClockUpdater);               // Here is where the class is defined, look inside ClockUpdater.hpp for more stuff.
+DEFINE_TYPE(ClockMod::ClockUpdater);               // Here is where the class is defined, look inside ClockUpdater.hpp for more stuff.
        
 // Function for getting time. Checks config Settings for 12/24 Hour time and if Show Seconds is toggled on or off.
 std::string getTimeString(struct tm* timeinfo) {

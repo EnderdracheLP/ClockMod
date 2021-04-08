@@ -18,7 +18,7 @@ struct ClockPos_t {
     UnityEngine::Vector3 NormalSongRotationTop =    UnityEngine::Vector3(-10.0f,    0.0f,    0.0f    );
     // Clock InNormalSong Positions Bottom
     UnityEngine::Vector3 NormalSongPosDown =        UnityEngine::Vector3(0.0f,      -1.4f,   1.3f    ); // 0, -2.5, 6.65     // 0, -4.45, 2 // 0.0f, -3.5f, 6.65f
-    float NormalSongScaleDown = 0.49999f;
+    float NormalSongScaleDown = 0.5f;
     UnityEngine::Vector3 NormalSongRotationDown =   UnityEngine::Vector3(32.0f,     0,         0    ); // 45, 0, 0
 
 

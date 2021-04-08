@@ -23,7 +23,7 @@ using namespace QuestUI;
 using namespace UnityEngine;
 using namespace HMUI;
 
-DEFINE_CLASS(ClockMod::ClockViewController);
+DEFINE_TYPE(ClockMod::ClockViewController);
 
 void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     if (firstActivation) {
