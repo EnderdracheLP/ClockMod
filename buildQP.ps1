@@ -2,10 +2,10 @@
 & $PSScriptRoot/build.ps1
 
 $ModID = "clockmod"
-$BSHook = "1_2_4"
+$BSHook = "1_2_6"
 
 if ($?) {
-    Compress-Archive -Path "./libs/arm64-v8a/lib$ModID.so", "./libs/arm64-v8a/libbeatsaber-hook_$BSHook.so", ".\mod.json" -DestinationPath "./Temp$ModID.zip" -Update
+    Compress-Archive -Path "./libs/arm64-v8a/lib$ModID.so", "./libs/arm64-v8a/libbeatsaber-hook_$BSHook.so", ".\mod.json", ".\Cover.png" -DestinationPath "./Temp$ModID.zip" -Update
     Remove-Item "./$ModID.qmod"
     Rename-Item "./Temp$ModID.zip" "./$ModID.qmod"
 }
