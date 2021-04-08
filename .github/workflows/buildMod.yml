@@ -11,7 +11,7 @@ jobs:
   build:
     env:
      module_id: clockmod
-     bs-hook: 1.2.6
+     bs_hook: 1.2.6
     runs-on: ubuntu-latest
     
     steps:
@@ -79,11 +79,7 @@ jobs:
     - name: Package QMOD
       run: |
         cd ${GITHUB_WORKSPACE}
-        pwsh -Command ./buildQP.ps1 --package
-    - name: Package BMBFMod
-      run: |
-        cd ${GITHUB_WORKSPACE}
-        pwsh -Command ./buildBMBF.ps1 --package
+        pwsh -Command ./buildQMOD.ps1 --package
     - name: Upload non-debug artifact
       uses: actions/upload-artifact@v2
       with:
@@ -101,10 +97,4 @@ jobs:
       with:
         name: ${{ env.module_id }}.qmod
         path: ./${{ env.module_id }}.qmod
-        if-no-files-found: warn
-    - name: Upload BMBFMod
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ env.module_id }}.zip
-        path: ./${{ env.module_id }}.zip
         if-no-files-found: warn

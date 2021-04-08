@@ -76,11 +76,7 @@ jobs:
     - name: Package QMOD
       run: |
         cd ${GITHUB_WORKSPACE}
-        pwsh -Command ./buildQP.ps1 --package
-    - name: Package BMBFMod
-      run: |
-        cd ${GITHUB_WORKSPACE}
-        pwsh -Command ./buildBMBF.ps1 --package
+        pwsh -Command ./buildQMOD.ps1 --package
     - name: Create Release
       id: create_pre-release
       uses: actions/create-release@v1
@@ -92,16 +88,6 @@ jobs:
         body_path: ./pre-rl-notes
         draft: false
         prerelease: true
-    - name: Upload BMBF Pre-Release Asset
-      id: upload-prerelease-BMBFMod
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_pre-release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./${{ env.module_id }}.zip
-        asset_name: ${{ env.module_id }}.zip
-        asset_content_type: application/zip
     - name: Upload QMOD Pre-Release Asset
       id: upload-prerelease-QMOD 
       uses: actions/upload-release-asset@v1
