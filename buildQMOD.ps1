@@ -1,6 +1,6 @@
 # Builds a .qmod file for loading with QP
 if ($args.Count -eq 0) {
-$BSHook = "1_2_6"
+$BSHook = "1_3_0"
 $ModID = "clockmod"
 
 echo "Compiling Mod"

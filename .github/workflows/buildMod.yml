@@ -11,7 +11,7 @@ jobs:
   build:
     env:
      module_id: clockmod
-     bs_hook: 1_2_6
+     bs_hook: 1_3_0
     runs-on: ubuntu-latest
     
     steps:

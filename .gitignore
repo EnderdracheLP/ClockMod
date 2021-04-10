@@ -50,3 +50,4 @@ ndkpath.txt
 extern/
 Android.mk.backup
 qpm.shared.json
+*.qmod

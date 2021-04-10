@@ -8,7 +8,7 @@ jobs:
     env:
      module_id: clockmod
      version: v1.4.0-Pre1
-     bs_hook: 1_2_6
+     bs_hook: 1_3_0
      BSVersion: 1.14.0
     runs-on: ubuntu-latest
     

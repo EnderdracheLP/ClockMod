@@ -7,7 +7,7 @@ DECLARE_CLASS_CODEGEN(ClockMod, ClockUpdater, UnityEngine::MonoBehaviour,
 
     DECLARE_METHOD(void, Update);
 
-    REGISTER_FUNCTION(ClockUpdater,
+    REGISTER_FUNCTION(
         REGISTER_METHOD(Update);
     )
 )
