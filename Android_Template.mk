@@ -29,7 +29,7 @@ LOCAL_EXPORT_C_INCLUDES := extern/beatsaber-hook
 LOCAL_SRC_FILES := extern/libbeatsaber-hook_{BS_Hook}.so
 LOCAL_EXPORT_C_FLAGS := -DNEED_UNSAFE_CSHARP
 include $(PREBUILT_SHARED_LIBRARY)
-# Creating prebuilt for dependency: codegen - version: 0.7.2
+# Creating prebuilt for dependency: codegen - version: 0.7.1
 include $(CLEAR_VARS)
 LOCAL_MODULE := codegen_{CG_VER}
 LOCAL_EXPORT_C_INCLUDES := extern/codegen

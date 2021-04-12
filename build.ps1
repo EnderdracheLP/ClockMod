@@ -3,7 +3,7 @@ if ($args.Count -eq 0) {
 $ModID = "clockmod"
 $VERSION = "1.4.0"
 $BSHook = "1_3_3"
-$codegen_ver = "0_7_2"
+$codegen_ver = "0_7_1"
 }
 
 if ($args[0] -eq "--package") {

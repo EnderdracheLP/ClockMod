@@ -6,7 +6,7 @@ on:
      version: 1.4.0
      BSVersion: 1.14.0
      bs_hook: 1_3_3
-     codegen: 0_7_2
+     codegen: 0_7_1
      ndkname: android-ndk-r22
 
 name: Release Mod
