@@ -91,7 +91,7 @@ jobs:
         draft: false
         prerelease: false
     - name: Upload QMOD Release Asset
-      id: upload-prerelease-QMOD 
+      id: upload-release-QMOD 
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

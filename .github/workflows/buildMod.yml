@@ -3,15 +3,15 @@ name: NDK build
 on:
   workflow_dispatch:
   push:
-    branches: [ master, dev, 1.14.0 ]
+    branches: [ main, dev, 1.14.0 ]
   pull_request:
-    branches: [ master, dev, 1.14.0 ]
+    branches: [ main, dev, 1.14.0 ]
 
 env:
      module_id: clockmod
      version: 1.4.0
-     bs_hook: 1_3_0
-     codegen: 0_7_1
+     bs_hook: 1_3_3
+     codegen: 0_7_2
      ndkname: android-ndk-r22
     
 jobs:
