@@ -2,17 +2,17 @@
   "_QPVersion": "0.1.1",
   "id": "clockmod",
   "name": "Clock Mod",
-  "version": "1.4.0",
+  "version": "{VERSION_NUMBER_PLACEHOLDER}",
   "author": "BoopetyDoopety, EnderdracheLP",
   "packageId": "com.beatgames.beatsaber",
   "packageVersion": "1.14.0",
-  "description": "Displays the time in game.",
+  //"description": "Displays the time in game.",
   "coverImage": "Cover.png",
   "modFiles": [
     "libclockmod.so"
   ],
   "libraryFiles": [
-    "libbeatsaber-hook_1_3_0.so"
+    "libbeatsaber-hook_{BS_Hook}.so"
   ],
   "dependencies": [],
   "fileCopies": []

@@ -537,11 +537,11 @@ extern "C" void setup(ModInfo & info) {
 
     //logger().debug("config path is %s", Modloader::getApplicationId());
 
-    std::string DD = getDataDir(modInfo);
-    logger().debug("DataDir path is %s", DD.c_str());
+    //std::string DD = getDataDir(modInfo);
+    //logger().debug("DataDir path is %s", DD.c_str());
 
-    std::string CFP = Configuration::getConfigFilePath(modInfo);
-    logger().debug("Config path is %s", CFP.c_str());
+    //std::string CFP = Configuration::getConfigFilePath(modInfo);
+    //logger().debug("Config path is %s", CFP.c_str());
 
 
     logger().info("Completed ClockMod setup!");
@@ -559,6 +559,7 @@ extern "C" void load() {
 
     Logger& hkLog = logger();
 
+    //custom_types::Register::AutoRegister();
     custom_types::Register::RegisterType<ClockMod::ClockUpdater>();
     //custom_types::Register::RegisterType<ClockMod::ClockRotationUpdater>();
     custom_types::Register::RegisterType<ClockMod::ClockViewController>();

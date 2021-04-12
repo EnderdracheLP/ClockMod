@@ -2,14 +2,17 @@ on:
   workflow_dispatch:
 
 name: Pre-Release Mod
+env:
+     module_id: clockmod
+     version: 1.4.0-Pre2
+     BSVersion: 1.14.0
+     bs_hook: 1_3_3
+     codegen: 0_7_2
+     ndkname: android-ndk-r22
+
 
 jobs:
   build:
-    env:
-     module_id: clockmod
-     version: v1.4.0-Pre1
-     bs_hook: 1_3_0
-     BSVersion: 1.14.0
     runs-on: ubuntu-latest
     
     steps:
@@ -26,7 +29,6 @@ jobs:
       uses: actions/cache@v2
       env:
         cache-name: cache-ndk
-        ndkname: android-ndk-r22
       with:
         path: ndk
         key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
@@ -35,8 +37,6 @@ jobs:
     
     - name: Install Android NDK
       if: steps.cache-ndk.outputs.cache-hit != 'true'
-      env:
-        ndkname: android-ndk-r22
       run: |
         wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
         unzip -q ndk.zip

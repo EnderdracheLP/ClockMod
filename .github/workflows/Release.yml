@@ -1,15 +1,18 @@
 on:
   workflow_dispatch:
 
+    env:
+     module_id: clockmod
+     version: 1.4.0
+     BSVersion: 1.14.0
+     bs_hook: 1_3_3
+     codegen: 0_7_2
+     ndkname: android-ndk-r22
+
 name: Release Mod
 
 jobs:
   build:
-    env:
-     module_id: clockmod
-     version: v1.4.0
-     bs_hook: 1_3_0
-     BSVersion: 1.14.0
     runs-on: ubuntu-latest
     
     steps:
@@ -35,8 +38,6 @@ jobs:
     
     - name: Install Android NDK
       if: steps.cache-ndk.outputs.cache-hit != 'true'
-      env:
-        ndkname: android-ndk-r22
       run: |
         wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
         unzip -q ndk.zip
@@ -90,7 +91,7 @@ jobs:
         draft: false
         prerelease: false
     - name: Upload QMOD Release Asset
-      id: upload-release-QMOD 
+      id: upload-prerelease-QMOD 
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -98,4 +99,4 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./${{ env.module_id }}.qmod
         asset_name: ${{ env.module_id }}.qmod
-        asset_content_type: application/zip
+        asset_content_type: application/qmod

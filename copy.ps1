@@ -12,10 +12,6 @@ if ($?) {
         #Start-Process PowerShell -ArgumentList '-NoExit',"./logging.ps1 --file"
         Start-Process PowerShell -ArgumentList "./logging.ps1 --file"
         }
-        if ($args[0] -eq "--debug") {
-            $timestamp = Get-Date -Format "MM-dd HH:mm:ss.fff"
-            adb logcat -T "$timestamp" main-modloader:W QuestHook[clockmod`|v1.4.0]:* AndroidRuntime:E *:S QuestHook[UtilsLogger`|v1.0.12]:*
-        }
     }
 }
 echo "Exiting Copy.ps1"
