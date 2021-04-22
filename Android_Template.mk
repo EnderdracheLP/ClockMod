@@ -27,7 +27,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := beatsaber-hook_{BS_Hook}
 LOCAL_EXPORT_C_INCLUDES := extern/beatsaber-hook
 LOCAL_SRC_FILES := extern/libbeatsaber-hook_{BS_Hook}.so
-LOCAL_EXPORT_C_FLAGS := -DNEED_UNSAFE_CSHARP
+LOCAL_CPP_FEATURES := exceptions
 include $(PREBUILT_SHARED_LIBRARY)
 # Creating prebuilt for dependency: codegen - version: 0.7.1
 include $(CLEAR_VARS)
@@ -67,6 +67,5 @@ LOCAL_SHARED_LIBRARIES += questui
 LOCAL_LDLIBS += -llog
 LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"clockmod"' -DVERSION='"{VERSION}"' -I'./shared' -I'./extern' -isystem'extern/codegen/include'
 LOCAL_CPPFLAGS += -std=c++2a
-LOCAL_CPP_FEATURES := exceptions
 LOCAL_C_INCLUDES += ./include ./src
 include $(BUILD_SHARED_LIBRARY)

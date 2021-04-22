@@ -12,6 +12,10 @@ if ($?) {
         #Start-Process PowerShell -ArgumentList '-NoExit',"./logging.ps1 --file"
         Start-Process PowerShell -ArgumentList "./logging.ps1 --file"
         }
+        if ($args[0] -eq "--log-simple") {
+        #Start-Process PowerShell -ArgumentList '-NoExit',"./logging.ps1 --file"
+        Start-Process PowerShell -ArgumentList "./logging.ps1 --file-simple"
+        }
     }
 }
 echo "Exiting Copy.ps1"

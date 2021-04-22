@@ -1,6 +1,8 @@
 #include "main.hpp"
 #include "ClockValues.hpp"
 
+#include "GlobalNamespace/OVRPlugin.hpp"
+
 #include "GlobalNamespace/MainMenuViewController.hpp"
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
 #include "GlobalNamespace/PauseMenuManager.hpp"
@@ -80,6 +82,8 @@ DEFINE_CONFIG(ModConfig);
 
 float RotateSongX;
 
+bool ClockModInit;
+
 UnityEngine::Canvas* canvas;
 UnityEngine::UI::VerticalLayoutGroup* layout;
 
@@ -93,7 +97,14 @@ void MPLobbyClockPos(float MLobbyVCPosY) {
 MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-    if (firstActivation) {
+    if (firstActivation && ClockModInit) {
+        //logger().debug("Available frequencies: ");
+        //auto SystemDisplayFrequencies = GlobalNamespace::OVRPlugin::get_systemDisplayFrequenciesAvailable();
+        //for (int i = 0; i < SystemDisplayFrequencies->Length(); i++)
+        //{
+        //    logger().debug("Frequency: %f", SystemDisplayFrequencies->values[i]);
+        //}
+
         auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::createcsstr("Canvas"));
         canvas = canvas_object->AddComponent<UnityEngine::Canvas*>();
         auto canvas_scaler = canvas_object->AddComponent<CanvasScaler*>();
@@ -138,7 +149,7 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         //if (getModConfig().RainbowClock.GetValue()) { logger().debug("RainbowClock true"); } else { logger().debug("RainbowClock false"); }
         ////if (getModConfig().ClockColor.GetValue()) { logger().debug("ClockColor true"); } else { logger().debug("ClockColor false"); }
         //if (getModConfig().ClockPosition.GetValue()) { logger().debug("ClockPosition bottom"); } else { logger().debug("ClockPosition top"); }
-
+        ClockModInit = false;
     }
     Config.IsInSong = false;
     Config.InMPLobby = false;
@@ -171,10 +182,10 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
     float LayoutClockPosY = layout->get_transform()->get_position().y;
     float LayoutClockPosZ = layout->get_transform()->get_position().z;
     float LayoutClockRotX = layout->get_transform()->get_eulerAngles().x;
-    logger().debug("ClockPos before X %f", LayoutClockPosX);
-    logger().debug("ClockPos before Y %f", LayoutClockPosY);
-    logger().debug("ClockPos before Z %f", LayoutClockPosZ);
-    logger().debug("ClockRot before X %f", LayoutClockRotX);
+    //logger().debug("ClockPos before X %f", LayoutClockPosX);
+    //logger().debug("ClockPos before Y %f", LayoutClockPosY);
+    //logger().debug("ClockPos before Z %f", LayoutClockPosZ);
+    //logger().debug("ClockRot before X %f", LayoutClockRotX);
 
     Config.InMPLobby = false;
     Config.IsInSong = true;
@@ -198,9 +209,9 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
         LayoutClockPosX = layout->get_transform()->get_position().x;
         LayoutClockPosY = layout->get_transform()->get_position().y;
         LayoutClockPosZ = layout->get_transform()->get_position().z;
-        logger().debug("ClockPos X %f", LayoutClockPosX);
-        logger().debug("ClockPos Y %f", LayoutClockPosY);
-        logger().debug("ClockPos Z %f", LayoutClockPosZ);
+        //logger().debug("ClockPos X %f", LayoutClockPosX);
+        //logger().debug("ClockPos Y %f", LayoutClockPosY);
+        //logger().debug("ClockPos Z %f", LayoutClockPosZ);
         }
     }
     else if (getModConfig().ClockPosition.GetValue()) { // When in a normal Map do this.
@@ -213,10 +224,10 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
         LayoutClockPosY = layout->get_transform()->get_position().y;
         LayoutClockPosZ = layout->get_transform()->get_position().z;
         LayoutClockRotX = layout->get_transform()->get_eulerAngles().x;
-        logger().debug("ClockPos after X %f", LayoutClockPosX);
-        logger().debug("ClockPos after Y %f", LayoutClockPosY);
-        logger().debug("ClockPos after Z %f", LayoutClockPosZ);
-        logger().debug("ClockRot after X %f", LayoutClockRotX);
+        //logger().debug("ClockPos after X %f", LayoutClockPosX);
+        //logger().debug("ClockPos after Y %f", LayoutClockPosY);
+        //logger().debug("ClockPos after Z %f", LayoutClockPosZ);
+        //logger().debug("ClockRot after X %f", LayoutClockRotX);
         //logger().debug("In Normal Map set to Bottom");
     }
     else {
@@ -535,6 +546,8 @@ extern "C" void setup(ModInfo & info) {
     info.version = VERSION;
     modInfo = info;
 
+    ClockModInit = true;
+
     //logger().debug("config path is %s", Modloader::getApplicationId());
 
     //std::string DD = getDataDir(modInfo);
@@ -542,7 +555,6 @@ extern "C" void setup(ModInfo & info) {
 
     //std::string CFP = Configuration::getConfigFilePath(modInfo);
     //logger().debug("Config path is %s", CFP.c_str());
-
 
     logger().info("Completed ClockMod setup!");
 }
