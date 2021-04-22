@@ -1,14 +1,18 @@
 on:
   workflow_dispatch:
 
+    env:
+     module_id: clockmod
+     version: 1.4.0
+     BSVersion: 1.14.0
+     bs_hook: 1_3_3
+     codegen: 0_7_2
+     ndkname: android-ndk-r22
+
 name: Release Mod
 
 jobs:
   build:
-    env:
-     module_id: clockmod
-     version: v1.4.0
-     BSVersion: 1.14.0
     runs-on: ubuntu-latest
     
     steps:
@@ -34,8 +38,6 @@ jobs:
     
     - name: Install Android NDK
       if: steps.cache-ndk.outputs.cache-hit != 'true'
-      env:
-        ndkname: android-ndk-r22
       run: |
         wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
         unzip -q ndk.zip
@@ -65,7 +67,7 @@ jobs:
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        pwsh -Command ./build.ps1
+        pwsh -Command ./build.ps1 --actions
     - name: Get Library Name
       id: libname
       run: |
@@ -73,10 +75,10 @@ jobs:
         pattern="lib${module_id}*.so"
         files=( $pattern )
         echo ::set-output name=NAME::"${files[0]}"
-    - name: Package BMBFMod
+    - name: Package QMOD
       run: |
         cd ${GITHUB_WORKSPACE}
-        pwsh -Command ./buildBMBF.ps1 --package
+        pwsh -Command ./buildQMOD.ps1 --package
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -88,13 +90,13 @@ jobs:
         body_path: ./rl-notes
         draft: false
         prerelease: false
-    - name: Upload BMBF Pre-Release Asset
-      id: upload-prerelease-BMBFMod
+    - name: Upload QMOD Release Asset
+      id: upload-release-QMOD 
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./${{ env.module_id }}.zip
-        asset_name: ${{ env.module_id }}.zip
-        asset_content_type: application/zip
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.module_id }}.qmod
+        asset_name: ${{ env.module_id }}.qmod
+        asset_content_type: application/qmod
