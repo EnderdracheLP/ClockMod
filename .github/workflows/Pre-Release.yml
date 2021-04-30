@@ -5,9 +5,9 @@ name: Pre-Release Mod
 env:
      module_id: clockmod
      version: 1.4.0-Pre2
-     BSVersion: 1.14.0
+     BSVersion: 1.15.0
      bs_hook: 1_3_3
-     codegen: 0_8_0
+     codegen: 0_8_1
      ndkname: android-ndk-r22
 
 
