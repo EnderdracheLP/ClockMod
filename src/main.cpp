@@ -105,7 +105,7 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         //    logger().debug("Frequency: %f", SystemDisplayFrequencies->values[i]);
         //}
 
-        auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::createcsstr("Canvas"));
+        auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::newcsstr("Canvas"));
         canvas = canvas_object->AddComponent<UnityEngine::Canvas*>();
         auto canvas_scaler = canvas_object->AddComponent<CanvasScaler*>();
         auto canvas_renderer = canvas_object->AddComponent<CanvasRenderer*>();

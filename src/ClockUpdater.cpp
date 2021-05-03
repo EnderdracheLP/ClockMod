@@ -124,7 +124,7 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
              }
 
              // This is where the Text and Clock Position is set.
-             text->set_text(il2cpp_utils::createcsstr(clockresult));        // This sets the Text
+             text->set_text(il2cpp_utils::newcsstr(clockresult));        // This sets the Text
              text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
              text->set_fontSize(getModConfig().FontSize.GetValue());
          }
