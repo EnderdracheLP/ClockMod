@@ -51,3 +51,4 @@ extern/
 Android.mk.backup
 qpm.shared.json
 *.qmod
+*.prolog
