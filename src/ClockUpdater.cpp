@@ -26,20 +26,28 @@ std::string getTimeString(struct tm* timeinfo) {
     if (!getModConfig().TwelveToggle.GetValue()) {
         if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
             TFormat = "%H:%M:%S";       // Time in 24 Hour Format with Seconds
+            strftime(time, sizeof(time), TFormat, timeinfo);
+            return time;
         }
         else {
             TFormat = "%H:%M";          // Time in 24 Hour Format without Seconds
+            strftime(time, sizeof(time), TFormat, timeinfo);
+            return time;
         }
     }
     else {      // If set to show 12 Hour Format
         if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
             TFormat = "%l:%M:%S %p";    // Time in 24 Hour Format with Seconds
+            strftime(time, sizeof(time), TFormat, timeinfo);
+            return time;
         }
         else {
             TFormat = "%l:%M %p";       // Time in 24 Hour Format without Seconds
+            strftime(time, sizeof(time), TFormat, timeinfo);
+            return time;
         }
     }
-    strftime(time, sizeof(time), TFormat, timeinfo);
+    strftime(time, sizeof(time), "%H:%M", timeinfo);
     return time;
 }
 
@@ -47,7 +55,8 @@ std::string getTimeString(struct tm* timeinfo) {
 std::string getBatteryString(int level)
 {
     std::string percent = string_format("%d%%", level);
-    if (level < 16) return string_format("<color=#ff0000>%s</color>", percent.c_str());
+    if (level < 20) return string_format("<color=#ff0000>%s</color>", percent.c_str());
+    else if (level < 35) return string_format("<color=#FFD700>%s</color>", percent.c_str());
     else if (level > 49) return string_format("<color=#00ff00>%s</color>", percent.c_str());
     else return string_format("<color=#ff8800>%s</color>", percent.c_str());
 }
@@ -77,7 +86,6 @@ std::string RainbowClock::rainbowify(std::string input)
         rainbowIndex++;
         rainbowIndex %= colors.size();
     }
-
     return result;
 }
 // */
@@ -149,27 +157,6 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
                      auto Scale = UnityEngine::Vector3(1, 1, 1);
                      SetClockPos(clockParent, text, Pos, Angle, Scale);
                  }
-             //}
-             // TODO: Reduce the amount of code here, like make stuff a variable or a function
-             //            When not in a Map with RotationEvents (360/90).
-             //else if (Config.InRotationMap == false && Config.InMP == false) {
-             //    if (getModConfig().ClockPosition.GetValue()) {
-             //        // If set to be at the Bottom do this.
-             //        auto Pos = UnityEngine::Vector3(0, -4.45, 2);
-             //        auto Angle = UnityEngine::Vector3(45, 0, 0);
-             //        auto Scale = UnityEngine::Vector3(1, 1, 1);
-             //        SetClockPos(clockParent, text, Pos, Angle, Scale);
-             //        //logger().debug("In Normal Map set to Bottom");
-             //    }
-             //    else {
-             //        // Otherwise it will do this.
-             //        auto Pos = UnityEngine::Vector3(0, -1.7, 5.6);
-             //        auto Angle = UnityEngine::Vector3(-10, 0, 0);
-             //        auto Scale = UnityEngine::Vector3(1, 1, 1);
-             //        SetClockPos(clockParent, text, Pos, Angle, Scale);
-             //        //logger().debug("In Normal Map set to Top");
-             //    }
-             //}
          }
          else { // If in MP Lobby or a Song, unset all this.
              //clockParent->set_position(UnityEngine::Vector3(0, 0, 0));
@@ -178,14 +165,3 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
          }
      }
  }
-
-//if (Config.InRotationMap == false) {
-//    if (getModConfig().ClockPosition.GetValue()) {
-//        text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-//        text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-//    }
-//    else { // If in a 360 Map, unset all of this.
-//        text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-//        text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-//    }
-//}

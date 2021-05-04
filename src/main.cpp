@@ -178,10 +178,10 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
     // Instance of PlayerDataModel the noTextAndHUDs variable specifically
     Config.noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->playerSpecificSettings->noTextsAndHuds;
 
-    float LayoutClockPosX = layout->get_transform()->get_position().x;
-    float LayoutClockPosY = layout->get_transform()->get_position().y;
-    float LayoutClockPosZ = layout->get_transform()->get_position().z;
-    float LayoutClockRotX = layout->get_transform()->get_eulerAngles().x;
+    //float LayoutClockPosX = layout->get_transform()->get_position().x;
+    //float LayoutClockPosY = layout->get_transform()->get_position().y;
+    //float LayoutClockPosZ = layout->get_transform()->get_position().z;
+    //float LayoutClockRotX = layout->get_transform()->get_eulerAngles().x;
     //logger().debug("ClockPos before X %f", LayoutClockPosX);
     //logger().debug("ClockPos before Y %f", LayoutClockPosY);
     //logger().debug("ClockPos before Z %f", LayoutClockPosZ);
@@ -200,15 +200,15 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
     if (/*Config.InMP ||*/ Config.InRotationMap) { // Checks if in a map with RotationEvents (360/90) or in a MP Song.
         if (getModConfig().ClockPosition.GetValue()) { // Then checks if the clock is set to be at the Top or the Bottom
             SetClockPos(ClockPos.RotateSongPosDown, ClockPos.RotateSongRotationDown, ClockPos.RotateSongScaleDown);
-            logger().debug("SetPos 360/MP Bottom");
+            logger().info("SetPos 360/MP Bottom");
         }
         else { 
-        logger().debug("SetPos 360/MP Top");
+        logger().info("SetPos 360/MP Top");
         SetClockPos(ClockPos.RotateSongPosTop, ClockPos.RotateSongRotationTop, ClockPos.RotateSongScaleTop);
 
-        LayoutClockPosX = layout->get_transform()->get_position().x;
-        LayoutClockPosY = layout->get_transform()->get_position().y;
-        LayoutClockPosZ = layout->get_transform()->get_position().z;
+        //LayoutClockPosX = layout->get_transform()->get_position().x;
+        //LayoutClockPosY = layout->get_transform()->get_position().y;
+        //LayoutClockPosZ = layout->get_transform()->get_position().z;
         //logger().debug("ClockPos X %f", LayoutClockPosX);
         //logger().debug("ClockPos Y %f", LayoutClockPosY);
         //logger().debug("ClockPos Z %f", LayoutClockPosZ);
@@ -220,15 +220,15 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
         //auto Angle = UnityEngine::Vector3(45, 0, 0);
         //auto Scale = UnityEngine::Vector3(ClockPos.NormalSongScaleDown, ClockPos.NormalSongScaleDown, ClockPos.NormalSongScaleDown);
         SetClockPos(ClockPos.NormalSongPosDown, ClockPos.NormalSongRotationDown, ClockPos.NormalSongScaleDown);
-        LayoutClockPosX = layout->get_transform()->get_position().x;
-        LayoutClockPosY = layout->get_transform()->get_position().y;
-        LayoutClockPosZ = layout->get_transform()->get_position().z;
-        LayoutClockRotX = layout->get_transform()->get_eulerAngles().x;
+        //LayoutClockPosX = layout->get_transform()->get_position().x;
+        //LayoutClockPosY = layout->get_transform()->get_position().y;
+        //LayoutClockPosZ = layout->get_transform()->get_position().z;
+        //LayoutClockRotX = layout->get_transform()->get_eulerAngles().x;
         //logger().debug("ClockPos after X %f", LayoutClockPosX);
         //logger().debug("ClockPos after Y %f", LayoutClockPosY);
         //logger().debug("ClockPos after Z %f", LayoutClockPosZ);
         //logger().debug("ClockRot after X %f", LayoutClockRotX);
-        //logger().debug("In Normal Map set to Bottom");
+        logger().info("In Normal Map set to Bottom");
     }
     else {
         // Otherwise it will do this.
@@ -236,7 +236,7 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
         //auto Angle = UnityEngine::Vector3(-10, 0, 0);
         //auto Scale = UnityEngine::Vector3(1, 1, 1);
         SetClockPos(ClockPos.NormalSongPosTop, ClockPos.NormalSongRotationTop, ClockPos.NormalSongScaleTop);
-        //logger().debug("In Normal Map set to Top");
+        logger().info("In Normal Map set to Top");
     } 
 }
 
