@@ -56,8 +56,8 @@ std::string getBatteryString(int level)
 {
     std::string percent = string_format("%d%%", level);
     if (level < 20) return string_format("<color=#ff0000>%s</color>", percent.c_str());
-    else if (level < 35) return string_format("<color=#FFD700>%s</color>", percent.c_str());
-    else if (level > 49) return string_format("<color=#00ff00>%s</color>", percent.c_str());
+    else if (level < 35) return string_format("<color=#00ff00>%s</color>", percent.c_str());
+    else if (level > 49) return string_format("<color=#FFD700>%s</color>", percent.c_str());
     else return string_format("<color=#ff8800>%s</color>", percent.c_str());
 }
 
