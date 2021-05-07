@@ -93,8 +93,7 @@ jobs:
         echo "Checking extern Folder"
         ls -l ${GITHUB_WORKSPACE}/extern/
         echo "Checking QPM_Temp Folder"
-        cd ${GITHUB_WORKSPACE}/QPM_Temp/
-        ls -l -R **/*.so
+        ls -l -R /QPM_Temp/
 
     - name: Build
       run: |
