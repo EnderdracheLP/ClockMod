@@ -50,6 +50,7 @@ jobs:
       run: |
         cd ndk
         pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
+        
     - name: Get QPM
       if: steps.cache-qpm.outputs.cache-hit != 'true'
       uses: dawidd6/action-download-artifact@v2
@@ -58,7 +59,8 @@ jobs:
         workflow: main.yml
         name: QPM-ubuntu-x64
         path: QPM
-        repo: sc2ad/QuestPackageManager
+        repo: Fernthedev/QuestPackageManager
+        branch: ci-symlink
       
     - name: QPM Restore
       run: |
