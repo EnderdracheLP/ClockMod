@@ -100,7 +100,7 @@ jobs:
         echo "Listing codegen folder"
         ls -lh QPM_Temp/codegen/
         echo "Listing all .so files in QPM_Temp"
-        ls -lh QPM_Temp/*.so -R
+        find QPM_Temp -type f -name "*.so"
 #      continue-on-error: true
 
     - name: Build
