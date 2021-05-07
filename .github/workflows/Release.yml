@@ -48,7 +48,7 @@ jobs:
         cd ndk
         pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
     - name: Get QPM
-      if: steps.cache-qpm.outputs.cache-hit != 'true'
+#      if: steps.cache-qpm.outputs.cache-hit != 'true'
       uses: dawidd6/action-download-artifact@v2
       with:
         github_token: ${{secrets.GITHUB_TOKEN}}
@@ -57,13 +57,30 @@ jobs:
         path: QPM
         repo: sc2ad/QuestPackageManager
       
+    - name: QPM Dependencies Cache
+      id: cache-qpm-deps
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-qpm-deps
+      with:
+        path: QPM_Temp
+        key: ${{ runner.os }}-${{ env.cache-name }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}
+      
     - name: QPM Restore
       run: |
         chmod +x ./QPM/QPM
         ./QPM/QPM restore
-    - name: test
+
+    - name: Check dependency Folders
       run: |
-        ls ./QPM/QPM_Temp
+        echo "Checking extern Folder"
+        ls -l ${GITHUB_WORKSPACE}/extern/
+        echo "Checking QPM_Temp Folder"
+        cd ${GITHUB_WORKSPACE}/QPM_Temp/
+        ls -l -R **/*.so
+
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}

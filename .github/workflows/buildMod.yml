@@ -63,15 +63,14 @@ jobs:
 #           ${{ runner.os }}-${{ env.cache-name }}-1
 
     - name: Get QPM
-      if: steps.cache-qpm.outputs.cache-hit != 'true'
+#      if: steps.cache-qpm.outputs.cache-hit != 'true'
       uses: dawidd6/action-download-artifact@v2
       with:
         github_token: ${{secrets.GITHUB_TOKEN}}
         workflow: main.yml
         name: QPM-ubuntu-x64
         path: QPM
-        repo: Fernthedev/QuestPackageManager
-        branch: ci-symlink
+        repo: sc2ad/QuestPackageManager
 
     - name: QPM Dependencies Cache
       id: cache-qpm-deps
@@ -80,7 +79,7 @@ jobs:
         cache-name: cache-qpm-deps
       with:
         path: QPM_Temp
-        key: ${{ runner.os }}-${{ env.cache-name }}
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('qpm.shared.json', '.github/buildMod.yml') }}
         restore-keys: |
           ${{ runner.os }}-${{ env.cache-name }}
       
@@ -94,7 +93,8 @@ jobs:
         echo "Checking extern Folder"
         ls -l ${GITHUB_WORKSPACE}/extern/
         echo "Checking QPM_Temp Folder"
-        ls -l ${GITHUB_WORKSPACE}/QPM_Temp/
+        cd ${GITHUB_WORKSPACE}/QPM_Temp/
+        ls -l -R **/*.so
 
     - name: Build
       run: |
@@ -129,6 +129,6 @@ jobs:
     - name: Upload QMOD
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.module_id }}-(UNZIP-for-QMOD).qmod
+        name: ${{ env.module_id }}-(UNZIP-for-QMOD)
         path: ./${{ env.module_id }}.qmod
         if-no-files-found: warn
