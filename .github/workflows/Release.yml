@@ -76,11 +76,11 @@ jobs:
 
     - name: Check dependency Folders
       run: |
-        echo "Checking extern Folder"
+        echo "Checking extern Folder\n"
         ls -lh ${GITHUB_WORKSPACE}/extern/
-        echo "Checking QPM_Temp Folders"
+        echo "\nChecking QPM_Temp Folders\n"
         ls -lh QPM_Temp/
-        echo "Listing all .so files in QPM_Temp"
+        echo "\nListing all .so files in QPM_Temp\n"
         find QPM_Temp -type f -name "*.so"
 #      continue-on-error: true
 
