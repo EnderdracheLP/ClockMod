@@ -45,12 +45,23 @@ jobs:
         wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
         unzip -q ndk.zip
         mv ${ndkname} ndk
-      
+
     - name: Create ndkpath.txt
       run: |
         cd ndk
         pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
-        
+      
+#     - name: Cache QPM
+#       id: cache-qpm
+#       uses: actions/cache@v2
+#       env:
+#         cache-name: cache-qpm
+#       with:
+#         path: QPM
+#         key: ${{ runner.os }}-${{ env.cache-name }}-1
+#         restore-keys: |
+#           ${{ runner.os }}-${{ env.cache-name }}-1
+
     - name: Get QPM
       if: steps.cache-qpm.outputs.cache-hit != 'true'
       uses: dawidd6/action-download-artifact@v2
@@ -61,18 +72,36 @@ jobs:
         path: QPM
         repo: Fernthedev/QuestPackageManager
         branch: ci-symlink
+
+    - name: QPM Dependencies Cache
+      id: cache-qpm-deps
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-qpm-deps
+      with:
+        path: QPM_Temp
+        key: ${{ runner.os }}-${{ env.cache-name }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}
       
     - name: QPM Restore
+      if: steps.cache-qpm-deps.outputs.cache-hit != 'true'
       run: |
         chmod +x ./QPM/QPM
         ./QPM/QPM restore
-    - name: Check extern Folder
+
+    - name: Check dependency Folders
       run: |
+        echo "Checking extern Folder"
         ls -l ${GITHUB_WORKSPACE}/extern/
+        echo "Checking QPM_Temp Folder"
+        ls -l ${GITHUB_WORKSPACE}/QPM_Temp/
+
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
         pwsh -Command ./build.ps1 --actions
+
     - name: Get Library Name
       id: libname
       run: |
@@ -80,10 +109,12 @@ jobs:
         pattern="lib${module_id}*.so"
         files=( $pattern )
         echo ::set-output name=NAME::"${files[0]}"
+
     - name: Package QMOD
       run: |
         cd ${GITHUB_WORKSPACE}
         pwsh -Command ./buildQMOD.ps1 --package
+
     - name: Upload non-debug artifact
       uses: actions/upload-artifact@v2
       with:
