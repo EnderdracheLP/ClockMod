@@ -64,9 +64,9 @@ jobs:
       run: |
         chmod +x ./QPM/QPM
         ./QPM/QPM restore
-    - name: test
+    - name: Check extern Folder
       run: |
-        ls ./QPM/QPM_Temp
+        ls ./extern/
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
