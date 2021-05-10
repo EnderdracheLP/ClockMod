@@ -11,6 +11,7 @@ jobs:
   build:
     env:
      module_id: clockmod
+     version: 1.4.0-D-Legacy
     runs-on: ubuntu-latest
     
     steps:
@@ -48,7 +49,7 @@ jobs:
         cd ndk
         pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
     - name: Get QPM
-      if: steps.cache-qpm.outputs.cache-hit != 'true'
+      #if: steps.cache-qpm.outputs.cache-hit != 'true'
       uses: dawidd6/action-download-artifact@v2
       with:
         github_token: ${{secrets.GITHUB_TOKEN}}
@@ -61,13 +62,33 @@ jobs:
       run: |
         chmod +x ./QPM/QPM
         ./QPM/QPM restore
-    - name: test
+
+    - name: Check dependency Folders
       run: |
-        ls ./QPM/QPM_Temp
+        echo "Checking extern Folder"
+        ls -lh ${GITHUB_WORKSPACE}/extern/
+        echo ""
+        echo "Checking QPM_Temp Folders"
+        ls -lh QPM_Temp/
+        echo ""
+        echo "Listing beatsaber-hook folder"
+        ls QPM_Temp/beatsaber-hook/
+        echo ""
+        echo "Listing codegen folder"
+        ls -lh QPM_Temp/codegen/
+        echo ""
+        echo "Listing all .so files in QPM_Temp"
+        find QPM_Temp -type f -name "*.so"
+#      continue-on-error: true
+
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        pwsh -Command ./build.ps1
+        pwsh -Command ./build.ps1 --actions
+    - name: Build BMBF Mod
+      run: |
+        cd ${GITHUB_WORKSPACE}
+        pwsh -Command ./buildBMBF.ps1 --package
     - name: Get Library Name
       id: libname
       run: |
@@ -86,4 +107,10 @@ jobs:
       with:
         name: debug_${{ steps.libname.outputs.NAME }}
         path: ./obj/local/arm64-v8a/${{ steps.libname.outputs.NAME }}
+        if-no-files-found: error
+    - name: Upload BMBF Mod
+      uses: actions/upload-artifact@v2
+      with:
+        name: Clockmod-(Unzip-for-BMBF-ZIP)
+        path: ./Clockmod.zip
         if-no-files-found: error
