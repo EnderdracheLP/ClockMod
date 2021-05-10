@@ -9,12 +9,12 @@ $VERSION = "1.4.0-InDev"
 if ($args[0] -eq "--package") {
 echo "Actions: Packaging BMBF Mod"
     (Get-Content "./bmbfmod.json").replace('{VERSION_NUMBER_PLACEHOLDER}', "$env:version") | Set-Content "./bmbfmod.json"
-    Compress-Archive -Path "./libs/arm64-v8a/libclockmod.so", "./libs/arm64-v8a/libbeatsaber-hook_1_0_12.so", "./bmbfmod.json","./Cover.png" -DestinationPath "./Clockmod.zip" -Update
+    Compress-Archive -Path "./libs/arm64-v8a/libclockmod.so", "./libs/arm64-v8a/libbeatsaber-hook_1_1_5.so", "./bmbfmod.json","./Cover.png" -DestinationPath "./Clockmod.zip" -Update
 }
 
 if ($? -And $args.Count -eq 0) {
     echo "Packaging BMBF Mod"
     (Get-Content "./bmbfmod.json").replace('{VERSION_NUMBER_PLACEHOLDER}', "$env:version") | Set-Content "./bmbfmod.json"
-    Compress-Archive -Path "./libs/arm64-v8a/libclockmod.so", "./libs/arm64-v8a/libbeatsaber-hook_1_0_12.so", "./bmbfmod.json","./Cover.png" -DestinationPath "./Clockmod.zip" -Update
+    Compress-Archive -Path "./libs/arm64-v8a/libclockmod.so", "./libs/arm64-v8a/libbeatsaber-hook_1_1_5.so", "./bmbfmod.json","./Cover.png" -DestinationPath "./Clockmod.zip" -Update
 }
 echo "Task Completed"
