@@ -46,6 +46,7 @@ using namespace TMPro;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 
+//#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
 using namespace QuestUI;
@@ -104,11 +105,14 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         //{
         //    logger().debug("Frequency: %f", SystemDisplayFrequencies->values[i]);
         //}
-
-        auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::newcsstr("Canvas"));
+        //auto EmptyParentObject = UnityEngine::GameObject::New_ctor(il2cpp_utils::newcsstr("EmptyParent"));
+        auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::newcsstr("ClockCanvas"));
+        //canvas_object->get_transform()->SetParent(canvas_object->get_transform());
         canvas = canvas_object->AddComponent<UnityEngine::Canvas*>();
         auto canvas_scaler = canvas_object->AddComponent<CanvasScaler*>();
         auto canvas_renderer = canvas_object->AddComponent<CanvasRenderer*>();
+
+        //canvas_object->AddComponent<QuestUI::Backgroundable*>()->ApplyBackgroundWithAlpha(il2cpp_utils::createcsstr("round-rect-panel"), 0.75f);
 
         // For reference on adding Button to clock
         //        UnityEngine::UI::Button* button = QuestUI::BeatSaberUI::CreateUIButton(rectTransform, "", "SettingsButton", il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, +[](Il2CppObject* obj, UnityEngine::UI::Button* button){}));
