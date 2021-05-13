@@ -1,6 +1,10 @@
 #include "main.hpp"
 
+#include "GlobalNamespace/PlayerDataModel.hpp"          // For checking if noTextandHUDs is enabled
+#include "GlobalNamespace/PlayerData.hpp"               // For checking if noTextandHUDs is enabled
+#include "GlobalNamespace/PlayerSpecificSettings.hpp"   // For checking if noTextandHUDs is enabled
 
+#include "GlobalNamespace/FlyingGameHUDRotation.hpp"    // Take rotation from this
 
 #include "GlobalNamespace/MainMenuViewController.hpp"
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
@@ -60,6 +64,8 @@ Logger& logger() {
     return *logger;
 }
 
+bool noTextAndHUD;
+
 UnityEngine::Canvas* canvas;
 UnityEngine::UI::VerticalLayoutGroup* layout;
 
@@ -73,7 +79,7 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
         auto canvas_renderer = canvas_object->AddComponent<CanvasRenderer*>();
 
         canvas_object->AddComponent<CurvedCanvasSettings*>();
-        canvas_object->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3));
+        canvas_object->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 0));
         canvas_object->get_transform()->set_localScale(UnityEngine::Vector3(0.1, 0.1, 0.1));
 
         Object::DontDestroyOnLoad(canvas_object);
@@ -85,11 +91,8 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
 
         layout->GetComponent<LayoutElement*>()->set_minWidth(7);
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
-//        layout->set_childAlignment(TMPro::TextAlignmentOptions::Center, TMPro::TMP_Text::m_lineSpacing(0));
         layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
-//        layout->set_(TMPro::TMP_Text::m_lineSpacing(0))
         layout->get_transform()->set_position(UnityEngine::Vector3(0, -1.7, 3.85));
-//        float fontsize = getConfig().config["FontSize"].GetFloat();
 
         clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 3.85));
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
@@ -97,15 +100,13 @@ MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewContr
     canvas->get_gameObject()->SetActive(true);
 }
 
-//void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-//    UnityEngine::MonoBehaviour::Update();
-//    clock_text->get_transform()->set_position(UnityEngine::Vector3(0, 1, 12.6));
-//}
-
 MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
     AudioTimeSyncController_StartSong(self, startTimeOffset);
 
-    if (getConfig().config["insong"].GetBool() == false) {
+    // Instance of PlayerDataModel the noTextAndHUDs variable specifically
+    noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->playerSpecificSettings->noTextsAndHuds;
+
+    if (getConfig().config["insong"].GetBool() == false || noTextAndHUD) {
         canvas->get_gameObject()->SetActive(false);
         logger().info("SetActive");
     }
@@ -114,7 +115,7 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
 MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
 
-    if (getConfig().config["insong"].GetBool() == false) {
+    if (getConfig().config["insong"].GetBool() == false || noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
         logger().info("SetActive");
     }
@@ -123,7 +124,7 @@ MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowC
 MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
     PauseMenuManager_ShowMenu(self);
 
-    if (getConfig().config["insong"].GetBool() == false) {
+    if (getConfig().config["insong"].GetBool() == false || noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
         logger().info("SetActive");
     }
@@ -132,10 +133,15 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
 MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManager* self) {
     PauseMenuManager_StartResumeAnimation(self);
 
-    if (getConfig().config["insong"].GetBool() == false) {
+    if (getConfig().config["insong"].GetBool() == false || noTextAndHUD) {
         canvas->get_gameObject()->SetActive(false);
         logger().info("SetActive");
     }
+}
+
+MAKE_HOOK_OFFSETLESS(FlyingGameHUDRotation_FixedUpdate, void, GlobalNamespace::FlyingGameHUDRotation* self) {
+    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, self->yAngle, 0));
+    FlyingGameHUDRotation_FixedUpdate(self);
 }
 
 // Multiplayer Lobby Specific Code
@@ -150,31 +156,28 @@ MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_ActivateMultiplayerLobby, void, 
 MAKE_HOOK_OFFSETLESS(QuickPlaySetupViewController_DidActivate, void, QuickPlaySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     QuickPlaySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<QuickPlaySetupViewController*>()->get_transform()->get_position().y;
-    MLobbyVCPosY = MLobbyVCPosY - 1;
-    logger().debug("%g", MLobbyVCPosY);
-    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
+    auto MLobbyVCPosY = self->get_transform()->get_position().y;
+    logger().debug("MLobbyVCPosY is: %g", (MLobbyVCPosY - 1));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY - 1, 1.62));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
 }
 
 MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_DidActivate, void, ClientLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     ClientLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-    auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<ClientLobbySetupViewController*>()->get_transform()->get_position().y;
-    MLobbyVCPosY = MLobbyVCPosY - 1;
-    logger().debug("%g", MLobbyVCPosY);
-    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
+    auto MLobbyVCPosY = self->get_transform()->get_position().y;
+    logger().debug("MLobbyVCPosY is: %g", (MLobbyVCPosY - 1));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY - 1, 1.62));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
 }
 
 MAKE_HOOK_OFFSETLESS(HostLobbySetupViewController_DidActivate, void, HostLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     HostLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-        auto MLobbyVCPosY = UnityEngine::Object::FindObjectOfType<HostLobbySetupViewController*>()->get_transform()->get_position().y;
-        MLobbyVCPosY = MLobbyVCPosY - 1;
-        logger().debug("%g", MLobbyVCPosY);
-        layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY, 1.62));
-        layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
+    auto MLobbyVCPosY = self->get_transform()->get_position().y;
+    logger().debug("MLobbyVCPosY is: %g", (MLobbyVCPosY-1));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY - 1, 1.62));
+    layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
 }
 
 MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
@@ -186,7 +189,7 @@ MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DeactivateMultiplayerLobby, void
 
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo & info) {
-    info.id = "clockmod";
+    info.id = ID;
     info.version = VERSION;
     modInfo = info;
 
@@ -214,18 +217,6 @@ extern "C" void setup(ModInfo & info) {
         getConfig().config.AddMember("BattToggle", rapidjson::Value(0).SetBool(false), allocator);
         getConfig().Write();
     }
-//    if (!getConfig().config.HasMember("ClockXOffset")) {
-//        getConfig().config.AddMember("ClockXOffset", rapidjson::Value(0).SetFloat(0), allocator);
-//        getConfig().Write();
-//    }
-//    if (!getConfig().config.HasMember("ClockYOffset")) {
-//        getConfig().config.AddMember("ClockYOffset", rapidjson::Value(0).SetFloat(0), allocator);
-//        getConfig().Write();
-//    }
-//    if (!getConfig().config.HasMember("ClockZOffset")) {
-//        getConfig().config.AddMember("ClockZOffset", rapidjson::Value(0).SetFloat(0), allocator);
-//        getConfig().Write();
-//    }
 }
 
 // Called later on in the game loading - a good time to install function hooks
@@ -246,7 +237,7 @@ extern "C" void load() {
     INSTALL_HOOK_OFFSETLESS(hookLogger, SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "SoloFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
     INSTALL_HOOK_OFFSETLESS(hookLogger, PauseMenuManager_ShowMenu, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "ShowMenu", 0));
     INSTALL_HOOK_OFFSETLESS(hookLogger, PauseMenuManager_StartResumeAnimation, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "StartResumeAnimation", 0));
-//    INSTALL_HOOK_OFFSETLESS(hookLogger, MultiplayerLobbyController_ActivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "ActivateMultiplayerLobby", 0));
+    INSTALL_HOOK_OFFSETLESS(hookLogger, FlyingGameHUDRotation_FixedUpdate, il2cpp_utils::FindMethodUnsafe("", "FlyingGameHUDRotation", "FixedUpdate", 0));
     // Multiplayer specific Hooks
     INSTALL_HOOK_OFFSETLESS(hookLogger, HostLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "HostLobbySetupViewController", "DidActivate", 3));
     INSTALL_HOOK_OFFSETLESS(hookLogger, ClientLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "ClientLobbySetupViewController", "DidActivate", 3));
