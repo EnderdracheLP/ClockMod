@@ -74,13 +74,6 @@ std::string RainbowClock::rainbowify(std::string input)
 }
  */
 
-// Function for updating the Clock Position, temp
-void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* text, UnityEngine::Vector3 Pos, UnityEngine::Vector3 Angle, UnityEngine::Vector3 Scale) {
-    ClockParent->set_position(Pos);
-    text->get_transform()->set_localEulerAngles(Angle);
-    text->get_transform()->set_localScale(Scale);
-}
-
 // Updates the Clock.
 int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
 
@@ -118,34 +111,8 @@ void ClockMod::ClockUpdater::Update() {
             // This is where the Text and Clock Position is set.
             text->set_text(il2cpp_utils::newcsstr(clockresult));        // This sets the Text
             //text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
-            text->set_fontSize(getConfig().config["FontSize"].GetFloat());
         }
         else { wait++; }
-
-        // Temp Code for updating Position.
-        if (Config.IsInSong == false && Config.InMPLobby == false) {
-            // TODO: Get Position Offset working. Trying to set the Position offset here, messes with the 360/90 Map stuff. 
-            //if (Config.IsInSong == false) {
-                // Checks if the clock should be at the Top or Bottom
-            if (getModConfig().ClockPosition.GetValue()) {
-                // If set to be at the Bottom do this.
-                auto Pos = UnityEngine::Vector3(0, -1.26, 0);
-                auto Angle = UnityEngine::Vector3(60, 0, 0);
-                auto Scale = UnityEngine::Vector3(0.6, 0.6, 0.6);
-                SetClockPos(clockParent, text, Pos, Angle, Scale);
-            }
-            else {
-                // Otherwise it will do this.
-                auto Pos = UnityEngine::Vector3(0, -1.7, 4.6);
-                auto Angle = UnityEngine::Vector3(-10, 0, 0);
-                auto Scale = UnityEngine::Vector3(1, 1, 1);
-                SetClockPos(clockParent, text, Pos, Angle, Scale);
-            }
-        }
-        else { // If in MP Lobby or a Song, unset all this.
-            //clockParent->set_position(UnityEngine::Vector3(0, 0, 0));
-            text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-            text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-        }
+        text->set_fontSize(getConfig().config["FontSize"].GetFloat());
     }
 }
