@@ -1,9 +1,6 @@
 #include "main.hpp"                                 // Well the main.hpp what else, this wouldn't be the same without.
-#include "ClockValues.hpp"
 
 #include "ClockUpdater.hpp"                         // For the ClockUpdater, like the stuff you see down there
-
-#include "ClockModConfig.hpp"                       // Just the Config
 
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/GameObject.hpp"               // For GameObject Stuff
