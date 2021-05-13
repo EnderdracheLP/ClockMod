@@ -78,7 +78,6 @@ std::string RainbowClock::rainbowify(std::string input)
 int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
 
 void ClockMod::ClockUpdater::Update() {
-    if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
         time_t rawtime;
         struct tm* timeinfo;
         time(&rawtime);
@@ -109,10 +108,9 @@ void ClockMod::ClockUpdater::Update() {
             }
 
             // This is where the Text and Clock Position is set.
-            text->set_text(il2cpp_utils::newcsstr(clockresult));        // This sets the Text
+            text->set_text(il2cpp_utils::createcsstr(clockresult));        // This sets the Text
             //text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
         }
         else { wait++; }
         text->set_fontSize(getConfig().config["FontSize"].GetFloat());
-    }
 }
