@@ -11,7 +11,7 @@ jobs:
   build:
     env:
      module_id: clockmod
-     version: 1.4.0-${{ github.run_id }}-L
+     version: 1.4.0-${{ github.run_number }}-L
     runs-on: ubuntu-latest
     
     steps:
