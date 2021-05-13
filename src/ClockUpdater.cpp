@@ -55,10 +55,11 @@ std::string getTimeString(struct tm* timeinfo) {
 std::string getBatteryString(int level)
 {
     std::string percent = string_format("%d%%", level);
-    if (level < 20) return string_format("<color=#FF0000>%s</color>", percent.c_str()); 		// Red      (if lower than 20 %)
-    else if (level < 35) return string_format("<color=#FF8800>%s</color>", percent.c_str());	// Orange   (if lower than 35 %)
-    else if (level >= 50) return string_format("<color=#00FF00>%s</color>", percent.c_str());	// Green    (if higher or equal to 50 %)
-    else return string_format("<color=#FFD700>%s</color>", percent.c_str());					// Yellow   (if none of the above)
+    if (level < 20) return string_format("<color=#FF0000>%s</color>", percent.c_str()); 		// Red          (if lower than 20 %)
+    else if (level < 35) return string_format("<color=#FF8800>%s</color>", percent.c_str());	// Orange       (if lower than 35 %)
+    else if (level < 50) return string_format("<color=#FFD700>%s</color>", percent.c_str());	// Yellow       (if lower than 50 %)
+    else if (level >= 75) return string_format("<color=#00FF00>%s</color>", percent.c_str());	// Green        (if higher or equal to 75 %)
+    else return string_format("<color=#9ACD32>%s</color>", percent.c_str());					// YellowGreen  (if none of the above)
 }
 /*
 std::string RainbowClock::rainbowify(std::string input) {
