@@ -1,4 +1,4 @@
-name: NDK build Legacy Branch
+name: NDK build 1.13.2 Legacy Branch
 
 on:
   workflow_dispatch:
