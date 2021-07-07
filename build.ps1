@@ -2,8 +2,8 @@ $NDKPath = Get-Content $PSScriptRoot/ndkpath.txt
 if ($args.Count -eq 0) {
 $ModID = "clockmod"
 $VERSION = "1.4.0-InDev"
-$BSHook = "1_3_3"
-$codegen_ver = "0_8_1"
+$BSHook = "2_0_3"
+$codegen_ver = "0_10_2"
 }
 
 if ($args[0] -eq "--actions") {

@@ -1,22 +1,27 @@
 #include "main.hpp"                                 // Well the main.hpp what else, this wouldn't be the same without.
 #include "ClockValues.hpp"
-//#include "ClockViewController.hpp"                  // Part of the config. Do I actually need this in here? idk.
 
 #include "ClockUpdater.hpp"                         // For the ClockUpdater, like the stuff you see down there
 
 #include "ClockModConfig.hpp"                       // Just the Config
 
-#include "UnityEngine/Transform.hpp"
+#include "UnityEngine/Transform.hpp"                // For Transform stuff
 #include "UnityEngine/GameObject.hpp"               // For GameObject Stuff
-#include "TMPro/TextMeshProUGUI.hpp"                // For Text Stuff.
+#include "TMPro/TextMeshProUGUI.hpp"                // Text Stuff.
 #include <ctime>                                    // For Time stuff, idk if I actually need it.
 #include "GlobalNamespace/OVRPlugin_OVRP_1_1_0.hpp" // Where I get the Battery Percentage from as float
 #include "RainbowClock.hpp"                         // Where the magic stuff is that makes the Clock Rainbowy (is that actually a word?)
 using namespace UnityEngine;
 using namespace TMPro;
 
-DEFINE_TYPE(ClockMod::ClockUpdater);               // Here is where the class is defined, look inside ClockUpdater.hpp for more stuff.
-       
+#ifndef REGISTER_FUNCTION
+DEFINE_TYPE(ClockMod, ClockUpdater);
+#elif defined(DEFINE_TYPE)
+DEFINE_TYPE(ClockMod::ClockUpdater);
+#elif defined(DEFINE_CLASS)
+DEFINE_CLASS(ClockMod::ClockUpdater);
+#endif
+
 // Function for getting time. Checks config Settings for 12/24 Hour time and if Show Seconds is toggled on or off.
 std::string getTimeString(struct tm* timeinfo) {
     char time[20];

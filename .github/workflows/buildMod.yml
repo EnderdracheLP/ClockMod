@@ -11,8 +11,8 @@ env:
      module_id: clockmod
      version: 1.4.0-Dev-${{ github.run_number }}
      BSVersion: 1.15.0
-     bs_hook: 1_3_3
-     codegen: 0_8_1
+     bs_hook: 2_0_3
+     codegen: 0_10_2
      ndkname: android-ndk-r22
     
 jobs:

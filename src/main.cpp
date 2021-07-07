@@ -70,6 +70,16 @@ Config_t Config;
 // Clock Positions
 ClockPos_t ClockPos;
 
+#if defined(MAKE_HOOK_OFFSETLESS) && !defined(MAKE_HOOK_MATCH)
+#define CM_MAKE_HOOK(name, mPtr, retval, ...) MAKE_HOOK_OFFSETLESS(name, retval, __VA_ARGS__)
+#define CM_INSTALL_HOOK(logger, name, methodInfo) INSTALL_HOOK_OFFSETLESS(logger, name, methodInfo)
+#elif defined(MAKE_HOOK_MATCH)
+#define CM_MAKE_HOOK(name, mPtr, retval, ...) MAKE_HOOK_MATCH(name, mPtr, retval, __VA_ARGS__)
+#define CM_INSTALL_HOOK(logger, name, methodInfo) INSTALL_HOOK(logger, name)
+#else
+#error No Compatible HOOK macro found
+#endif
+
 ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
 // Returns a logger, useful for printing debug messages
@@ -95,7 +105,7 @@ void MPLobbyClockPos(float MLobbyVCPosY) {
     layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
-MAKE_HOOK_OFFSETLESS(MainMenuViewController_DidActivate, void, MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+CM_MAKE_HOOK(MainMenuViewController_DidActivate, &MainMenuViewController::DidActivate, void, MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if (firstActivation && ClockModInit) {
@@ -178,7 +188,7 @@ void SetClockPos(UnityEngine::Vector3 Pos, UnityEngine::Vector3 Angle, float Sca
 }
 
 // TODO: Use a different hook, this one is too small and causes issues
-MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
+CM_MAKE_HOOK(AudioTimeSyncController_StartSong, &AudioTimeSyncController::StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
     // Instance of PlayerDataModel the noTextAndHUDs variable specifically
     Config.noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->playerSpecificSettings->noTextsAndHuds;
 
@@ -244,7 +254,7 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
     } 
 }
 
-//MAKE_HOOK_OFFSETLESS(SceneManager_Internal_ActiveSceneChanged, void, UnityEngine::SceneManagement::Scene prevScene, UnityEngine::SceneManagement::Scene nextScene) {
+//CM_MAKE_HOOK(SceneManager_Internal_ActiveSceneChanged, &UnityEngine::SceneManagement::SceneManager::Internal_ActiveSceneChanged, void, UnityEngine::SceneManagement::Scene prevScene, UnityEngine::SceneManagement::Scene nextScene) {
 //    SceneManager_Internal_ActiveSceneChanged(prevScene, nextScene);
 //    if (nextScene.IsValid()) {
 //        std::string sceneName = to_utf8(csstrtostr(nextScene.get_name()));
@@ -315,13 +325,13 @@ MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StartSong, void, AudioTimeSyncContr
 //    }
 //}
 
-//MAKE_HOOK_OFFSETLESS(AudioTimeSyncController_StopSong, void, AudioTimeSyncController* self) {
+//CM_MAKE_HOOK(AudioTimeSyncController_StopSong, &AudioTimeSyncController::StopSong, void, AudioTimeSyncController* self) {
 //    AudioTimeSyncController_StopSong(self);
 //    Config.IsInSong = false;
 //    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
 //}
 
-MAKE_HOOK_OFFSETLESS(CampaignFlowCoordinator_DidActivate, void, CampaignFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+CM_MAKE_HOOK(CampaignFlowCoordinator_DidActivate, &CampaignFlowCoordinator::DidActivate, void, CampaignFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     CampaignFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
@@ -339,7 +349,7 @@ MAKE_HOOK_OFFSETLESS(CampaignFlowCoordinator_DidActivate, void, CampaignFlowCoor
     layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
-MAKE_HOOK_OFFSETLESS(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, PartyFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
+CM_MAKE_HOOK(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, &PartyFreePlayFlowCoordinator::SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, PartyFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
@@ -357,7 +367,7 @@ MAKE_HOOK_OFFSETLESS(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlow
     layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
-MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
+CM_MAKE_HOOK(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, &SoloFreePlayFlowCoordinator::SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
@@ -375,7 +385,7 @@ MAKE_HOOK_OFFSETLESS(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowC
     layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
-MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
+CM_MAKE_HOOK(PauseMenuManager_ShowMenu, &PauseMenuManager::ShowMenu, void, PauseMenuManager* self) {
     PauseMenuManager_ShowMenu(self);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
@@ -390,7 +400,7 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_ShowMenu, void, PauseMenuManager* self) {
 //    Config.IsInSong = false;
 }
 
-MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManager* self) {
+CM_MAKE_HOOK(PauseMenuManager_StartResumeAnimation, &PauseMenuManager::StartResumeAnimation, void, PauseMenuManager* self) {
     PauseMenuManager_StartResumeAnimation(self);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
@@ -405,7 +415,7 @@ MAKE_HOOK_OFFSETLESS(PauseMenuManager_StartResumeAnimation, void, PauseMenuManag
 
 // TODO: Use the below information wisely
 // Check if it there are RotationEvents within the map, and if there are, declare it a 360/90 Map.
-MAKE_HOOK_OFFSETLESS(BeatmapObjectCallbackController_SetNewBeatmapData, void, BeatmapObjectCallbackController* self, IReadonlyBeatmapData* beatmapData) {
+CM_MAKE_HOOK(BeatmapObjectCallbackController_SetNewBeatmapData, &BeatmapObjectCallbackController::SetNewBeatmapData, void, BeatmapObjectCallbackController* self, IReadonlyBeatmapData* beatmapData) {
     BeatmapObjectCallbackController_SetNewBeatmapData(self, beatmapData);
     if (beatmapData) {
         int RotationEvents = beatmapData->get_spawnRotationEventsCount();
@@ -420,7 +430,7 @@ MAKE_HOOK_OFFSETLESS(BeatmapObjectCallbackController_SetNewBeatmapData, void, Be
     }
 }
 
-MAKE_HOOK_OFFSETLESS(FlyingGameHUDRotation_FixedUpdate, void, GlobalNamespace::FlyingGameHUDRotation* self) {
+CM_MAKE_HOOK(FlyingGameHUDRotation_FixedUpdate, &FlyingGameHUDRotation::FixedUpdate, void, GlobalNamespace::FlyingGameHUDRotation* self) {
     //float YAngle = self->yAngle;
     //if (getModConfig().ClockPosition.GetValue()) {
     //    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(ClockPos.RotateSongRotationDownX, self->yAngle, 0));
@@ -444,7 +454,7 @@ MAKE_HOOK_OFFSETLESS(FlyingGameHUDRotation_FixedUpdate, void, GlobalNamespace::F
 
 // TODO: figure out why, the results screen causes problems with the clock
 
-MAKE_HOOK_OFFSETLESS(QuickPlaySetupViewController_DidActivate, void, QuickPlaySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+CM_MAKE_HOOK(QuickPlaySetupViewController_DidActivate, &QuickPlaySetupViewController::DidActivate, void, QuickPlaySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     QuickPlaySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
@@ -463,7 +473,7 @@ MAKE_HOOK_OFFSETLESS(QuickPlaySetupViewController_DidActivate, void, QuickPlaySe
     if (Config.InMP == true) { logger().debug("QLobby, InMP is True"); }
 }
 
-MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_DidActivate, void, ClientLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+CM_MAKE_HOOK(ClientLobbySetupViewController_DidActivate, &ClientLobbySetupViewController::DidActivate, void, ClientLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -483,7 +493,7 @@ MAKE_HOOK_OFFSETLESS(ClientLobbySetupViewController_DidActivate, void, ClientLob
     ClientLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 
-MAKE_HOOK_OFFSETLESS(HostLobbySetupViewController_DidActivate, void, HostLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+CM_MAKE_HOOK(HostLobbySetupViewController_DidActivate, &HostLobbySetupViewController::DidActivate, void, HostLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -503,7 +513,7 @@ MAKE_HOOK_OFFSETLESS(HostLobbySetupViewController_DidActivate, void, HostLobbySe
     HostLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 
-MAKE_HOOK_OFFSETLESS(MultiplayerResultsViewController_DidActivate, void, MultiplayerResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+CM_MAKE_HOOK(MultiplayerResultsViewController_DidActivate, &MultiplayerResultsViewController::DidActivate, void, MultiplayerResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -523,7 +533,7 @@ MAKE_HOOK_OFFSETLESS(MultiplayerResultsViewController_DidActivate, void, Multipl
     MultiplayerResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 
-MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
+CM_MAKE_HOOK(MultiplayerLobbyController_DeactivateMultiplayerLobby, &MultiplayerLobbyController::DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_DeactivateMultiplayerLobby(self);
 
     Config.InMPLobby = false;
@@ -575,36 +585,38 @@ extern "C" void load() {
 
     Logger& hkLog = logger();
 
-    //custom_types::Register::AutoRegister();
+#ifndef REGISTER_FUNCTION
+    custom_types::Register::AutoRegister();
+#else
     custom_types::Register::RegisterType<ClockMod::ClockUpdater>();
     //custom_types::Register::RegisterType<ClockMod::ClockRotationUpdater>();
     custom_types::Register::RegisterType<ClockMod::ClockViewController>();
+#endif
     QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
 
-    INSTALL_HOOK_OFFSETLESS(hkLog, MainMenuViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
-    INSTALL_HOOK_OFFSETLESS(hkLog, CampaignFlowCoordinator_DidActivate, il2cpp_utils::FindMethodUnsafe("", "CampaignFlowCoordinator", "DidActivate", 3));
-    INSTALL_HOOK_OFFSETLESS(hkLog, AudioTimeSyncController_StartSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StartSong", 1));
+    CM_INSTALL_HOOK(hkLog, MainMenuViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
+    CM_INSTALL_HOOK(hkLog, CampaignFlowCoordinator_DidActivate, il2cpp_utils::FindMethodUnsafe("", "CampaignFlowCoordinator", "DidActivate", 3));
+    CM_INSTALL_HOOK(hkLog, AudioTimeSyncController_StartSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StartSong", 1));
     //INSTALL_HOOK_OFFSETLESS(hkLog, SceneManager_Internal_ActiveSceneChanged, il2cpp_utils::FindMethodUnsafe("UnityEngine.SceneManagement", "SceneManager", "Internal_ActiveSceneChanged", 2));
     // Third attempt at clock rotation
 //    INSTALL_HOOK_OFFSETLESS(hkLog, BeatmapObjectManager_SpawnBasicNote, il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectManager", "SpawnBasicNote", 4));
 //    INSTALL_HOOK_OFFSETLESS(hkLog, NoteController_Update, il2cpp_utils::FindMethodUnsafe("", "NoteController", "Update", 0));
     //INSTALL_HOOK_OFFSETLESS(hkLog, AudioTimeSyncController_StopSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StopSong", 0));
-    INSTALL_HOOK_OFFSETLESS(hkLog, SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "SoloFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
+    CM_INSTALL_HOOK(hkLog, SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "SoloFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
     // Added by ELP
-    INSTALL_HOOK_OFFSETLESS(hkLog, FlyingGameHUDRotation_FixedUpdate, il2cpp_utils::FindMethodUnsafe("", "FlyingGameHUDRotation", "FixedUpdate", 0));
-    INSTALL_HOOK_OFFSETLESS(hkLog, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "PartyFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
-    INSTALL_HOOK_OFFSETLESS(hkLog, PauseMenuManager_ShowMenu, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "ShowMenu", 0));
-    INSTALL_HOOK_OFFSETLESS(hkLog, PauseMenuManager_StartResumeAnimation, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "StartResumeAnimation", 0));
-    INSTALL_HOOK_OFFSETLESS(hkLog, BeatmapObjectCallbackController_SetNewBeatmapData, il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectCallbackController", "SetNewBeatmapData", 1));
+    CM_INSTALL_HOOK(hkLog, FlyingGameHUDRotation_FixedUpdate, il2cpp_utils::FindMethodUnsafe("", "FlyingGameHUDRotation", "FixedUpdate", 0));
+    CM_INSTALL_HOOK(hkLog, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "PartyFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
+    CM_INSTALL_HOOK(hkLog, PauseMenuManager_ShowMenu, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "ShowMenu", 0));
+    CM_INSTALL_HOOK(hkLog, PauseMenuManager_StartResumeAnimation, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "StartResumeAnimation", 0));
+    CM_INSTALL_HOOK(hkLog, BeatmapObjectCallbackController_SetNewBeatmapData, il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectCallbackController", "SetNewBeatmapData", 1));
 //    INSTALL_HOOK_OFFSETLESS(hkLog, CoreGameHUDController_Start, il2cpp_utils::FindMethodUnsafe("", "CoreGameHUDController", "Start", 0));
 //    INSTALL_HOOK_OFFSETLESS(hookLogger, MultiplayerLobbyController_ActivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "ActivateMultiplayerLobby", 0));
     // Multiplayer specific Hooks
-    INSTALL_HOOK_OFFSETLESS(hkLog, HostLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "HostLobbySetupViewController", "DidActivate", 3));
-    INSTALL_HOOK_OFFSETLESS(hkLog, ClientLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "ClientLobbySetupViewController", "DidActivate", 3));
-    INSTALL_HOOK_OFFSETLESS(hkLog, QuickPlaySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "QuickPlaySetupViewController", "DidActivate", 3));
-    INSTALL_HOOK_OFFSETLESS(hkLog, MultiplayerLobbyController_DeactivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "DeactivateMultiplayerLobby", 0));
-    INSTALL_HOOK_OFFSETLESS(hkLog, MultiplayerResultsViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MultiplayerResultsViewController", "DidActivate", 3));
-
+    CM_INSTALL_HOOK(hkLog, HostLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "HostLobbySetupViewController", "DidActivate", 3));
+    CM_INSTALL_HOOK(hkLog, ClientLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "ClientLobbySetupViewController", "DidActivate", 3));
+    CM_INSTALL_HOOK(hkLog, QuickPlaySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "QuickPlaySetupViewController", "DidActivate", 3));
+    CM_INSTALL_HOOK(hkLog, MultiplayerLobbyController_DeactivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "DeactivateMultiplayerLobby", 0));
+    CM_INSTALL_HOOK(hkLog, MultiplayerResultsViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MultiplayerResultsViewController", "DidActivate", 3));
 
     //INSTALL_HOOK_OFFSETLESS(hkLog, MultiplayerLevelScenesTransitionSetupDataSO_Init, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLevelScenesTransitionSetupDataSO", "Init", 10));
 

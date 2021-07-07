@@ -9,6 +9,9 @@
 #include "beatsaber-hook/shared/config/config-utils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#ifndef BS__1_13_2
+#include "beatsaber-hook/shared/utils/hooking.hpp"
+#endif
 
 // Define these functions here so that we can easily read configuration and log information from other files
 Logger& logger();
