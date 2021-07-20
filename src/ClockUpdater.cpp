@@ -11,6 +11,9 @@
 #include <ctime>                                    // For Time stuff, idk if I actually need it.
 #include "GlobalNamespace/OVRPlugin_OVRP_1_1_0.hpp" // Where I get the Battery Percentage from as float
 #include "RainbowClock.hpp"                         // Where the magic stuff is that makes the Clock Rainbowy (is that actually a word?)
+
+#include "UnityEngine/Time.hpp"
+
 using namespace UnityEngine;
 using namespace TMPro;
 
@@ -103,9 +106,13 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
 }
 
 // Updates the Clock.
- int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
+ //int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
 
- void ClockMod::ClockUpdater::Update() {
+ void ClockMod::ClockUpdater::Start() {
+     UnityEngine::Time::set_fixedDeltaTime(0.35f);
+ }
+
+ void ClockMod::ClockUpdater::FixedUpdate() {
      if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
          time_t rawtime;
          struct tm* timeinfo;
@@ -115,18 +122,22 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
          auto clockParent = get_transform()->GetParent();
          //auto clockParent = get_transform();
 
-         // Yes all the "wait" stuff here is for slowing it down
-         if (wait == 18) {
+         //// Yes all the "wait" stuff here is for slowing it down
+         //if (wait == 18) {
              // Gets the time using the function at the top.
              auto clockresult = getTimeString((struct tm*)timeinfo);
-             wait = 0;
+             //wait = 0;
 
              // /*
              // TODO: Fix this rainbow stuff
              // Checks, if the clock is set to rainbowify
              if (getModConfig().RainbowClock.GetValue()) {
                  clockresult = RainbowClock::rainbowify(clockresult);
-             };
+                 //text->set_color(UnityEngine::Color::HSVToRGB(std::fmod(UnityEngine::Time::get_time() * 0.35f, 1), 1, 1));
+             }
+             //else {
+             //    text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
+             //}
              // */
              // Checks, the below condition and if it retunrs true, gets the current Battery Percentage Level and adds it to the clockresult variable.
              if (getModConfig().BattToggle.GetValue()) {
@@ -140,8 +151,8 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
              text->set_text(il2cpp_utils::newcsstr(clockresult));        // This sets the Text
              text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
              text->set_fontSize(getModConfig().FontSize.GetValue());
-         }
-         else { wait++; }
+         //}
+         //else { wait++; }
 
          // Temp Code for updating Position.
          if (Config.IsInSong == false && Config.InMPLobby == false) {

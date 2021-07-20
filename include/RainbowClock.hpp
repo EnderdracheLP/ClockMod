@@ -9,8 +9,9 @@ class RainbowClock
 {
 public:
     static std::string rainbowify(std::string);
-private:
+    static void textRainbowifier(std::string);
     static inline int rainbowIndex = rand() % 12;
+private:
     static inline const std::vector<std::string> colors = {
         "#ff6060",
         "#ffa060",
