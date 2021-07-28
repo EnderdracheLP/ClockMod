@@ -12,9 +12,10 @@
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"          // For checking the characteristic 360/90.
 #include "GlobalNamespace/GameplayCoreInstaller.hpp"            // Also part of the check.
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
-#include "GlobalNamespace/HostLobbySetupViewController.hpp"
-#include "GlobalNamespace/ClientLobbySetupViewController.hpp"
-#include "GlobalNamespace/QuickPlaySetupViewController.hpp"
+//#include "GlobalNamespace/HostLobbySetupViewController.hpp"
+//#include "GlobalNamespace/ClientLobbySetupViewController.hpp"
+//#include "GlobalNamespace/QuickPlaySetupViewController.hpp"
+#include "GlobalNamespace/LobbySetupViewController.hpp"         // NEW: For 1.16.4
 #include "GlobalNamespace/BeatmapObjectCallbackController.hpp"  // For checking characteristic
 #include "GlobalNamespace/IReadonlyBeatmapData.hpp"             // To read the BeatmapData
 #include "GlobalNamespace/FlyingGameHUDRotation.hpp"            // Take rotation from this instead lol
@@ -454,30 +455,71 @@ CM_MAKE_HOOK(FlyingGameHUDRotation_FixedUpdate, &FlyingGameHUDRotation::FixedUpd
 
 // TODO: figure out why, the results screen causes problems with the clock
 
-CM_MAKE_HOOK(QuickPlaySetupViewController_DidActivate, &QuickPlaySetupViewController::DidActivate, void, QuickPlaySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    QuickPlaySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+//CM_MAKE_HOOK(QuickPlaySetupViewController_DidActivate, &QuickPlaySetupViewController::DidActivate, void, QuickPlaySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+//    QuickPlaySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+//
+//    if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
+//        canvas->get_gameObject()->SetActive(true);
+//        logger().info("SetActive true QuickPlayLobby");
+//    }
+//    layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
+//
+//    auto MLobbyVCPosY = self->get_transform()->get_position().y;
+//    Config.InMPLobby = true;
+//    Config.IsInSong = false;
+//    Config.InMP = true;
+//    Config.InRotationMap = false;
+////    logger().debug("%g", MLobbyVCPosY);
+//    MPLobbyClockPos(MLobbyVCPosY);
+//    if (Config.InMP == true) { logger().debug("QLobby, InMP is True"); }
+//}
+//
+//CM_MAKE_HOOK(ClientLobbySetupViewController_DidActivate, &ClientLobbySetupViewController::DidActivate, void, ClientLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+//
+//    if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
+//        canvas->get_gameObject()->SetActive(true);
+//        logger().info("SetActive true ClientLobby");
+//    }
+//    layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
+//
+//    auto MLobbyVCPosY = self->get_transform()->get_position().y;
+//    Config.InMPLobby = true;
+//    Config.IsInSong = false;
+//    Config.InMP = true;
+//    Config.InRotationMap = false;
+////    logger().debug("%g", MLobbyVCPosY);
+//    MPLobbyClockPos(MLobbyVCPosY);
+//    if (Config.InMP == true) { logger().debug("CLobby, InMP is True"); }
+//
+//    ClientLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+//}
+//
+//CM_MAKE_HOOK(HostLobbySetupViewController_DidActivate, &HostLobbySetupViewController::DidActivate, void, HostLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+//
+//    if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
+//        canvas->get_gameObject()->SetActive(true);
+//        logger().info("SetActive true HostLobby");
+//    }
+//    layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
+//
+//    auto MLobbyVCPosY = self->get_transform()->get_position().y;
+//    Config.InMPLobby = true;
+//    Config.IsInSong = false;
+//    Config.InMP = true;
+//    Config.InRotationMap = false;
+//    //  logger().debug("%g", MLobbyVCPosY);
+//    MPLobbyClockPos(MLobbyVCPosY);
+//    if (Config.InMP == true) { logger().debug("HLobby, InMP is True"); }
+//
+//    HostLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+//}
+
+
+CM_MAKE_HOOK(LobbySetupViewController_DidActivate, &LobbySetupViewController::DidActivate, void, LobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
-        logger().info("SetActive true QuickPlayLobby");
-    }
-    layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-
-    auto MLobbyVCPosY = self->get_transform()->get_position().y;
-    Config.InMPLobby = true;
-    Config.IsInSong = false;
-    Config.InMP = true;
-    Config.InRotationMap = false;
-//    logger().debug("%g", MLobbyVCPosY);
-    MPLobbyClockPos(MLobbyVCPosY);
-    if (Config.InMP == true) { logger().debug("QLobby, InMP is True"); }
-}
-
-CM_MAKE_HOOK(ClientLobbySetupViewController_DidActivate, &ClientLobbySetupViewController::DidActivate, void, ClientLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-
-    if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
-        canvas->get_gameObject()->SetActive(true);
-        logger().info("SetActive true ClientLobby");
+        logger().info("SetActive true Multiplayer Lobby");
     }
     layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
 
@@ -490,27 +532,7 @@ CM_MAKE_HOOK(ClientLobbySetupViewController_DidActivate, &ClientLobbySetupViewCo
     MPLobbyClockPos(MLobbyVCPosY);
     if (Config.InMP == true) { logger().debug("CLobby, InMP is True"); }
 
-    ClientLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-}
-
-CM_MAKE_HOOK(HostLobbySetupViewController_DidActivate, &HostLobbySetupViewController::DidActivate, void, HostLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-
-    if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
-        canvas->get_gameObject()->SetActive(true);
-        logger().info("SetActive true HostLobby");
-    }
-    layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-
-    auto MLobbyVCPosY = self->get_transform()->get_position().y;
-    Config.InMPLobby = true;
-    Config.IsInSong = false;
-    Config.InMP = true;
-    Config.InRotationMap = false;
-//  logger().debug("%g", MLobbyVCPosY);
-    MPLobbyClockPos(MLobbyVCPosY);
-    if (Config.InMP == true) { logger().debug("HLobby, InMP is True"); }
-
-    HostLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+    LobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 
 CM_MAKE_HOOK(MultiplayerResultsViewController_DidActivate, &MultiplayerResultsViewController::DidActivate, void, MultiplayerResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
@@ -612,9 +634,11 @@ extern "C" void load() {
 //    INSTALL_HOOK_OFFSETLESS(hkLog, CoreGameHUDController_Start, il2cpp_utils::FindMethodUnsafe("", "CoreGameHUDController", "Start", 0));
 //    INSTALL_HOOK_OFFSETLESS(hookLogger, MultiplayerLobbyController_ActivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "ActivateMultiplayerLobby", 0));
     // Multiplayer specific Hooks
-    CM_INSTALL_HOOK(hkLog, HostLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "HostLobbySetupViewController", "DidActivate", 3));
-    CM_INSTALL_HOOK(hkLog, ClientLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "ClientLobbySetupViewController", "DidActivate", 3));
-    CM_INSTALL_HOOK(hkLog, QuickPlaySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "QuickPlaySetupViewController", "DidActivate", 3));
+    //CM_INSTALL_HOOK(hkLog, HostLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "HostLobbySetupViewController", "DidActivate", 3));
+    //CM_INSTALL_HOOK(hkLog, ClientLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "ClientLobbySetupViewController", "DidActivate", 3));
+    //CM_INSTALL_HOOK(hkLog, QuickPlaySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "QuickPlaySetupViewController", "DidActivate", 3));
+
+    CM_INSTALL_HOOK(hkLog, LobbySetupViewController_DidActivate, nullptr);
     CM_INSTALL_HOOK(hkLog, MultiplayerLobbyController_DeactivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "DeactivateMultiplayerLobby", 0));
     CM_INSTALL_HOOK(hkLog, MultiplayerResultsViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MultiplayerResultsViewController", "DidActivate", 3));
 

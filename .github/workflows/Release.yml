@@ -4,9 +4,9 @@ on:
     env:
      module_id: clockmod
      version: 1.4.0
-     BSVersion: 1.16.2
-     bs_hook: 2_0_3
-     codegen: 0_10_2
+     BSVersion: 1.16.4
+     bs_hook: 2_2_2
+     codegen: 0_12_3
      ndkname: android-ndk-r22
 
 name: Release Mod
