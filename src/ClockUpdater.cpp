@@ -11,8 +11,6 @@
 #include "GlobalNamespace/OVRPlugin_OVRP_1_1_0.hpp" // Where I get the Battery Percentage from as float
 #include "RainbowClock.hpp"                         // Where the magic stuff is that makes the Clock Rainbowy (is that actually a word?)
 
-#include <chrono>
-
 using namespace UnityEngine;
 using namespace TMPro;
 
@@ -27,39 +25,30 @@ DEFINE_CLASS(ClockMod::ClockUpdater);
 // Function for getting time. Checks config Settings for 12/24 Hour time and if Show Seconds is toggled on or off.
 std::string getTimeString(struct tm* timeinfo) {
     char time[20];
-    const char* TFormat;
+    std::string TFormat;
     int switch_int = (int)getModConfig().TwelveToggle.GetValue() + ((int)getModConfig().SecToggle.GetValue() * 2);
-
     switch (switch_int) {
     case 0:
         TFormat = "%OH:%OM";          // Time in 24 Hour Format without Seconds
+        break;
     case 1:
         TFormat = "%Ol:%OM %p";       // Time in 24 Hour Format without Seconds
+        break;
     case 2:
         TFormat = "%OH:%OM:%OS";       // Time in 24 Hour Format with Seconds
+        break;
     case 3:
         TFormat = "%Ol:%OM:%OS %p";    // Time in 24 Hour Format with Seconds
+        break;
     default:
-        TFormat = "%OH:%OM";          // Time in 24 Hour Format without Seconds
+        logger().warning("Using default formatting!");
+        TFormat = "%EX";          // Time in 24 Hour Format without Seconds
+        break;
     }
-    // If set to show 24 Hour Format
-    //if (!getModConfig().TwelveToggle.GetValue()) {
-    //    if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
-    //        TFormat = "%OH:%OM:%OS";       // Time in 24 Hour Format with Seconds
-    //    }
-    //    else {
-    //        TFormat = "%OH:%OM";          // Time in 24 Hour Format without Seconds
-    //    }
-    //}
-    //else {      // If set to show 12 Hour Format
-    //    if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
-    //        TFormat = "%Ol:%OM:%OS %p";    // Time in 24 Hour Format with Seconds
-    //    }
-    //    else {
-    //        TFormat = "%Ol:%OM %p";       // Time in 24 Hour Format without Seconds
-    //    }
-    //}
-    strftime(time, sizeof(time), TFormat, timeinfo);
+    //char timeInformation[40];
+    //strftime(timeInformation, sizeof(timeInformation), "Timezone is: %Z UTC offset is: %z", timeinfo);
+    //logger().debug("%s", timeInformation);
+    strftime(time, sizeof(time), TFormat.c_str(), timeinfo);
     return time;
 }
 
@@ -112,9 +101,38 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
 // Updates the Clock.
  //int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
 
-#define NUM_SECONDS 0.5
+#define NUM_SECONDS 0.2
 
  void ClockMod::ClockUpdater::Update() {
+
+     auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
+     auto clockParent = get_transform()->GetParent();
+
+     // Temp Code for updating Position.
+     if (Config.IsInSong == false && Config.InMPLobby == false) {
+         // TODO: Get Position Offset working. Trying to set the Position offset here, messes with the 360/90 Map stuff. 
+         //if (Config.IsInSong == false) {
+             // Checks if the clock should be at the Top or Bottom
+         if (getModConfig().ClockPosition.GetValue()) {
+             // If set to be at the Bottom do this.
+             auto Pos = UnityEngine::Vector3(0, -1.26, 0);
+             auto Angle = UnityEngine::Vector3(60, 0, 0);
+             auto Scale = UnityEngine::Vector3(0.6, 0.6, 0.6);
+             SetClockPos(clockParent, text, Pos, Angle, Scale);
+         }
+         else {
+             // Otherwise it will do this.
+             auto Pos = UnityEngine::Vector3(0, -1.7, 4.6);
+             auto Angle = UnityEngine::Vector3(-10, 0, 0);
+             auto Scale = UnityEngine::Vector3(1, 1, 1);
+             SetClockPos(clockParent, text, Pos, Angle, Scale);
+         }
+     }
+     else { // If in MP Lobby or a Song, unset all this.
+         //clockParent->set_position(UnityEngine::Vector3(0, 0, 0));
+         text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
+         text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
+     }
 
      this_time = clock();
 
@@ -131,8 +149,6 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
      if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
          time(&rawtime);
          timeinfo = localtime(&rawtime);
-         auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
-         auto clockParent = get_transform()->GetParent();
          //auto clockParent = get_transform();
 
          //// Yes all the "wait" stuff here is for slowing it down
@@ -166,32 +182,6 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
              text->set_fontSize(getModConfig().FontSize.GetValue());
          //}
          //else { wait++; }
-
-         // Temp Code for updating Position.
-         if (Config.IsInSong == false && Config.InMPLobby == false) {
-             // TODO: Get Position Offset working. Trying to set the Position offset here, messes with the 360/90 Map stuff. 
-             //if (Config.IsInSong == false) {
-                 // Checks if the clock should be at the Top or Bottom
-                 if (getModConfig().ClockPosition.GetValue()) {
-                     // If set to be at the Bottom do this.
-                     auto Pos = UnityEngine::Vector3(0, -1.26, 0);
-                     auto Angle = UnityEngine::Vector3(60, 0, 0);
-                     auto Scale = UnityEngine::Vector3(0.6, 0.6, 0.6);
-                     SetClockPos(clockParent, text, Pos, Angle, Scale);
-                 }
-                 else {
-                     // Otherwise it will do this.
-                     auto Pos = UnityEngine::Vector3(0, -1.7, 4.6);
-                     auto Angle = UnityEngine::Vector3(-10, 0, 0);
-                     auto Scale = UnityEngine::Vector3(1, 1, 1);
-                     SetClockPos(clockParent, text, Pos, Angle, Scale);
-                 }
-         }
-         else { // If in MP Lobby or a Song, unset all this.
-             //clockParent->set_position(UnityEngine::Vector3(0, 0, 0));
-             text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-             text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-         }
      }
  }
 

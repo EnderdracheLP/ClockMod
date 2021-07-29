@@ -21,7 +21,8 @@ adb logcat -T "$timestamp" main-modloader:W AndroidRuntime:E *:S $YourModsToLog 
         }
         if ($args[0] -eq "--file") {
             echo "Running with parameter '--file'"
-            adb logcat -T "$timestamp" DEBUG:* main-modloader:* AndroidRuntime:* *:S $YourModsToLog $OtherModsToLog $LibsToLogAll | Tee-Object -FilePath $PSScriptRoot/logcat.prolog
+            adb logcat -T "$timestamp" | Select-String -pattern "(QuestHook|modloader|AndroidRuntime)" | Tee-Object -FilePath $PSScriptRoot/logcat.prolog
+            # adb logcat -T "$timestamp" DEBUG:* modloader:* main-modloader:* AndroidRuntime:* *:S $YourModsToLog $OtherModsToLog $LibsToLogAll | Tee-Object -FilePath $PSScriptRoot/logcat.prolog
         }
         if ($args[0] -eq "--file-simple") {
             echo "Running with parameter '--file-simple'"
