@@ -8,11 +8,10 @@
 #include "UnityEngine/Transform.hpp"                // For Transform stuff
 #include "UnityEngine/GameObject.hpp"               // For GameObject Stuff
 #include "TMPro/TextMeshProUGUI.hpp"                // Text Stuff.
-#include <ctime>                                    // For Time stuff, idk if I actually need it.
 #include "GlobalNamespace/OVRPlugin_OVRP_1_1_0.hpp" // Where I get the Battery Percentage from as float
 #include "RainbowClock.hpp"                         // Where the magic stuff is that makes the Clock Rainbowy (is that actually a word?)
 
-#include "UnityEngine/Time.hpp"
+#include <chrono>
 
 using namespace UnityEngine;
 using namespace TMPro;
@@ -29,33 +28,38 @@ DEFINE_CLASS(ClockMod::ClockUpdater);
 std::string getTimeString(struct tm* timeinfo) {
     char time[20];
     const char* TFormat;
+    int switch_int = (int)getModConfig().TwelveToggle.GetValue() + ((int)getModConfig().SecToggle.GetValue() * 2);
 
-                // If set to show 24 Hour Format
-    if (!getModConfig().TwelveToggle.GetValue()) {
-        if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
-            TFormat = "%H:%M:%S";       // Time in 24 Hour Format with Seconds
-            strftime(time, sizeof(time), TFormat, timeinfo);
-            return time;
-        }
-        else {
-            TFormat = "%H:%M";          // Time in 24 Hour Format without Seconds
-            strftime(time, sizeof(time), TFormat, timeinfo);
-            return time;
-        }
+    switch (switch_int) {
+    case 0:
+        TFormat = "%OH:%OM";          // Time in 24 Hour Format without Seconds
+    case 1:
+        TFormat = "%Ol:%OM %p";       // Time in 24 Hour Format without Seconds
+    case 2:
+        TFormat = "%OH:%OM:%OS";       // Time in 24 Hour Format with Seconds
+    case 3:
+        TFormat = "%Ol:%OM:%OS %p";    // Time in 24 Hour Format with Seconds
+    default:
+        TFormat = "%OH:%OM";          // Time in 24 Hour Format without Seconds
     }
-    else {      // If set to show 12 Hour Format
-        if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
-            TFormat = "%l:%M:%S %p";    // Time in 24 Hour Format with Seconds
-            strftime(time, sizeof(time), TFormat, timeinfo);
-            return time;
-        }
-        else {
-            TFormat = "%l:%M %p";       // Time in 24 Hour Format without Seconds
-            strftime(time, sizeof(time), TFormat, timeinfo);
-            return time;
-        }
-    }
-    strftime(time, sizeof(time), "%H:%M", timeinfo);
+    // If set to show 24 Hour Format
+    //if (!getModConfig().TwelveToggle.GetValue()) {
+    //    if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
+    //        TFormat = "%OH:%OM:%OS";       // Time in 24 Hour Format with Seconds
+    //    }
+    //    else {
+    //        TFormat = "%OH:%OM";          // Time in 24 Hour Format without Seconds
+    //    }
+    //}
+    //else {      // If set to show 12 Hour Format
+    //    if (getModConfig().SecToggle.GetValue()) {    //Check if seconds should be shown
+    //        TFormat = "%Ol:%OM:%OS %p";    // Time in 24 Hour Format with Seconds
+    //    }
+    //    else {
+    //        TFormat = "%Ol:%OM %p";       // Time in 24 Hour Format without Seconds
+    //    }
+    //}
+    strftime(time, sizeof(time), TFormat, timeinfo);
     return time;
 }
 
@@ -108,14 +112,23 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
 // Updates the Clock.
  //int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
 
- void ClockMod::ClockUpdater::Start() {
-     UnityEngine::Time::set_fixedDeltaTime(0.35f);
- }
+#define NUM_SECONDS 0.5
 
- void ClockMod::ClockUpdater::FixedUpdate() {
+ void ClockMod::ClockUpdater::Update() {
+
+     this_time = clock();
+
+     time_counter += (double)(this_time - last_time);
+
+     last_time = this_time;
+
+     if (!(time_counter > (double)(NUM_SECONDS * CLOCKS_PER_SEC)))
+     {
+         return;
+     }
+     time_counter -= (double)(NUM_SECONDS * CLOCKS_PER_SEC);
+
      if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
-         time_t rawtime;
-         struct tm* timeinfo;
          time(&rawtime);
          timeinfo = localtime(&rawtime);
          auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
@@ -180,4 +193,12 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
              text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
          }
      }
+ }
+
+ time_t ClockMod::ClockUpdater::getRawTime() {
+     return rawtime;
+ }
+
+ struct tm* ClockMod::ClockUpdater::getTimeInfo() {
+     return timeinfo;
  }
