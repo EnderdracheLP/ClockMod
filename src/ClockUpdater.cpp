@@ -98,7 +98,7 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
 // Updates the Clock.
  //int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
 
-#define NUM_SECONDS 0.2
+#define NUM_SECONDS 0.25
 
  void ClockMod::ClockUpdater::Update() {
 
@@ -141,7 +141,7 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
      {
          return;
      }
-     time_counter -= (double)(NUM_SECONDS * CLOCKS_PER_SEC);
+     time_counter = 0;
 
      if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
          time(&rawtime);
