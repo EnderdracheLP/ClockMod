@@ -1,6 +1,7 @@
 #include "ClockViewController.hpp"
 #include "main.hpp"
 #include "ClockModConfig.hpp"
+#include "ClockUpdater.hpp"
 using namespace ClockMod;
 
 #include "questui/shared/BeatSaberUI.hpp"
@@ -12,6 +13,7 @@ using namespace ClockMod;
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/Color.hpp"
+#include "UnityEngine/Resources.hpp"
 
 #include "HMUI/Touchable.hpp"
 #include "HMUI/ScrollView.hpp"
@@ -38,6 +40,11 @@ void ClockMod::ClockViewController::DidActivate(bool firstActivation, bool added
         get_gameObject()->AddComponent<Touchable*>();
         GameObject* container = BeatSaberUI::CreateScrollableSettingsContainer(get_transform());
         Transform* parent = container->get_transform();
+
+        char timeInformation[40];
+        strftime(timeInformation, sizeof(timeInformation), "Your Timezone  %Z\nUTC offset  %z", UnityEngine::Resources::FindObjectsOfTypeAll<ClockUpdater*>()->values[0]->getTimeInfo());
+        BeatSaberUI::CreateText(parent, timeInformation, false);
+
 
         AddConfigValueToggle(parent, getModConfig().InSong);
         AddConfigValueToggle(parent, getModConfig().TwelveToggle);

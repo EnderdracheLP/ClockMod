@@ -45,9 +45,6 @@ std::string getTimeString(struct tm* timeinfo) {
         TFormat = "%EX";          // Time in 24 Hour Format without Seconds
         break;
     }
-    //char timeInformation[40];
-    //strftime(timeInformation, sizeof(timeInformation), "Timezone is: %Z UTC offset is: %z", timeinfo);
-    //logger().debug("%s", timeInformation);
     strftime(time, sizeof(time), TFormat.c_str(), timeinfo);
     return time;
 }
