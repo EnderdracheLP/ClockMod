@@ -5,11 +5,10 @@
 
 #include "ClockModConfig.hpp"                       // Just the Config
 
-#include "UnityEngine/Transform.hpp"                // For Transform stuff
-#include "UnityEngine/GameObject.hpp"               // For GameObject Stuff
-#include "TMPro/TextMeshProUGUI.hpp"                // Text Stuff.
 #include "GlobalNamespace/OVRPlugin_OVRP_1_1_0.hpp" // Where I get the Battery Percentage from as float
 #include "RainbowClock.hpp"                         // Where the magic stuff is that makes the Clock Rainbowy (is that actually a word?)
+
+//#include "..\android-ndk-r22\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\jni.h"
 
 using namespace UnityEngine;
 using namespace TMPro;
@@ -46,6 +45,9 @@ std::string getTimeString(struct tm* timeinfo) {
         break;
     }
     strftime(time, sizeof(time), TFormat.c_str(), timeinfo);
+
+
+
     return time;
 }
 
@@ -100,10 +102,19 @@ void SetClockPos(UnityEngine::Transform* ClockParent, TMPro::TextMeshProUGUI* te
 
 #define NUM_SECONDS 0.25
 
+void ClockMod::ClockUpdater::Start() {
+    //JNIEnv* javaEnv = Modloader::getJni();
+
+    //jclass clazz = javaEnv->FindClass("java/text/SimpleDateFormat");
+    //jmethodID dateMethod = javaEnv->GetMethodID(clazz, "SimpleDateFormat");
+
+
+    text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
+    clockParent = get_transform()->GetParent();
+}
+
  void ClockMod::ClockUpdater::Update() {
 
-     auto text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
-     auto clockParent = get_transform()->GetParent();
 
      // Temp Code for updating Position.
      if (Config.IsInSong == false && Config.InMPLobby == false) {

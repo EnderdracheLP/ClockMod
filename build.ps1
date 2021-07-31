@@ -1,7 +1,11 @@
 $NDKPath = Get-Content $PSScriptRoot/ndkpath.txt
-if ($args.Count -eq 0) {
+if ($args.Count -eq 0  -or $args[0] -eq "--release") {
 $ModID = "clockmod"
-$VERSION = "1.4.0-InDev"
+if ($args[0] -eq "--release") {
+    $VERSION = "1.4.0"
+} else {
+    $VERSION = "1.4.0-InDev"
+}
 $BSHook = "2_2_4"
 $codegen_ver = "0_12_5"
 }

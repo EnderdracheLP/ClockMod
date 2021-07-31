@@ -110,12 +110,6 @@ CM_MAKE_HOOK(MainMenuViewController_DidActivate, &MainMenuViewController::DidAct
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if (firstActivation && ClockModInit) {
-        //logger().debug("Available frequencies: ");
-        //auto SystemDisplayFrequencies = GlobalNamespace::OVRPlugin::get_systemDisplayFrequenciesAvailable();
-        //for (int i = 0; i < SystemDisplayFrequencies->Length(); i++)
-        //{
-        //    logger().debug("Frequency: %f", SystemDisplayFrequencies->values[i]);
-        //}
         //auto EmptyParentObject = UnityEngine::GameObject::New_ctor(il2cpp_utils::newcsstr("EmptyParent"));
         auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::newcsstr("ClockCanvas"));
         //canvas_object->get_transform()->SetParent(canvas_object->get_transform());
