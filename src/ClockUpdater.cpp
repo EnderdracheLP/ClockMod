@@ -82,9 +82,13 @@ std::string RainbowClock::rainbowify(std::string input)
     for (auto c : input)
     {
         result += string_format("<color=%s>%c</color>", colors[rainbowIndex].c_str(), c);
-//        result += string_format("<color=%s%>%c%</color>", colors[rainbowIndex].c_str(), c);
         rainbowIndex++;
         rainbowIndex %= colors.size();
+    }
+	int addValue = (colors.size() - 1) - input.length();
+    if (input.length() < 10) {
+        rainbowIndex += addValue;
+        if (rainbowIndex > (colors.size() - 1)) rainbowIndex -= colors.size();
     }
     return result;
 }
