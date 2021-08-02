@@ -1,0 +1,15 @@
+{
+    "Show During Song": true,
+    "24/12 Toggle": false,
+    "Show Seconds": true,
+    "Show Battery Percentage": true,
+    "Rainbowify it": true,
+    "Font Size": 3.5,
+    "In-Menu Clock Position (Top/Bottom)": false,
+    "Clock Color": {
+        "r": 255.0,
+        "g": 255.0,
+        "b": 255.0,
+        "a": 255.0
+    }
+}

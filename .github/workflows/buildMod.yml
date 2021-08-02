@@ -1,16 +1,22 @@
-name: NDK build Mod
+name: NDK build
 
 on:
   workflow_dispatch:
   push:
-    branches: [ main, dev, 1.14.0 ]
+    branches: [ main, dev, 1.16.4 ]
   pull_request:
-    branches: [ main, dev, 1.14.0 ]
+    branches: [ main, dev, 1.16.4 ]
+
+env:
+     module_id: clockmod
+     version: 1.4.0-Dev.${{ github.run_number }}
+     BSVersion: 1.16.4
+     bs_hook: 2_2_4
+     codegen: 0_12_5
+     ndkname: android-ndk-r22
     
 jobs:
   build:
-    env:
-     module_id: clockmod
     runs-on: ubuntu-latest
     
     steps:
@@ -27,7 +33,6 @@ jobs:
       uses: actions/cache@v2
       env:
         cache-name: cache-ndk
-        ndkname: android-ndk-r22
       with:
         path: ndk
         key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
@@ -36,19 +41,29 @@ jobs:
     
     - name: Install Android NDK
       if: steps.cache-ndk.outputs.cache-hit != 'true'
-      env:
-        ndkname: android-ndk-r22
       run: |
         wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
         unzip -q ndk.zip
         mv ${ndkname} ndk
-      
+
     - name: Create ndkpath.txt
       run: |
         cd ndk
         pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
+      
+#     - name: Cache QPM
+#       id: cache-qpm
+#       uses: actions/cache@v2
+#       env:
+#         cache-name: cache-qpm
+#       with:
+#         path: QPM
+#         key: ${{ runner.os }}-${{ env.cache-name }}-1
+#         restore-keys: |
+#           ${{ runner.os }}-${{ env.cache-name }}-1
+
     - name: Get QPM
-      if: steps.cache-qpm.outputs.cache-hit != 'true'
+#      if: steps.cache-qpm.outputs.cache-hit != 'true'
       uses: dawidd6/action-download-artifact@v2
       with:
         github_token: ${{secrets.GITHUB_TOKEN}}
@@ -56,18 +71,47 @@ jobs:
         name: QPM-ubuntu-x64
         path: QPM
         repo: sc2ad/QuestPackageManager
+
+    - name: QPM Dependencies Cache
+      id: cache-qpm-deps
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-qpm-deps
+      with:
+        path: QPM_Temp
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('qpm.json', '.github/buildMod.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-
+          ${{ runner.os }}-${{ env.cache-name }}
       
     - name: QPM Restore
       run: |
         chmod +x ./QPM/QPM
         ./QPM/QPM restore
-    - name: test
+
+    - name: Check dependency Folders
       run: |
-        ls ./QPM/QPM_Temp
+        echo "Checking extern Folder"
+        ls -lh ${GITHUB_WORKSPACE}/extern/
+        echo ""
+        echo "Checking QPM_Temp Folders"
+        ls -lh QPM_Temp/
+        echo ""
+        echo "Listing beatsaber-hook folder"
+        ls QPM_Temp/beatsaber-hook/
+        echo ""
+        echo "Listing codegen folder"
+        ls QPM_Temp/codegen/
+        echo ""
+        echo "Listing all .so files in QPM_Temp"
+        find QPM_Temp -type f -name "*.so"
+#      continue-on-error: true
+
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        pwsh -Command ./build.ps1
+        pwsh -Command ./build.ps1 --actions
+
     - name: Get Library Name
       id: libname
       run: |
@@ -75,10 +119,12 @@ jobs:
         pattern="lib${module_id}*.so"
         files=( $pattern )
         echo ::set-output name=NAME::"${files[0]}"
+
     - name: Package QMOD
       run: |
         cd ${GITHUB_WORKSPACE}
-        pwsh -Command ./buildQP.ps1 --package
+        pwsh -Command ./buildQMOD.ps1 --package
+
     - name: Upload non-debug artifact
       uses: actions/upload-artifact@v2
       with:
@@ -94,6 +140,6 @@ jobs:
     - name: Upload QMOD
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.module_id }}.qmod
+        name: ${{ env.module_id }}-(UNZIP-for-QMOD)
         path: ./${{ env.module_id }}.qmod
         if-no-files-found: warn

@@ -9,7 +9,7 @@ Displays the time and optionally the battery percentage in the game.
 For creating the original Mod
 * [ChillGunner](https://github.com/ChillGunner) - [ClockMod](https://github.com/ChillGunner/ClockMod)
 
-For making modding possible
+Credits
 
 * [zoller27osu](https://github.com/zoller27osu), [Sc2ad](https://github.com/Sc2ad) and [jakibaki](https://github.com/jakibaki) - [beatsaber-hook](https://github.com/sc2ad/beatsaber-hook)
 * [raftario](https://github.com/raftario) 

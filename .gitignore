@@ -48,5 +48,7 @@ ndkpath.txt
 *.zip
 *.txt
 extern/
-Android.mk.backup
 qpm.shared.json
+Android.mk.backup
+*.qmod
+*.prolog
