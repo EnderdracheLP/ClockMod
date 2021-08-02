@@ -13,7 +13,6 @@ env:
      BSVersion: 1.16.4
      bs_hook: 2_2_4
      codegen: 0_12_5
-     ndkname: android-ndk-r22
     
 jobs:
   build:
@@ -25,31 +24,11 @@ jobs:
       with:
         submodules: true
         lfs: true
-    - name: Install Powershell
-      run: sudo apt-get install -y powershell
-
-    - name: Cache Android NDK
-      id: cache-ndk
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ndk
-      with:
-        path: ndk
-        key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
-        restore-keys: |
-          ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
-    
-    - name: Install Android NDK
-      if: steps.cache-ndk.outputs.cache-hit != 'true'
-      run: |
-        wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
-        unzip -q ndk.zip
-        mv ${ndkname} ndk
 
     - name: Create ndkpath.txt
       run: |
-        cd ndk
-        pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
+        echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/ndkpath.txt
+        cat ${GITHUB_WORKSPACE}/ndkpath.txt
       
 #     - name: Cache QPM
 #       id: cache-qpm
