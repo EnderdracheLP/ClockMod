@@ -2,7 +2,7 @@
 if ($args.Count -eq 0) {
 $ModID = "clockmod"
 $VERSION = "1.4.0"
-$BSHook = "2_2_4"
+$BSHook = "2_2_5"
 $BS_Version = "1.16.4"
 echo "Compiling Mod"
 & $PSScriptRoot/build.ps1 --release

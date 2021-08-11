@@ -6,7 +6,7 @@ if ($args[0] -eq "--release") {
 } else {
     $VERSION = "1.4.0-InDev"
 }
-$BSHook = "2_2_4"
+$BSHook = "2_2_5"
 $codegen_ver = "0_12_5"
 }
 
