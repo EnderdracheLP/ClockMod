@@ -29,10 +29,16 @@ private:
     time_t rawtime;
     struct tm* timeinfo;
 
+    static ClockUpdater* instance;
 
 public:
-    time_t getRawTime();
+    const time_t getRawTime() const;
     struct tm* getTimeInfo();
+    struct tm* getTimeInfoUTC();
+    TMPro::TextMeshProUGUI* getTextMesh();
+    void SetColor(UnityEngine::Color color);
+    static ClockUpdater* getInstance();
+    static std::string getTimeFormat();
 
 #if defined(BS__1_16) && defined(REGISTER_FUNCTION)
     REGISTER_FUNCTION(

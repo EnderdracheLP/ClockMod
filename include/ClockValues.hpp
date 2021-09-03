@@ -6,7 +6,7 @@
 // This containts all the ClockPositions
 struct ClockPos_t {
     // Clock InMenu Positions Top                                           X        Y        Z
-    UnityEngine::Vector3 MenuPosTop =               UnityEngine::Vector3(0.0f,    -1.7f,    3.85f);
+    UnityEngine::Vector3 MenuPosTop =               UnityEngine::Vector3(0.0f,    -1.7f,    4.0f);
     // Clock InMenu Positions Bottom    // UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ)
     //float MenuXdown = 0;
     //float MenuYdown = 0;

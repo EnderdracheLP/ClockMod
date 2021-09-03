@@ -1,13 +1,24 @@
 #include "custom-types/shared/macros.hpp"
+#include "custom-types/shared/coroutine.hpp"
 #include "HMUI/ViewController.hpp"
+#include "UnityEngine/Color.hpp"
+#include "TMPro/TextMeshProUGUI.hpp"
+#include "questui/shared/CustomTypes/Components/ModalColorPicker.hpp"
 //#include "questui/shared/BeatSaberUI.hpp"
 //#include "TMPro/TextMeshProUGUI.hpp"
-//#include "UnityEngine/Color.hpp"
 
 DECLARE_CLASS_CODEGEN(ClockMod, ClockViewController, HMUI::ViewController,
 
     DECLARE_OVERRIDE_METHOD(void, DidActivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidActivate", 3), bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
-//    DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidDeactivate", 2), bool removedFromHierarchy, bool systemScreenDisabling);
+    DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidDeactivate", 2), bool removedFromHierarchy, bool systemScreenDisabling);
+
+    DECLARE_INSTANCE_FIELD(QuestUI::ModalColorPicker*, ColorPicker);
+    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, TimeInfo);
+
+    custom_types::Helpers::Coroutine UpdateTimeText();
+    bool SettingsOpen;
+
+    //UnityEngine::Color lastChangedColor;
 
 #if defined(BS__1_16) && defined(REGISTER_FUNCTION)
     REGISTER_FUNCTION(
@@ -16,7 +27,7 @@ DECLARE_CLASS_CODEGEN(ClockMod, ClockViewController, HMUI::ViewController,
 #endif
 #if defined(REGISTER_METHOD)
         REGISTER_METHOD(DidActivate);
-    //        REGISTER_METHOD(DidDeactivate);
+        REGISTER_METHOD(DidDeactivate);
     )
 #endif
 );
