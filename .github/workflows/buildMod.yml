@@ -3,16 +3,16 @@ name: NDK build
 on:
   workflow_dispatch:
   push:
-    branches: [ main, dev, 1.16.4 ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ main, dev, 1.16.4 ]
+    branches: [ main, dev ]
 
 env:
      module_id: clockmod
-     version: 1.5.0-Dev.${{ github.run_number }}
-     BSVersion: 1.17.0
+     version: 1.5.1-Dev.${{ github.run_number }}
+     BSVersion: 1.17.1
      bs_hook: 2_3_0
-     codegen: 0_13_0
+     codegen: 0_14_0
     
 jobs:
   build:

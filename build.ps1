@@ -1,26 +1,22 @@
 $NDKPath = Get-Content $PSScriptRoot/ndkpath.txt
 if ($args.Count -eq 0  -or $args[0] -eq "--release") {
 $ModID = "clockmod"
-if ($args[0] -eq "--release") {
-    $VERSION = "1.5.0"
-} else {
-    $VERSION = "1.5.0-Dev"
+$VERSION = "1.5.1"
+if ($args[0] -ne "--release") {
+    $VERSION += "-Dev"
 }
 $BSHook = "2_3_0"
-$codegen_ver = "0_13_0"
 }
 
 if ($args[0] -eq "--actions") {
     $ModID = $env:module_id
     $BSHook = $env:bs_hook
     $VERSION = $env:version
-    $codegen_ver = $env:codegen
 }
 echo "Building mod with ModID: $ModID version: $VERSION, BS-Hook version: $BSHook"
 Copy-Item "./Android_Template.mk" "./Android.mk" -Force
 (Get-Content "./Android.mk").replace('{BS_Hook}',   "$BSHook")        | Set-Content "./Android.mk"
 (Get-Content "./Android.mk").replace('{VERSION}',   "$VERSION")       | Set-Content "./Android.mk"
-(Get-Content "./Android.mk").replace('{CG_VER}',    "$codegen_ver")   | Set-Content "./Android.mk"
 
 $buildScript = "$NDKPath/build/ndk-build"
 if (-not ($PSVersionTable.PSEdition -eq "Core")) {

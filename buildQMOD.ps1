@@ -1,12 +1,12 @@
 # Builds a .qmod file for loading with QP
 if ($args.Count -eq 0 -or $args[0] -eq "--dev") {
 $ModID = "clockmod"
-$VERSION = "1.5.0"
+$VERSION = "1.5.1"
 if ($args[0] -eq "--dev") {
     $VERSION += "-Dev"
 }
 $BSHook = "2_3_0"
-$BS_Version = "1.17.0"
+$BS_Version = "1.17.1"
 echo "Compiling Mod"
 if ($args[0] -eq "--dev") {
     & $PSScriptRoot/build.ps1

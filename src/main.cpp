@@ -101,7 +101,7 @@ UnityEngine::UI::VerticalLayoutGroup* layout;
 
 // Function that sets the ClockPosition for Multiplayer Lobbies.
 void MPLobbyClockPos(float MLobbyVCPosY) {
-    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY-1, 1.62));
+    layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY-1, 1.75));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
     layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, 0, 0));
 }

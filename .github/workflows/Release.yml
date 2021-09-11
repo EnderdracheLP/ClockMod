@@ -3,10 +3,10 @@ on:
 
     env:
      module_id: clockmod
-     version: 1.5.0
-     BSVersion: 1.17.0
+     version: 1.5.1
+     BSVersion: 1.17.1
      bs_hook: 2_3_0
-     codegen: 0_13_0
+     codegen: 0_14_0
      ndkname: android-ndk-r23
 
 name: Release Mod
