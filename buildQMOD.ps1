@@ -36,12 +36,8 @@ if ($qmodName -eq "")
     exit
 }
 
-if ($package -eq $true) {
-    $qmodName = "$($env:module_id)_$($env:version)"
-    echo "Actions: Packaging QMod $qmodName"
-}
-if (($args.Count -eq 0) -And $package -eq $false) {
-echo "Creating QMod $qmodName"
+if (($args.Count -eq 0 -or $dev -eq $true) -And $package -eq $false) {
+echo "Packaging QMod $qmodName"
     & $PSScriptRoot/build.ps1 -clean:$clean
 
     if ($LASTEXITCODE -ne 0) {
@@ -65,6 +61,16 @@ if ((-not ($cover -eq "./")) -and (Test-Path $cover))
     $filelist += ,$cover
 } else {
     echo "No cover Image found"
+}
+
+if ($package -eq $true -And $env:version.Contains('-Dev')) {
+    $qmodName = "$($env:module_id)_$($env:version)"
+echo "Actions: Packaging QMod $qmodName"
+} elseif ($package -eq $true) {
+        $qmodName = "$($env:module_id)"
+echo "Actions: Packaging QMod $qmodName"
+} else {
+    $qmodName += "_$($modJson.version)"
 }
 
 foreach ($mod in $modJson.modFiles)

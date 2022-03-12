@@ -17,7 +17,7 @@ on:
       - '**.ogg'
       - '**.zip'
   pull_request:
-    branches: [ master, dev ]
+    branches: [ main, dev ]
 
 env:
      module_id: ClockMod
