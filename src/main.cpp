@@ -12,11 +12,7 @@
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"          // For checking the characteristic 360/90.
 #include "GlobalNamespace/GameplayCoreInstaller.hpp"            // Also part of the check.
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
-//#include "GlobalNamespace/HostLobbySetupViewController.hpp"
-//#include "GlobalNamespace/ClientLobbySetupViewController.hpp"
-//#include "GlobalNamespace/QuickPlaySetupViewController.hpp"
 #include "GlobalNamespace/LobbySetupViewController.hpp"         // NEW: For 1.16.4
-#include "GlobalNamespace/BeatmapObjectCallbackController.hpp"  // For checking characteristic
 #include "GlobalNamespace/IReadonlyBeatmapData.hpp"             // To read the BeatmapData
 #include "GlobalNamespace/FlyingGameHUDRotation.hpp"            // Take rotation from this instead lol
 #include "GlobalNamespace/PlayerDataModel.hpp"            // For checking if noTextandHUDs is enabled
@@ -71,14 +67,10 @@ Config_t Config;
 // Clock Positions
 ClockPos_t ClockPos;
 
-#if defined(MAKE_HOOK_OFFSETLESS) && !defined(MAKE_HOOK_MATCH)
-#define CM_MAKE_HOOK(name, mPtr, retval, ...) MAKE_HOOK_OFFSETLESS(name, retval, __VA_ARGS__)
-#define CM_INSTALL_HOOK(logger, name, methodInfo) INSTALL_HOOK_OFFSETLESS(logger, name, methodInfo)
-#elif defined(MAKE_HOOK_MATCH)
-#define CM_MAKE_HOOK(name, mPtr, retval, ...) MAKE_HOOK_MATCH(name, mPtr, retval, __VA_ARGS__)
-#define CM_INSTALL_HOOK(logger, name, methodInfo) INSTALL_HOOK(logger, name)
-#else
-#error No Compatible HOOK macro found
+#if defined(MAKE_HOOK_OFFSETLESS)
+#error Outdated bs-hook
+#elif !defined(MAKE_HOOK_MATCH)
+#error No supported HOOK macro found, make sure that you have ran: 'qpm-rust restore' and that you have a compatible version of bs-hook
 #endif
 
 ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
@@ -106,7 +98,7 @@ void MPLobbyClockPos(float MLobbyVCPosY) {
     layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
-CM_MAKE_HOOK(MainMenuViewController_DidActivate, &MainMenuViewController::DidActivate, void, MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::DidActivate, void, MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if (firstActivation && ClockModInit) {
@@ -183,9 +175,9 @@ void SetClockPos(UnityEngine::Vector3 Pos, UnityEngine::Vector3 Angle, float Sca
 }
 
 // TODO: Use a different hook, this one is too small and causes issues
-CM_MAKE_HOOK(AudioTimeSyncController_StartSong, &AudioTimeSyncController::StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
+MAKE_HOOK_MATCH(AudioTimeSyncController_StartSong, &AudioTimeSyncController::StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
     // Instance of PlayerDataModel the noTextAndHUDs variable specifically
-    Config.noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->playerSpecificSettings->noTextsAndHuds;
+    Config.noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->dyn__playerData()->get_playerSpecificSettings()->dyn__noTextsAndHuds();
 
     //float LayoutClockPosX = layout->get_transform()->get_position().x;
     //float LayoutClockPosY = layout->get_transform()->get_position().y;
@@ -249,7 +241,7 @@ CM_MAKE_HOOK(AudioTimeSyncController_StartSong, &AudioTimeSyncController::StartS
     } 
 }
 
-//CM_MAKE_HOOK(SceneManager_Internal_ActiveSceneChanged, &UnityEngine::SceneManagement::SceneManager::Internal_ActiveSceneChanged, void, UnityEngine::SceneManagement::Scene prevScene, UnityEngine::SceneManagement::Scene nextScene) {
+//MAKE_HOOK_MATCH(SceneManager_Internal_ActiveSceneChanged, &UnityEngine::SceneManagement::SceneManager::Internal_ActiveSceneChanged, void, UnityEngine::SceneManagement::Scene prevScene, UnityEngine::SceneManagement::Scene nextScene) {
 //    SceneManager_Internal_ActiveSceneChanged(prevScene, nextScene);
 //    if (nextScene.IsValid()) {
 //        std::string sceneName = to_utf8(csstrtostr(nextScene.get_name()));
@@ -320,13 +312,13 @@ CM_MAKE_HOOK(AudioTimeSyncController_StartSong, &AudioTimeSyncController::StartS
 //    }
 //}
 
-//CM_MAKE_HOOK(AudioTimeSyncController_StopSong, &AudioTimeSyncController::StopSong, void, AudioTimeSyncController* self) {
+//MAKE_HOOK_MATCH(AudioTimeSyncController_StopSong, &AudioTimeSyncController::StopSong, void, AudioTimeSyncController* self) {
 //    AudioTimeSyncController_StopSong(self);
 //    Config.IsInSong = false;
 //    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
 //}
 
-CM_MAKE_HOOK(CampaignFlowCoordinator_DidActivate, &CampaignFlowCoordinator::DidActivate, void, CampaignFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+MAKE_HOOK_MATCH(CampaignFlowCoordinator_DidActivate, &CampaignFlowCoordinator::DidActivate, void, CampaignFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     CampaignFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
@@ -344,7 +336,7 @@ CM_MAKE_HOOK(CampaignFlowCoordinator_DidActivate, &CampaignFlowCoordinator::DidA
     layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
-CM_MAKE_HOOK(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, &PartyFreePlayFlowCoordinator::SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, PartyFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
+MAKE_HOOK_MATCH(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, &PartyFreePlayFlowCoordinator::SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, PartyFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
@@ -362,7 +354,7 @@ CM_MAKE_HOOK(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordina
     layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
-CM_MAKE_HOOK(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, &SoloFreePlayFlowCoordinator::SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
+MAKE_HOOK_MATCH(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, &SoloFreePlayFlowCoordinator::SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
@@ -380,38 +372,35 @@ CM_MAKE_HOOK(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinat
     layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
-CM_MAKE_HOOK(PauseMenuManager_ShowMenu, &PauseMenuManager::ShowMenu, void, PauseMenuManager* self) {
+MAKE_HOOK_MATCH(PauseMenuManager_ShowMenu, &PauseMenuManager::ShowMenu, void, PauseMenuManager* self) {
     PauseMenuManager_ShowMenu(self);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
         logger().info("SetActive true PauseMenu");
     }
-    //if (Config.noTextAndHUD) {
-    //    canvas->get_gameObject()->SetActive(false);
-    //    logger().info("SetActive false (NoTextAndHUD)");
-    //}
-//    layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ));
-//    Config.IsInSong = false;
 }
 
-CM_MAKE_HOOK(PauseMenuManager_StartResumeAnimation, &PauseMenuManager::StartResumeAnimation, void, PauseMenuManager* self) {
+MAKE_HOOK_MATCH(PauseMenuManager_StartResumeAnimation, &PauseMenuManager::StartResumeAnimation, void, PauseMenuManager* self) {
     PauseMenuManager_StartResumeAnimation(self);
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(false);
         logger().info("SetActive false PauseMenu");
     }
-//    if (Config.InRotationMap) {
-//        layout->get_transform()->set_position(UnityEngine::Vector3(0, Config.ClockY+2, Config.ClockZ+5));
-//    }
-//    Config.IsInSong = true;
 }
 
 // TODO: Use the below information wisely
 // Check if it there are RotationEvents within the map, and if there are, declare it a 360/90 Map.
-CM_MAKE_HOOK(BeatmapObjectCallbackController_SetNewBeatmapData, &BeatmapObjectCallbackController::SetNewBeatmapData, void, BeatmapObjectCallbackController* self, IReadonlyBeatmapData* beatmapData) {
-    BeatmapObjectCallbackController_SetNewBeatmapData(self, beatmapData);
+#if __has_include("GlobalNamespace/BeatmapObjectCallbackController.hpp")
+#include "GlobalNamespace/BeatmapObjectCallbackController.hpp"  // For checking characteristic
+MAKE_HOOK_MATCH(BeatmapDataCallback, &BeatmapObjectCallbackController::SetNewBeatmapData, void, BeatmapObjectCallbackController* self, IReadonlyBeatmapData* beatmapData) {
+    BeatmapDataCallback(self, beatmapData);
+#else
+#include "GlobalNamespace/BeatmapCallbacksController_InitData.hpp"
+MAKE_HOOK_FIND_INSTANCE(BeatmapDataCallback, classof(BeatmapCallbacksController::InitData*), ".ctor", void, BeatmapCallbacksController::InitData* self, IReadonlyBeatmapData* beatmapData, float startFilterTime) {
+    BeatmapDataCallback(self, beatmapData, startFilterTime);
+#endif
     if (beatmapData) {
         int RotationEvents = beatmapData->get_spawnRotationEventsCount();
         if (RotationEvents > 0) {
@@ -425,91 +414,13 @@ CM_MAKE_HOOK(BeatmapObjectCallbackController_SetNewBeatmapData, &BeatmapObjectCa
     }
 }
 
-CM_MAKE_HOOK(FlyingGameHUDRotation_FixedUpdate, &FlyingGameHUDRotation::FixedUpdate, void, GlobalNamespace::FlyingGameHUDRotation* self) {
-    //float YAngle = self->yAngle;
-    //if (getModConfig().ClockPosition.GetValue()) {
-    //    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(ClockPos.RotateSongRotationDownX, self->yAngle, 0));
-    //} else layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(ClockPos.RotateSongRotationTopX, self->yAngle, 0));
-    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, self->yAngle, 0));
+MAKE_HOOK_MATCH(FlyingGameHUDRotation_FixedUpdate, &FlyingGameHUDRotation::FixedUpdate, void, GlobalNamespace::FlyingGameHUDRotation* self) {
+    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, self->dyn__yAngle(), 0));
     FlyingGameHUDRotation_FixedUpdate(self);
 }
 
-//MAKE_HOOK_OFFSETLESS(CoreGameHUDController_Start, void, GlobalNamespace::CoreGameHUDController* self) {
-//    CoreGameHUDController_Start(self);
-//}
 
-// Multiplayer Lobby Specific Code
-
-//MAKE_HOOK_OFFSETLESS(MultiplayerLobbyController_ActivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
-//    MultiplayerLobbyController_ActivateMultiplayerLobby(self);
-//
- //   layout->get_transform()->set_position(UnityEngine::Vector3(0, -0.05, 1.62));
- //   layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
-//}
-
-// TODO: figure out why, the results screen causes problems with the clock
-
-//CM_MAKE_HOOK(QuickPlaySetupViewController_DidActivate, &QuickPlaySetupViewController::DidActivate, void, QuickPlaySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-//    QuickPlaySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-//
-//    if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
-//        canvas->get_gameObject()->SetActive(true);
-//        logger().info("SetActive true QuickPlayLobby");
-//    }
-//    layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-//
-//    auto MLobbyVCPosY = self->get_transform()->get_position().y;
-//    Config.InMPLobby = true;
-//    Config.IsInSong = false;
-//    Config.InMP = true;
-//    Config.InRotationMap = false;
-////    logger().debug("%g", MLobbyVCPosY);
-//    MPLobbyClockPos(MLobbyVCPosY);
-//    if (Config.InMP == true) { logger().debug("QLobby, InMP is True"); }
-//}
-//
-//CM_MAKE_HOOK(ClientLobbySetupViewController_DidActivate, &ClientLobbySetupViewController::DidActivate, void, ClientLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-//
-//    if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
-//        canvas->get_gameObject()->SetActive(true);
-//        logger().info("SetActive true ClientLobby");
-//    }
-//    layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-//
-//    auto MLobbyVCPosY = self->get_transform()->get_position().y;
-//    Config.InMPLobby = true;
-//    Config.IsInSong = false;
-//    Config.InMP = true;
-//    Config.InRotationMap = false;
-////    logger().debug("%g", MLobbyVCPosY);
-//    MPLobbyClockPos(MLobbyVCPosY);
-//    if (Config.InMP == true) { logger().debug("CLobby, InMP is True"); }
-//
-//    ClientLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-//}
-//
-//CM_MAKE_HOOK(HostLobbySetupViewController_DidActivate, &HostLobbySetupViewController::DidActivate, void, HostLobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-//
-//    if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
-//        canvas->get_gameObject()->SetActive(true);
-//        logger().info("SetActive true HostLobby");
-//    }
-//    layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-//
-//    auto MLobbyVCPosY = self->get_transform()->get_position().y;
-//    Config.InMPLobby = true;
-//    Config.IsInSong = false;
-//    Config.InMP = true;
-//    Config.InRotationMap = false;
-//    //  logger().debug("%g", MLobbyVCPosY);
-//    MPLobbyClockPos(MLobbyVCPosY);
-//    if (Config.InMP == true) { logger().debug("HLobby, InMP is True"); }
-//
-//    HostLobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-//}
-
-
-CM_MAKE_HOOK(LobbySetupViewController_DidActivate, &LobbySetupViewController::DidActivate, void, LobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController::DidActivate, void, LobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -529,7 +440,7 @@ CM_MAKE_HOOK(LobbySetupViewController_DidActivate, &LobbySetupViewController::Di
     LobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 
-CM_MAKE_HOOK(MultiplayerResultsViewController_DidActivate, &MultiplayerResultsViewController::DidActivate, void, MultiplayerResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+MAKE_HOOK_MATCH(MultiplayerResultsViewController_DidActivate, &MultiplayerResultsViewController::DidActivate, void, MultiplayerResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -549,7 +460,7 @@ CM_MAKE_HOOK(MultiplayerResultsViewController_DidActivate, &MultiplayerResultsVi
     MultiplayerResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 
-CM_MAKE_HOOK(MultiplayerLobbyController_DeactivateMultiplayerLobby, &MultiplayerLobbyController::DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
+MAKE_HOOK_MATCH(MultiplayerLobbyController_DeactivateMultiplayerLobby, &MultiplayerLobbyController::DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_DeactivateMultiplayerLobby(self);
 
     Config.InMPLobby = false;
@@ -561,18 +472,10 @@ CM_MAKE_HOOK(MultiplayerLobbyController_DeactivateMultiplayerLobby, &Multiplayer
     layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
-/*
-// Multiplayer song starting taken from QDRPC, probably a better way of figuring this out
-MAKE_HOOK_OFFSETLESS(MultiplayerLevelScenesTransitionSetupDataSO_Init, void, MultiplayerLevelScenesTransitionSetupDataSO* self, Il2CppString* gameMode, GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel, GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap, GlobalNamespace::ColorScheme* overrideColorScheme, GlobalNamespace::GameplayModifiers* gameplayModifiers, GlobalNamespace::PlayerSpecificSettings* playerSpecificSettings, GlobalNamespace::PracticeSettings* practiceSettings, bool useTestNoteCutSoundEffects) {
-    logger().info("Multiplayer Song Started");
-    Config.InMPSong = true;
-    MultiplayerLevelScenesTransitionSetupDataSO_Init(self, gameMode, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, overrideColorScheme, gameplayModifiers, playerSpecificSettings, practiceSettings, useTestNoteCutSoundEffects);
-}
-*/
 
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo & info) {
-    info.id = "clockmod";
+    info.id = MOD_ID;
     info.version = VERSION;
     modInfo = info;
 
@@ -601,42 +504,20 @@ extern "C" void load() {
 
     Logger& hkLog = logger();
 
-#ifndef REGISTER_FUNCTION
     custom_types::Register::AutoRegister();
-#else
-    custom_types::Register::RegisterType<ClockMod::ClockUpdater>();
-    //custom_types::Register::RegisterType<ClockMod::ClockRotationUpdater>();
-    custom_types::Register::RegisterType<ClockMod::ClockViewController>();
-#endif
     QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
 
-    CM_INSTALL_HOOK(hkLog, MainMenuViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
-    CM_INSTALL_HOOK(hkLog, CampaignFlowCoordinator_DidActivate, il2cpp_utils::FindMethodUnsafe("", "CampaignFlowCoordinator", "DidActivate", 3));
-    CM_INSTALL_HOOK(hkLog, AudioTimeSyncController_StartSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StartSong", 1));
-    //INSTALL_HOOK_OFFSETLESS(hkLog, SceneManager_Internal_ActiveSceneChanged, il2cpp_utils::FindMethodUnsafe("UnityEngine.SceneManagement", "SceneManager", "Internal_ActiveSceneChanged", 2));
-    // Third attempt at clock rotation
-//    INSTALL_HOOK_OFFSETLESS(hkLog, BeatmapObjectManager_SpawnBasicNote, il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectManager", "SpawnBasicNote", 4));
-//    INSTALL_HOOK_OFFSETLESS(hkLog, NoteController_Update, il2cpp_utils::FindMethodUnsafe("", "NoteController", "Update", 0));
-    //INSTALL_HOOK_OFFSETLESS(hkLog, AudioTimeSyncController_StopSong, il2cpp_utils::FindMethodUnsafe("", "AudioTimeSyncController", "StopSong", 0));
-    CM_INSTALL_HOOK(hkLog, SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "SoloFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
-    // Added by ELP
-    CM_INSTALL_HOOK(hkLog, FlyingGameHUDRotation_FixedUpdate, il2cpp_utils::FindMethodUnsafe("", "FlyingGameHUDRotation", "FixedUpdate", 0));
-    CM_INSTALL_HOOK(hkLog, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, il2cpp_utils::FindMethodUnsafe("", "PartyFreePlayFlowCoordinator", "SinglePlayerLevelSelectionFlowCoordinatorDidActivate", 2));
-    CM_INSTALL_HOOK(hkLog, PauseMenuManager_ShowMenu, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "ShowMenu", 0));
-    CM_INSTALL_HOOK(hkLog, PauseMenuManager_StartResumeAnimation, il2cpp_utils::FindMethodUnsafe("", "PauseMenuManager", "StartResumeAnimation", 0));
-    CM_INSTALL_HOOK(hkLog, BeatmapObjectCallbackController_SetNewBeatmapData, il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectCallbackController", "SetNewBeatmapData", 1));
-//    INSTALL_HOOK_OFFSETLESS(hkLog, CoreGameHUDController_Start, il2cpp_utils::FindMethodUnsafe("", "CoreGameHUDController", "Start", 0));
-//    INSTALL_HOOK_OFFSETLESS(hookLogger, MultiplayerLobbyController_ActivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "ActivateMultiplayerLobby", 0));
-    // Multiplayer specific Hooks
-    //CM_INSTALL_HOOK(hkLog, HostLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "HostLobbySetupViewController", "DidActivate", 3));
-    //CM_INSTALL_HOOK(hkLog, ClientLobbySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "ClientLobbySetupViewController", "DidActivate", 3));
-    //CM_INSTALL_HOOK(hkLog, QuickPlaySetupViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "QuickPlaySetupViewController", "DidActivate", 3));
-
-    CM_INSTALL_HOOK(hkLog, LobbySetupViewController_DidActivate, nullptr);
-    CM_INSTALL_HOOK(hkLog, MultiplayerLobbyController_DeactivateMultiplayerLobby, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLobbyController", "DeactivateMultiplayerLobby", 0));
-    CM_INSTALL_HOOK(hkLog, MultiplayerResultsViewController_DidActivate, il2cpp_utils::FindMethodUnsafe("", "MultiplayerResultsViewController", "DidActivate", 3));
-
-    //INSTALL_HOOK_OFFSETLESS(hkLog, MultiplayerLevelScenesTransitionSetupDataSO_Init, il2cpp_utils::FindMethodUnsafe("", "MultiplayerLevelScenesTransitionSetupDataSO", "Init", 10));
-
+    INSTALL_HOOK(hkLog, MainMenuViewController_DidActivate);
+    INSTALL_HOOK(hkLog, CampaignFlowCoordinator_DidActivate);
+    INSTALL_HOOK(hkLog, AudioTimeSyncController_StartSong);
+    INSTALL_HOOK(hkLog, SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate);
+    INSTALL_HOOK(hkLog, FlyingGameHUDRotation_FixedUpdate);
+    INSTALL_HOOK(hkLog, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate);
+    INSTALL_HOOK(hkLog, PauseMenuManager_ShowMenu);
+    INSTALL_HOOK(hkLog, PauseMenuManager_StartResumeAnimation);
+    INSTALL_HOOK(hkLog, BeatmapDataCallback);
+    INSTALL_HOOK(hkLog, LobbySetupViewController_DidActivate);
+    INSTALL_HOOK(hkLog, MultiplayerLobbyController_DeactivateMultiplayerLobby);
+    INSTALL_HOOK(hkLog, MultiplayerResultsViewController_DidActivate);
     logger().info("Installed all ClockMod hooks!");
 }

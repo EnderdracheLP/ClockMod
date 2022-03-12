@@ -1,14 +1,12 @@
+name: Pre-Release Mod
+
 on:
   workflow_dispatch:
 
-name: Pre-Release Mod
 env:
-     module_id: clockmod
-     version: 1.5.1-rc.1
-     BSVersion: 1.17.1
-     bs_hook: 2_3_0
-     codegen: 0_14_0
-     ndkname: android-ndk-r23
+     module_id: ClockMod
+     version: 1.5.3-rc.1
+     ndkname: android-ndk-r24
 
 
 jobs:
@@ -63,7 +61,7 @@ jobs:
         cache-name: cache-qpm-deps
       with:
         path: QPM_Temp
-        key: ${{ runner.os }}-${{ env.cache-name }}
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('qpm_${{ env.BSVersion }}.json', '.github/BuildMod.yml') }}
         restore-keys: |
           ${{ runner.os }}-${{ env.cache-name }}-
           ${{ runner.os }}-${{ env.cache-name }}
@@ -81,13 +79,17 @@ jobs:
         echo "Checking QPM_Temp Folders"
         ls -lh QPM_Temp/
         echo ""
+        echo "Listing beatsaber-hook folder"
+        ls QPM_Temp/beatsaber-hook/
+        echo ""
         echo "Listing all .so files in QPM_Temp"
         find QPM_Temp -type f -name "*.so"
-#      continue-on-error: true
 
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
+        ./QPM/qpm-rust package edit --version ${{ env.version }}
+        ./QPM/qpm-rust qmod build
         pwsh -Command ./build.ps1 --actions
     - name: Get Library Name
       id: libname
@@ -99,7 +101,7 @@ jobs:
     - name: Package QMOD
       run: |
         cd ${GITHUB_WORKSPACE}
-        pwsh -Command ./buildQMOD.ps1 --package
+        pwsh -Command ./buildQMOD.ps1 -package
     - name: Create Release
       id: create_pre-release
       uses: actions/create-release@v1
@@ -108,7 +110,7 @@ jobs:
       with:
         tag_name: ${{ env.version }}
         release_name: ${{ env.module_id }} ${{ env.version }} for Beat Saber ${{ env.BSVersion }}
-        body_path: ./pre-rl-notes
+        body_path: ./pre-rl-notes.md
         draft: false
         prerelease: true
     - name: Upload QMOD Pre-Release Asset

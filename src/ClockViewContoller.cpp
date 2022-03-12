@@ -29,13 +29,14 @@ using namespace QuestUI;
 using namespace UnityEngine;
 using namespace HMUI;
 
-#ifndef REGISTER_FUNCTION
-DEFINE_TYPE(ClockMod, ClockViewController);
-#elif defined(DEFINE_TYPE)
-DEFINE_TYPE(ClockMod::ClockViewController);
-#elif defined(DEFINE_CLASS)
-DEFINE_CLASS(ClockMod::ClockViewController);
+#if defined(REGISTER_FUNCTION) || defined(DEFINE_CLASS)
+#error Outdated custom-types
+#elif !defined(DEFINE_TYPE)
+#error Custom-types macro missing, make sure you have ran: 'qpm-rust restore' and that you have a compatible version of custom-types
 #endif
+
+DEFINE_TYPE(ClockMod, ClockViewController);
+
 
 namespace ClockMod {
 
@@ -111,7 +112,7 @@ namespace ClockMod {
                 );
 
         }
-        StartCoroutine(reinterpret_cast<System::Collections::IEnumerator*>(custom_types::Helpers::CoroutineHelper::New(UpdateTimeText())));
+        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(UpdateTimeText()));
     }
     void ClockViewController::DidDeactivate(bool removedFromHierarchy, bool systemScreenDisabling) {
         SettingsOpen = false;

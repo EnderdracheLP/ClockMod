@@ -13,13 +13,13 @@
 using namespace UnityEngine;
 using namespace TMPro;
 
-#ifndef REGISTER_FUNCTION
-DEFINE_TYPE(ClockMod, ClockUpdater);
-#elif defined(DEFINE_TYPE)
-DEFINE_TYPE(ClockMod::ClockUpdater);
-#elif defined(DEFINE_CLASS)
-DEFINE_CLASS(ClockMod::ClockUpdater);
+#if defined(REGISTER_FUNCTION) || defined(DEFINE_CLASS)
+#error Outdated custom-types
+#elif !defined(DEFINE_TYPE)
+#error Custom-types macro missing, make sure you have ran: 'qpm-rust restore' and that you have a compatible version of custom-types
 #endif
+
+DEFINE_TYPE(ClockMod, ClockUpdater);
 
 namespace ClockMod {
     std::string ClockUpdater::getTimeFormat() {

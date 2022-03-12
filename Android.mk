@@ -65,7 +65,7 @@ LOCAL_SHARED_LIBRARIES += codegen
 LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += questui
 LOCAL_LDLIBS += -llog
-LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"clockmod"' -DVERSION='"1.5.1-Dev"' -I'./shared' -I'./extern' -isystem'extern/codegen/include' -Ofast
+LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"clockmod"' -DVERSION='"1.5.1"' -I'./shared' -I'./extern' -isystem'extern/codegen/include' -Ofast
 LOCAL_CPPFLAGS += -std=c++2a -Ofast
 LOCAL_C_INCLUDES += ./include ./src
 include $(BUILD_SHARED_LIBRARY)
