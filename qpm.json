@@ -4,7 +4,7 @@
   "info": {
     "name": "Clock Mod",
     "id": "ClockMod",
-    "version": "1.5.2-Dev",
+    "version": "1.5.3-Dev",
     "url": null,
     "additionalData": {
       "overrideSoName": "libClockMod.so"
@@ -13,7 +13,7 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^3.6.8",
+      "versionRange": "^3.7.4",
       "additionalData": {
         "extraFiles": [
           "src/inline-hook"
@@ -22,17 +22,17 @@
     },
     {
       "id": "codegen",
-      "versionRange": "^0.20.0",
+      "versionRange": "^0.21.0",
       "additionalData": {}
     },
     {
       "id": "questui",
-      "versionRange": "^0.13.2",
+      "versionRange": "^0.13.4",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.15.7",
+      "versionRange": "^0.15.8",
       "additionalData": {}
     },
     {

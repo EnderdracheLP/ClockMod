@@ -48,5 +48,6 @@ struct ClockPos_t {
     //float MPSongXdown = 0;
     //float MPSongYdown = 0;
     //float MPSongZdown = 0;
+    bool ap1 = false;
 };
 extern ClockPos_t ClockPos;

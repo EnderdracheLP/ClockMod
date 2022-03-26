@@ -30,13 +30,13 @@ namespace ClockMod {
             TFormat = "%OH:%OM";          // Time in 24 Hour Format without Seconds
             break;
         case 1:
-            TFormat = "%Ol:%OM %p";       // Time in 24 Hour Format without Seconds
+            TFormat = "%Ol:%OM %p";       // Time in 12 Hour Format without Seconds
             break;
         case 2:
             TFormat = "%OH:%OM:%OS";       // Time in 24 Hour Format with Seconds
             break;
         case 3:
-            TFormat = "%Ol:%OM:%OS %p";    // Time in 24 Hour Format with Seconds
+            TFormat = "%Ol:%OM:%OS %p";    // Time in 12 Hour Format with Seconds
             break;
         default:
             logger().warning("Using default formatting!");
@@ -180,22 +180,34 @@ namespace ClockMod {
                 time(&rawtime);
                 timeinfo = localtime(&rawtime);
                 //auto clockParent = get_transform();
+                std::string clockresult;
 
+                if (_message.empty()) {
                     // Gets the time using the function at the top.
-                    auto clockresult = getTimeString((struct tm*)timeinfo);
+                    clockresult = getTimeString((struct tm*)timeinfo);
+                } 
+                else {
+                    clockresult = _message;
+                }
 
-                    // Checks, if the clock is set to rainbowify
-                    if (getModConfig().RainbowClock.GetValue()) {
-                        clockresult = RainbowClock::rainbowify(clockresult);
-                        //text->set_color(UnityEngine::Color::HSVToRGB(std::fmod(UnityEngine::Time::get_time() * 0.35f, 1), 1, 1));
-                    }
+                // Checks, if the clock is set to rainbowify
+                if (getModConfig().RainbowClock.GetValue()) {
+                    clockresult = RainbowClock::rainbowify(clockresult);
+                    //text->set_color(UnityEngine::Color::HSVToRGB(std::fmod(UnityEngine::Time::get_time() * 0.35f, 1), 1, 1));
+                }
+
+
                     // Checks, the below condition and if it retunrs true, gets the current Battery Percentage Level and adds it to the clockresult variable.
-                    if (getModConfig().BattToggle.GetValue()) {
+                    if (getModConfig().BattToggle.GetValue() && _message.empty()) {
                         // Gets the Battery Percentage as float 1.00, multiplies it by 100, and then uses the getBatteryString function defined above to format the percentage.
                         auto battery = getBatteryString((int)(GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel() * 100));
                         clockresult += " - ";                // Adds  -  to it with spaces, before and after the - .
                         clockresult += battery;         // Here is where the Battery gets added to the tandb string.
                     }
+
+                    if (!_message.empty() && messageShowing > 0) messageShowing--;
+                    else _message.clear();
+
 
                     // This is where the Text and Clock Position is set.
                     text->set_text(il2cpp_utils::newcsstr(clockresult));        // This sets the Text
@@ -228,5 +240,10 @@ namespace ClockMod {
 
         ClockUpdater* ClockUpdater::getInstance() {
             return instance;
+        }
+
+        void ClockUpdater::ShowMessage(std::string message) {
+            this->messageShowing = 2;
+            this->_message = message;
         }
 }

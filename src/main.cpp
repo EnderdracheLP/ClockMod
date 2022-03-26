@@ -472,6 +472,23 @@ MAKE_HOOK_MATCH(MultiplayerLobbyController_DeactivateMultiplayerLobby, &Multipla
     layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
+#include <random>
+#include "GlobalNamespace/ResultsViewController.hpp"
+#include "GlobalNamespace/LevelCompletionResults.hpp"
+MAKE_HOOK_MATCH(ResultsViewController_DidActivate, &ResultsViewController::DidActivate, void, ResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    ResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+    std::vector<std::string> failTexts({ "Get Better", "Fail", "lol", "learn2play", "no skills", "get skills" });
+    if (ClockPos.ap1 && self->dyn__levelCompletionResults()->dyn_levelEndStateType() == LevelCompletionResults::LevelEndStateType::Failed) {
+        ClockUpdater* clockUpdater = ClockUpdater::getInstance();
+        if (clockUpdater) {
+            std::random_device random_device;
+            std::mt19937 engine{ random_device() };
+            std::uniform_int_distribution<int> dist(0, failTexts.size() - 1);
+            clockUpdater->ShowMessage(failTexts.at(dist(engine)));
+        }
+    }
+}
+
 
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo & info) {
@@ -500,12 +517,21 @@ extern "C" void load() {
     //Init/Load Config
     getModConfig().Init(modInfo);
 
+    time_t rawtime;
+    time(&rawtime);
+    struct tm* timeinfo = localtime(&rawtime);
+    if (timeinfo && timeinfo->tm_mon == 4 && timeinfo->tm_mday == 1) ClockPos.ap1 = true;
+
     logger().info("Installing Clockmod hooks...");
 
     Logger& hkLog = logger();
 
     custom_types::Register::AutoRegister();
     QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
+
+    if (ClockPos.ap1) {
+        INSTALL_HOOK(hkLog, ResultsViewController_DidActivate);
+    }
 
     INSTALL_HOOK(hkLog, MainMenuViewController_DidActivate);
     INSTALL_HOOK(hkLog, CampaignFlowCoordinator_DidActivate);

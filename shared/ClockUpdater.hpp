@@ -31,6 +31,9 @@ private:
 
     static ClockUpdater* instance;
 
+    std::string _message;
+    int messageShowing = 2;
+
 public:
     const time_t getRawTime() const;
     struct tm* getTimeInfo();
@@ -39,15 +42,6 @@ public:
     void SetColor(UnityEngine::Color color);
     static ClockUpdater* getInstance();
     static std::string getTimeFormat();
+    void ShowMessage(std::string message);
 
-#if defined(BS__1_16) && defined(REGISTER_FUNCTION)
-    REGISTER_FUNCTION(
-#elif defined(BS__1_13_2)
-    REGISTER_FUNCTION(ClockUpdater,
-#endif
-#if defined(REGISTER_METHOD)
-        REGISTER_METHOD(Start);
-        REGISTER_METHOD(Update);
-    )
-#endif
 )
