@@ -48,6 +48,6 @@ struct ClockPos_t {
     //float MPSongXdown = 0;
     //float MPSongYdown = 0;
     //float MPSongZdown = 0;
-    bool ap1 = true; // This should be set to false by default unless we're testing it
+    bool ap1 = false; // This should be set to false by default unless we're testing it
 };
 extern ClockPos_t ClockPos;
