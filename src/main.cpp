@@ -522,7 +522,7 @@ extern "C" void load() {
     struct tm* timeinfo = localtime(&rawtime);
     // Months start at 0 so 0 = January while days start at 1
     //if (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1) ClockPos.ap1 = true;
-    logger().debug("Day is: %d Month is: %d", timeinfo->tm_mday, timeinfo->tm_mon);
+    logger().debug("Day is: %d Month is: %d", timeinfo->tm_mday, timeinfo->tm_mon + 1);
 
     logger().info("Installing Clockmod hooks...");
 
