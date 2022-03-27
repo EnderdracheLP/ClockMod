@@ -32,7 +32,7 @@ private:
     static ClockUpdater* instance;
 
     std::string _message;
-    int messageShowing = 2;
+    int messageShowing = 4;
 
 public:
     const time_t getRawTime() const;

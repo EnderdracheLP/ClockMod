@@ -521,7 +521,7 @@ extern "C" void load() {
     time(&rawtime);
     struct tm* timeinfo = localtime(&rawtime);
     // Months start at 0 so 0 = January while days start at 1
-    //if (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1) ClockPos.ap1 = true;
+    ClockPos.ap1 = (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1);
     logger().debug("Day is: %d Month is: %d", timeinfo->tm_mday, timeinfo->tm_mon + 1);
 
     logger().info("Installing Clockmod hooks...");
@@ -531,7 +531,7 @@ extern "C" void load() {
     custom_types::Register::AutoRegister();
     QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
 
-    if (ClockPos.ap1) {
+    if (timeinfo && (timeinfo->tm_mon == 2 && timeinfo->tm_mday == 31) || (timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1)) {
         INSTALL_HOOK(hkLog, ResultsViewController_DidActivate);
     }
 

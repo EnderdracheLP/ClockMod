@@ -180,6 +180,9 @@ namespace ClockMod {
                 time(&rawtime);
                 timeinfo = localtime(&rawtime);
                 //auto clockParent = get_transform();
+
+                ClockPos.ap1 = (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1);
+
                 std::string clockresult;
 
                 if (_message.empty()) {
@@ -243,7 +246,7 @@ namespace ClockMod {
         }
 
         void ClockUpdater::ShowMessage(std::string message) {
-            this->messageShowing = 2;
+            this->messageShowing = 4;
             this->_message = message;
         }
 }

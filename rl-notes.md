@@ -10,6 +10,6 @@
 
 __**Changelog:**__
 - Update to 1.20.0
-- Added something "fun"
+- Added something "*fun*"
 
 __**Download:**__
