@@ -477,7 +477,7 @@ MAKE_HOOK_MATCH(MultiplayerLobbyController_DeactivateMultiplayerLobby, &Multipla
 #include "GlobalNamespace/LevelCompletionResults.hpp"
 MAKE_HOOK_MATCH(ResultsViewController_DidActivate, &ResultsViewController::DidActivate, void, ResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     ResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-    std::vector<std::string> failTexts({ "Get Better", "Fail", "lol", "learn2play", "no skills", "get skills" });
+    std::vector<std::string> failTexts({ "Get Better", "fail", "lol", "learn2play", "no skills", "get skills", "loser", "hit bloq", "no comment", "you failed" });
     if (ClockPos.ap1 && self->dyn__levelCompletionResults()->dyn_levelEndStateType() == LevelCompletionResults::LevelEndStateType::Failed) {
         ClockUpdater* clockUpdater = ClockUpdater::getInstance();
         if (clockUpdater) {
@@ -520,7 +520,9 @@ extern "C" void load() {
     time_t rawtime;
     time(&rawtime);
     struct tm* timeinfo = localtime(&rawtime);
-    if (timeinfo && timeinfo->tm_mon == 4 && timeinfo->tm_mday == 1) ClockPos.ap1 = true;
+    // Months start at 0 so 0 = January while days start at 1
+    //if (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1) ClockPos.ap1 = true;
+    logger().debug("Day is: %d Month is: %d", timeinfo->tm_mday, timeinfo->tm_mon);
 
     logger().info("Installing Clockmod hooks...");
 
