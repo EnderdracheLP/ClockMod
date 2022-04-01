@@ -9,7 +9,6 @@
 - Option to choose between the Clock being at the Top or the Bottom.
 
 __**Changelog:**__
-- Update to 1.20.0
-- Added something "*fun*"
+- Update to 1.21.0
 
 __**Download:**__
