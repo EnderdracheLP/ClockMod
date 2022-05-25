@@ -177,7 +177,7 @@ void SetClockPos(UnityEngine::Vector3 Pos, UnityEngine::Vector3 Angle, float Sca
 // TODO: Use a different hook, this one is too small and causes issues
 MAKE_HOOK_MATCH(AudioTimeSyncController_StartSong, &AudioTimeSyncController::StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
     // Instance of PlayerDataModel the noTextAndHUDs variable specifically
-    Config.noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->dyn__playerData()->get_playerSpecificSettings()->dyn__noTextsAndHuds();
+    Config.noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->get_playerSpecificSettings()->noTextsAndHuds;
 
     //float LayoutClockPosX = layout->get_transform()->get_position().x;
     //float LayoutClockPosY = layout->get_transform()->get_position().y;
@@ -415,7 +415,7 @@ MAKE_HOOK_FIND_INSTANCE(BeatmapDataCallback, classof(BeatmapCallbacksController:
 }
 
 MAKE_HOOK_MATCH(FlyingGameHUDRotation_FixedUpdate, &FlyingGameHUDRotation::FixedUpdate, void, GlobalNamespace::FlyingGameHUDRotation* self) {
-    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, self->dyn__yAngle(), 0));
+    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, self->yAngle, 0));
     FlyingGameHUDRotation_FixedUpdate(self);
 }
 
@@ -478,7 +478,7 @@ MAKE_HOOK_MATCH(MultiplayerLobbyController_DeactivateMultiplayerLobby, &Multipla
 MAKE_HOOK_MATCH(ResultsViewController_DidActivate, &ResultsViewController::DidActivate, void, ResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     ResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     std::vector<std::string> failTexts({ "Get Better", "fail", "lol", "learn2play", "no skills", "get skills", "loser", "hit bloq", "no comment", "you failed" });
-    if (ClockPos.ap1 && self->dyn__levelCompletionResults()->dyn_levelEndStateType() == LevelCompletionResults::LevelEndStateType::Failed) {
+    if (ClockPos.ap1 && self->levelCompletionResults->levelEndStateType == LevelCompletionResults::LevelEndStateType::Failed) {
         ClockUpdater* clockUpdater = ClockUpdater::getInstance();
         if (clockUpdater) {
             std::random_device random_device;
