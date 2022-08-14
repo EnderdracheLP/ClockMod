@@ -5,7 +5,7 @@
   "author": "BoopetyDoopety, EnderdracheLP",
   "version": "${version}",
   "packageId": "com.beatgames.beatsaber",
-  "packageVersion": "1.22.0",
+  "packageVersion": "1.24.0",
   "description": "Displays the time in game. Alternatively also the Battery Percentage",
   "coverImage": "Cover.jpg",
   "dependencies": [],

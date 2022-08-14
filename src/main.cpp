@@ -103,7 +103,7 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::Did
 
     if (firstActivation && ClockModInit) {
         //auto EmptyParentObject = UnityEngine::GameObject::New_ctor(il2cpp_utils::newcsstr("EmptyParent"));
-        auto canvas_object = UnityEngine::GameObject::New_ctor(il2cpp_utils::newcsstr("ClockCanvas"));
+        auto canvas_object = UnityEngine::GameObject::New_ctor("ClockCanvas");
         //canvas_object->get_transform()->SetParent(canvas_object->get_transform());
         canvas = canvas_object->AddComponent<UnityEngine::Canvas*>();
         auto canvas_scaler = canvas_object->AddComponent<CanvasScaler*>();
@@ -131,7 +131,7 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::Did
 
         layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(canvas_object->get_transform());
         //layout = CreateVerticalLayoutGroup(canvas_object->get_transform());
-        auto clock_text = QuestUI::BeatSaberUI::CreateText(layout->get_rectTransform(), "");
+        auto clock_text = QuestUI::BeatSaberUI::CreateText(layout->get_rectTransform(), "", false);
         //auto clock_text = CreateText(layout->get_rectTransform(), "");
 
         layout->GetComponent<LayoutElement*>()->set_minWidth(7);
@@ -477,7 +477,7 @@ MAKE_HOOK_MATCH(MultiplayerLobbyController_DeactivateMultiplayerLobby, &Multipla
 #include "GlobalNamespace/LevelCompletionResults.hpp"
 MAKE_HOOK_MATCH(ResultsViewController_DidActivate, &ResultsViewController::DidActivate, void, ResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     ResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-    std::vector<std::string> failTexts({ "Get Better", "fail", "lol", "learn2play", "no skills", "get skills", "loser", "hit bloq", "no comment", "you failed" });
+    std::vector<std::string> failTexts({ "Get Better", "fail", "lol", "learn2play", "no skills", "get skills", "loser", "hit bloq", "no comment", "you failed", "can you even play" });
     if (ClockPos.ap1 && self->levelCompletionResults->levelEndStateType == LevelCompletionResults::LevelEndStateType::Failed) {
         ClockUpdater* clockUpdater = ClockUpdater::getInstance();
         if (clockUpdater) {

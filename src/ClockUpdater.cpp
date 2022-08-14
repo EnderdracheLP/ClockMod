@@ -213,7 +213,7 @@ namespace ClockMod {
 
 
                     // This is where the Text and Clock Position is set.
-                    text->set_text(il2cpp_utils::newcsstr(clockresult));        // This sets the Text
+                    text->set_text(StringW(clockresult.c_str()));        // This sets the Text
                 //}
             }
         }

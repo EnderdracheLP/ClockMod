@@ -3,33 +3,33 @@
   "name": "Clock Mod",
   "id": "ClockMod",
   "author": "BoopetyDoopety, EnderdracheLP",
-  "version": "1.5.3-Dev",
+  "version": "1.6.0-Dev",
   "packageId": "com.beatgames.beatsaber",
-  "packageVersion": "1.20.0",
+  "packageVersion": "1.24.0",
   "description": "Displays the time in game. Alternatively also the Battery Percentage",
   "coverImage": "Cover.jpg",
   "dependencies": [
     {
-      "version": "^0.15.8",
+      "version": "^0.15.18",
       "id": "custom-types",
-      "downloadIfMissing": "https://github.com/sc2ad/Il2CppQuestTypePatching/releases/download/v0.15.9/CustomTypes.qmod"
+      "downloadIfMissing": "https://github.com/sc2ad/Il2CppQuestTypePatching/releases/download/v0.15.18/CustomTypes.qmod"
     },
     {
-      "version": "^0.21.0",
+      "version": "^0.25.0",
       "id": "codegen",
-      "downloadIfMissing": "https://github.com/sc2ad/BeatSaber-Quest-Codegen/releases/download/v0.21.0/Codegen.qmod"
+      "downloadIfMissing": "https://github.com/sc2ad/BeatSaber-Quest-Codegen/releases/download/v0.25.0/Codegen.qmod"
     },
     {
-      "version": "^0.13.4",
+      "version": "^0.16.4",
       "id": "questui",
-      "downloadIfMissing": "https://github.com/darknight1050/questui/releases/download/v0.13.4/QuestUI.qmod"
+      "downloadIfMissing": "https://github.com/darknight1050/QuestUI/releases/download/v0.16.4/QuestUI.qmod"
     }
   ],
   "modFiles": [
     "libClockMod.so"
   ],
   "libraryFiles": [
-    "libbeatsaber-hook_3_7_4.so"
+    "libbeatsaber-hook_3_10_0.so"
   ],
   "fileCopies": [],
   "copyExtensions": []
