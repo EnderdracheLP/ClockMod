@@ -9,8 +9,8 @@ on:
 
 env:
      module_id: ClockMod
-     BSVersion: 1.22.0
-     ndkname: android-ndk-r24
+     BSVersion: 1.24.0
+     ndkname: android-ndk-r25
 
 jobs:
   build:
