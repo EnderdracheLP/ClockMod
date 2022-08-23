@@ -8,14 +8,16 @@
 #include "GlobalNamespace/OVRPlugin_OVRP_1_1_0.hpp" // Where I get the Battery Percentage from as float
 #include "RainbowClock.hpp"                         // Where the magic stuff is that makes the Clock Rainbowy (is that actually a word?)
 
+#include "ColorUtility.hpp"
+
+#include "UnityEngine/GradientColorKey.hpp"
+
 //#include "..\android-ndk-r22\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\jni.h"
 
 using namespace UnityEngine;
 using namespace TMPro;
 
-#if defined(REGISTER_FUNCTION) || defined(DEFINE_CLASS)
-#error Outdated custom-types
-#elif !defined(DEFINE_TYPE)
+#if !defined(DEFINE_TYPE)
 #error Custom-types macro missing, make sure you have ran: 'qpm-rust restore' and that you have a compatible version of custom-types
 #endif
 
@@ -54,15 +56,31 @@ namespace ClockMod {
         return time;
     }
 
-    // Battery Percentage Formatting, thanks to RedBrumbler on #quest-mod-dev
-    std::string getBatteryString(int level)
+    // New Battery Percentage Formatting
+    std::string getBatteryString(float level, ClockMod::ClockUpdater* instance)
     {
-        std::string percent = string_format("%d%%", level);
-        if (level < 20) return string_format("<color=#FF0000>%s</color>", percent.c_str()); 		// Red          (if lower than 20 %)
-        else if (level < 35) return string_format("<color=#FF8800>%s</color>", percent.c_str());	// Orange       (if lower than 35 %)
-        else if (level < 50) return string_format("<color=#FFD700>%s</color>", percent.c_str());	// Yellow       (if lower than 50 %)
-        else if (level >= 75) return string_format("<color=#00FF00>%s</color>", percent.c_str());	// Green        (if higher or equal to 75 %)
-        else return string_format("<color=#9ACD32>%s</color>", percent.c_str());					// YellowGreen  (if none of the above)
+        std::string percent = string_format("%d%%", (int)(level * 100));
+        if (!(instance && instance->batteryGradient)) {
+            instance->batteryGradient = UnityEngine::Gradient::New_ctor();
+            instance->batteryGradient->set_colorKeys(
+                {
+                // Red
+                UnityEngine::GradientColorKey({1, 0, 0, 1}, 0.0f), 
+                // Orange
+                UnityEngine::GradientColorKey({1, 0.53 , 0, 1}, 0.35f),
+                // Yellow
+                UnityEngine::GradientColorKey({1, 0.84, 0, 1}, 0.5f), 
+                // YellowGreen
+                UnityEngine::GradientColorKey({0.6f, 0.8f , 0.14, 1}, 0.75f),
+                // Green
+                UnityEngine::GradientColorKey({0, 1, 0, 1}, 1.0f)
+                }
+            );
+        }
+
+        UnityEngine::Color color = instance->batteryGradient->Evaluate(level);
+        std::string colorStr = ClockMod::ColorUtility::ToHtmlStringRGB(color);
+        return string_format("<color=%s>%s</color>", colorStr.c_str(), percent.c_str());
     }
     /*
     std::string RainbowClock::rainbowify(std::string input) {
@@ -104,9 +122,6 @@ namespace ClockMod {
         text->get_transform()->set_localScale(Scale);
     }
 
-    // Updates the Clock.
-        //int wait = 18; // Sometimes you just need to take a deep breath and slow the fuck down, I'm looking at you ClockUpdater, also probably the dumbest way to slow it down.
-
     #define NUM_SECONDS 0.25
 
     void ClockUpdater::Start() {
@@ -131,122 +146,131 @@ namespace ClockMod {
         if (text) {
             text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
             text->set_fontSize(getModConfig().FontSize.GetValue());
+            // text->set_alignment(TMPro::TextAlignmentOptions::Center);
         }
         instance = this;
     }
 
-        void ClockUpdater::Update() {
+    // Updates the Clock.
+    void ClockUpdater::Update() {
 
 
-            // Temp Code for updating Position.
-            if (Config.IsInSong == false && Config.InMPLobby == false) {
-                // TODO: Get Position Offset working. Trying to set the Position offset here, messes with the 360/90 Map stuff. 
-                //if (Config.IsInSong == false) {
-                    // Checks if the clock should be at the Top or Bottom
-                if (getModConfig().ClockPosition.GetValue()) {
-                    // If set to be at the Bottom do this.
-                    auto Pos = UnityEngine::Vector3(0, -1.26, 0);
-                    auto Angle = UnityEngine::Vector3(60, 0, 0);
-                    auto Scale = UnityEngine::Vector3(0.6, 0.6, 0.6);
-                    SetClockPos(clockParent, text, Pos, Angle, Scale);
-                }
-                else {
-                    // Otherwise it will do this.
-                    auto Pos = UnityEngine::Vector3(0, -1.7, 5.0);
-                    auto Angle = UnityEngine::Vector3(-10, 0, 0);
-                    auto Scale = UnityEngine::Vector3(1, 1, 1);
-                    SetClockPos(clockParent, text, Pos, Angle, Scale);
-                }
+        // Temp Code for updating Position.
+        if (Config.IsInSong == false && Config.InMPLobby == false) {
+            // TODO: Get Position Offset working. Trying to set the Position offset here, messes with the 360/90 Map stuff. 
+            //if (Config.IsInSong == false) {
+                // Checks if the clock should be at the Top or Bottom
+            if (getModConfig().ClockPosition.GetValue()) {
+                // If set to be at the Bottom do this.
+                auto Pos = UnityEngine::Vector3(0, -1.26, 0);
+                auto Angle = UnityEngine::Vector3(60, 0, 0);
+                auto Scale = UnityEngine::Vector3(0.6, 0.6, 0.6);
+                SetClockPos(clockParent, text, Pos, Angle, Scale);
             }
-            else { // If in MP Lobby or a Song, unset all this.
-                //clockParent->set_position(UnityEngine::Vector3(0, 0, 0));
-                text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
-                text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
-            }
-
-            this_time = clock();
-
-            time_counter += (double)(this_time - last_time);
-
-            last_time = this_time;
-
-            if (!(time_counter > (double)(NUM_SECONDS * CLOCKS_PER_SEC)))
-            {
-                return;
-            }
-            time_counter = 0;
-
-            if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
-                time(&rawtime);
-                timeinfo = localtime(&rawtime);
-                //auto clockParent = get_transform();
-
-                ClockPos.ap1 = (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1);
-
-                std::string clockresult;
-
-                if (_message.empty()) {
-                    // Gets the time using the function at the top.
-                    clockresult = getTimeString((struct tm*)timeinfo);
-                } 
-                else {
-                    clockresult = _message;
-                }
-
-                // Checks, if the clock is set to rainbowify
-                if (getModConfig().RainbowClock.GetValue()) {
-                    clockresult = RainbowClock::rainbowify(clockresult);
-                    //text->set_color(UnityEngine::Color::HSVToRGB(std::fmod(UnityEngine::Time::get_time() * 0.35f, 1), 1, 1));
-                }
-
-
-                    // Checks, the below condition and if it retunrs true, gets the current Battery Percentage Level and adds it to the clockresult variable.
-                    if (getModConfig().BattToggle.GetValue() && _message.empty()) {
-                        // Gets the Battery Percentage as float 1.00, multiplies it by 100, and then uses the getBatteryString function defined above to format the percentage.
-                        auto battery = getBatteryString((int)(GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel() * 100));
-                        clockresult += " - ";                // Adds  -  to it with spaces, before and after the - .
-                        clockresult += battery;         // Here is where the Battery gets added to the tandb string.
-                    }
-
-                    if (!_message.empty() && messageShowing > 0) messageShowing--;
-                    else _message.clear();
-
-
-                    // This is where the Text and Clock Position is set.
-                    text->set_text(StringW(clockresult.c_str()));        // This sets the Text
-                //}
+            else {
+                // Otherwise it will do this.
+                auto Pos = UnityEngine::Vector3(0, -1.7, 5.0);
+                auto Angle = UnityEngine::Vector3(-10, 0, 0);
+                auto Scale = UnityEngine::Vector3(1, 1, 1);
+                SetClockPos(clockParent, text, Pos, Angle, Scale);
             }
         }
-
-        const time_t ClockUpdater::getRawTime() const {
-            return rawtime;
+        else { // If in MP Lobby or a Song, unset all this.
+            //clockParent->set_position(UnityEngine::Vector3(0, 0, 0));
+            text->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
+            text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
         }
 
-        struct tm* ClockUpdater::getTimeInfo() {
-            time_t time = rawtime;
-            return localtime(&time);
-        }
+        this_time = clock();
 
-        struct tm* ClockUpdater::getTimeInfoUTC() {
-            time_t time = rawtime;
-            return gmtime(&time);
-        }
+        time_counter += (double)(this_time - last_time);
 
-        TMPro::TextMeshProUGUI* ClockUpdater::getTextMesh() {
-            return text;
-        }
+        last_time = this_time;
 
-        void ClockUpdater::SetColor(UnityEngine::Color color) {
-            if (text)
-            text->set_color(color);
+        if (!(time_counter > (double)(NUM_SECONDS * CLOCKS_PER_SEC)))
+        {
+            return;
         }
+        time_counter = 0;
 
-        ClockUpdater* ClockUpdater::getInstance() {
-            return instance;
-        }
+        if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
+            time(&rawtime);
+            timeinfo = localtime(&rawtime);
+            //auto clockParent = get_transform();
 
-        void ClockUpdater::ShowMessage(std::string message) {
-            this->messageShowing = 4;
-            this->_message = message;
+            ClockPos.ap1 = (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1);
+
+            std::string clockresult;
+
+            if (_message.empty()) {
+                // Gets the time using the function at the top.
+                clockresult = getTimeString((struct tm*)timeinfo);
+            } 
+            else {
+                clockresult = _message;
+            }
+
+            // Checks, if the clock is set to rainbowify
+            if (getModConfig().RainbowClock.GetValue()) {
+                clockresult = RainbowClock::rainbowify(clockresult);
+                //text->set_color(UnityEngine::Color::HSVToRGB(std::fmod(UnityEngine::Time::get_time() * 0.35f, 1), 1, 1));
+            }
+
+
+                // Checks, the below condition and if it retunrs true, gets the current Battery Percentage Level and adds it to the clockresult variable.
+                if (getModConfig().BattToggle.GetValue() && _message.empty()) {
+                    // Gets the Battery Percentage as float 1.00, multiplies it by 100, and then uses the getBatteryString function defined above to format the percentage.
+                    // auto battery = getBatteryString((int)(GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel() * 100));
+                    auto battery = getBatteryString(GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel(), this);
+
+                    // static float testPercentage = 1.0f;
+                    // auto battery = getBatteryString(testPercentage, this);
+                    // if (testPercentage > 0.0f) testPercentage += -0.01f;
+                    // else testPercentage = 1.0f;
+
+                    clockresult += " - ";                // Adds  -  to it with spaces, before and after the - .
+                    clockresult += battery;         // Here is where the Battery gets added to the tandb string.
+                }
+
+                if (!_message.empty() && messageShowing > 0) messageShowing--;
+                else _message.clear();
+
+
+                // This is where the Text and Clock Position is set.
+                text->set_text(StringW(clockresult.c_str()));        // This sets the Text
+            //}
         }
+    }
+
+    const time_t ClockUpdater::getRawTime() const {
+        return rawtime;
+    }
+
+    struct tm* ClockUpdater::getTimeInfo() {
+        time_t time = rawtime;
+        return localtime(&time);
+    }
+
+    struct tm* ClockUpdater::getTimeInfoUTC() {
+        time_t time = rawtime;
+        return gmtime(&time);
+    }
+
+    TMPro::TextMeshProUGUI* ClockUpdater::getTextMesh() {
+        return text;
+    }
+
+    void ClockUpdater::SetColor(UnityEngine::Color color) {
+        if (text)
+        text->set_color(color);
+    }
+
+    ClockUpdater* ClockUpdater::getInstance() {
+        return instance;
+    }
+
+    void ClockUpdater::ShowMessage(std::string message) {
+        this->messageShowing = 4;
+        this->_message = message;
+    }
 }
