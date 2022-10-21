@@ -4,7 +4,7 @@
   "info": {
     "name": "Clock Mod",
     "id": "ClockMod",
-    "version": "1.6.0-Dev",
+    "version": "1.7.0",
     "url": null,
     "additionalData": {
       "overrideSoName": "libClockMod.so"
@@ -22,17 +22,17 @@
     },
     {
       "id": "codegen",
-      "versionRange": "^0.25.0",
+      "versionRange": "^0.28.0",
       "additionalData": {}
     },
     {
       "id": "questui",
-      "versionRange": "^0.16.4",
+      "versionRange": "^0.17.3",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.15.18",
+      "versionRange": "^0.15.21",
       "additionalData": {}
     },
     {
