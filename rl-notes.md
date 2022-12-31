@@ -9,6 +9,6 @@
 - Option to choose between the Clock being at the Top or the Bottom.
 
 __**Changelog:**__
-- Update to 1.24.0
-
-__**Download:**__
+- Update to 1.27.0_3631150051
+- Battery Percentage Indicator will now be light blue when charging.
+- Added ~~[REDACTED]~~.
