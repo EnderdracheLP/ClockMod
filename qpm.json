@@ -4,7 +4,7 @@
   "info": {
     "name": "Clock Mod",
     "id": "ClockMod",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "url": null,
     "additionalData": {
       "overrideSoName": "libClockMod.so"
