@@ -29,7 +29,7 @@ private:
     static ClockUpdater* instance;
 
     std::string _message;
-    int messageShowing = 4;
+    int messageShowing = 0;
 
 public:
     const time_t getRawTime() const;
@@ -39,6 +39,6 @@ public:
     void SetColor(UnityEngine::Color color);
     static ClockUpdater* getInstance();
     static std::string getTimeFormat();
-    void ShowMessage(std::string message);
+    void ShowMessage(std::string message, int duration = 4);
 
 )

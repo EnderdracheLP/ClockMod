@@ -5,7 +5,7 @@ on:
 
 env:
      module_id: ClockMod
-     version: 1.5.3-rc.1
+     version: 1.8.0-rc.1
      ndkname: android-ndk-r24
 
 

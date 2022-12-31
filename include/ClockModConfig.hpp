@@ -15,18 +15,4 @@ DECLARE_CONFIG(ModConfig,
 //    CONFIG_VALUE(ClockYOffset, double, "Clock Y Offset", 0);
 //    CONFIG_VALUE(ClockZOffset, double, "Clock Z Offset", 0);
     CONFIG_VALUE(ClockColor, UnityEngine::Color, "Clock Color", UnityEngine::Color(1.0f, 1.0f, 1.0f, 1.0f), "The color of the clock text.");
-
-    CONFIG_INIT_FUNCTION(
-        CONFIG_INIT_VALUE(InSong);
-        CONFIG_INIT_VALUE(TwelveToggle);
-        CONFIG_INIT_VALUE(SecToggle);
-        CONFIG_INIT_VALUE(BattToggle);
-        CONFIG_INIT_VALUE(RainbowClock);
-        CONFIG_INIT_VALUE(FontSize);
-//        CONFIG_INIT_VALUE(ClockXOffset);
-//        CONFIG_INIT_VALUE(ClockYOffset);
-//        CONFIG_INIT_VALUE(ClockZOffset);
-        CONFIG_INIT_VALUE(ClockPosition);
-        CONFIG_INIT_VALUE(ClockColor);
-    )
 )

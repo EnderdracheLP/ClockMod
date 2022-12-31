@@ -12,15 +12,15 @@ if ($?) {
         adb push $path /sdcard/Android/data/com.beatgames.beatsaber/files/mods/$mod
     }
 
-    foreach ($lib in $modJson.libraryFiles)
-    {
-        $path = "./extern/libs/" + $lib
-        if (-not (Test-Path $path))
-        {
-            $path = "./build/" + $lib
-        }
-        adb push $path /sdcard/Android/data/com.beatgames.beatsaber/files/libs/$lib
-    }
+    # foreach ($lib in $modJson.libraryFiles)
+    # {
+    #     $path = "./extern/libs/" + $lib
+    #     if (-not (Test-Path $path))
+    #     {
+    #         $path = "./build/" + $lib
+    #     }
+    #     adb push $path /sdcard/Android/data/com.beatgames.beatsaber/files/libs/$lib
+    # }
     if ($?) {
         adb shell am force-stop com.beatgames.beatsaber
         adb shell am start com.beatgames.beatsaber/com.unity3d.player.UnityPlayerActivity

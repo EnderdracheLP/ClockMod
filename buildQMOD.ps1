@@ -5,6 +5,9 @@ Param(
     [Alias("rebuild")]
     [Switch] $clean,
 
+    [Parameter(Mandatory=$false, HelpMessage="Switch to create a release build")]
+    [Switch] $release,
+
     [Parameter(Mandatory=$false, HelpMessage="Prints the help instructions")]
     [Switch] $help,
 
@@ -38,7 +41,7 @@ if ($qmodName -eq "")
 
 if (($args.Count -eq 0 -or $dev -eq $true) -And $package -eq $false) {
 echo "Packaging QMod $qmodName"
-    & $PSScriptRoot/build.ps1 -clean:$clean
+    & $PSScriptRoot/build.ps1 -clean:$clean --release:$release
 
     if ($LASTEXITCODE -ne 0) {
         echo "Failed to build, exiting..."

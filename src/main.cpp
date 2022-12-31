@@ -81,9 +81,6 @@ Logger& logger() {
     return *logger;
 }
 
-//Define Config
-DEFINE_CONFIG(ModConfig);
-
 float RotateSongX;
 
 bool ClockModInit;
@@ -392,15 +389,9 @@ MAKE_HOOK_MATCH(PauseMenuManager_StartResumeAnimation, &PauseMenuManager::StartR
 
 // TODO: Use the below information wisely
 // Check if it there are RotationEvents within the map, and if there are, declare it a 360/90 Map.
-#if __has_include("GlobalNamespace/BeatmapObjectCallbackController.hpp")
-#include "GlobalNamespace/BeatmapObjectCallbackController.hpp"  // For checking characteristic
-MAKE_HOOK_MATCH(BeatmapDataCallback, &BeatmapObjectCallbackController::SetNewBeatmapData, void, BeatmapObjectCallbackController* self, IReadonlyBeatmapData* beatmapData) {
-    BeatmapDataCallback(self, beatmapData);
-#else
 #include "GlobalNamespace/BeatmapCallbacksController_InitData.hpp"
-MAKE_HOOK_FIND_INSTANCE(BeatmapDataCallback, classof(BeatmapCallbacksController::InitData*), ".ctor", void, BeatmapCallbacksController::InitData* self, IReadonlyBeatmapData* beatmapData, float startFilterTime) {
-    BeatmapDataCallback(self, beatmapData, startFilterTime);
-#endif
+MAKE_HOOK_FIND_INSTANCE(BeatmapDataCallback, classof(BeatmapCallbacksController::InitData*), ".ctor", void, BeatmapCallbacksController::InitData* self, IReadonlyBeatmapData* beatmapData, float startFilterTime, bool shouldKeepReplayState) {
+    BeatmapDataCallback(self, beatmapData, startFilterTime, shouldKeepReplayState);
     if (beatmapData) {
         int RotationEvents = beatmapData->get_spawnRotationEventsCount();
         if (RotationEvents > 0) {
@@ -514,15 +505,23 @@ extern "C" void load() {
     il2cpp_functions::Init();
     QuestUI::Init();
 
+    logger().debug("Init ModConfig...");
+
     //Init/Load Config
     getModConfig().Init(modInfo);
 
+    logger().debug("Init ModConfig...Done");
+
+    logger().debug("CheckTime...");
     time_t rawtime;
     time(&rawtime);
     struct tm* timeinfo = localtime(&rawtime);
     // Months start at 0 so 0 = January while days start at 1
     ClockPos.ap1 = (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1);
-    logger().debug("Day is: %d Month is: %d", timeinfo->tm_mday, timeinfo->tm_mon + 1);
+    logger().debug("Year is: %d Day is: %d Month is: %d time is %d:%d:%d", 
+    timeinfo->tm_year, timeinfo->tm_mday, timeinfo->tm_mon + 1, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+
+    logger().debug("CheckTime...Done");
 
     logger().info("Installing Clockmod hooks...");
 

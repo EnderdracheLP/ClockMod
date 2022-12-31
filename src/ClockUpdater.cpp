@@ -6,6 +6,9 @@
 #include "ClockModConfig.hpp"                       // Just the Config
 
 #include "GlobalNamespace/OVRPlugin_OVRP_1_1_0.hpp" // Where I get the Battery Percentage from as float
+#include "GlobalNamespace/OVRPlugin_BatteryStatus.hpp"
+#include "GlobalNamespace/OVRPlugin.hpp"
+
 #include "RainbowClock.hpp"                         // Where the magic stuff is that makes the Clock Rainbowy (is that actually a word?)
 
 #include "ColorUtility.hpp"
@@ -57,7 +60,7 @@ namespace ClockMod {
     }
 
     // New Battery Percentage Formatting
-    std::string getBatteryString(float level, ClockMod::ClockUpdater* instance)
+    std::string getBatteryString(float level,  GlobalNamespace::OVRPlugin::BatteryStatus status, ClockMod::ClockUpdater* instance)
     {
         std::string percent = string_format("%d%%", (int)(level * 100));
         if (!(instance && instance->batteryGradient)) {
@@ -77,7 +80,13 @@ namespace ClockMod {
                 }
             );
         }
-
+        
+        if (status == GlobalNamespace::OVRPlugin::BatteryStatus::Charging || 
+            status == GlobalNamespace::OVRPlugin::BatteryStatus::Full ||
+            (status != GlobalNamespace::OVRPlugin::BatteryStatus::NotCharging && status != GlobalNamespace::OVRPlugin::BatteryStatus::Discharging)) {
+            // return string_format("<color=#00FF00>%s</color>", percent.c_str());
+            return string_format("<color=#00FFFF>%s</color>", percent.c_str());
+        }
         UnityEngine::Color color = instance->batteryGradient->Evaluate(level);
         std::string colorStr = ClockMod::ColorUtility::ToHtmlStringRGB(color);
         return string_format("<color=%s>%s</color>", colorStr.c_str(), percent.c_str());
@@ -198,6 +207,11 @@ namespace ClockMod {
             timeinfo = localtime(&rawtime);
             //auto clockParent = get_transform();
 
+            if (timeinfo && timeinfo->tm_mon == 0 && timeinfo->tm_mday == 1 && timeinfo->tm_hour == 0 && timeinfo->tm_min == 0 && timeinfo->tm_sec == 0 && messageShowing == 0)
+            {
+                this->ShowMessage("Happy New Year!", 10);
+            }
+
             ClockPos.ap1 = (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1);
 
             std::string clockresult;
@@ -221,7 +235,7 @@ namespace ClockMod {
                 if (getModConfig().BattToggle.GetValue() && _message.empty()) {
                     // Gets the Battery Percentage as float 1.00, multiplies it by 100, and then uses the getBatteryString function defined above to format the percentage.
                     // auto battery = getBatteryString((int)(GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel() * 100));
-                    auto battery = getBatteryString(GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel(), this);
+                    auto battery = getBatteryString(GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel(), GlobalNamespace::OVRPlugin::get_batteryStatus(), this);
 
                     // static float testPercentage = 1.0f;
                     // auto battery = getBatteryString(testPercentage, this);
@@ -269,8 +283,8 @@ namespace ClockMod {
         return instance;
     }
 
-    void ClockUpdater::ShowMessage(std::string message) {
-        this->messageShowing = 4;
+    void ClockUpdater::ShowMessage(std::string message, int duration) {
+        this->messageShowing = duration;
         this->_message = message;
     }
 }

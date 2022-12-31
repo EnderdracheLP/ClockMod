@@ -19,15 +19,4 @@ DECLARE_CLASS_CODEGEN(ClockMod, ClockViewController, HMUI::ViewController,
     bool SettingsOpen;
 
     //UnityEngine::Color lastChangedColor;
-
-#if defined(BS__1_16) && defined(REGISTER_FUNCTION)
-    REGISTER_FUNCTION(
-#elif defined(BS__1_13_2)
-    REGISTER_FUNCTION(ClockViewController,
-#endif
-#if defined(REGISTER_METHOD)
-        REGISTER_METHOD(DidActivate);
-        REGISTER_METHOD(DidDeactivate);
-    )
-#endif
 );
