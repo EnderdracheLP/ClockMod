@@ -21,8 +21,8 @@ on:
 
 env:
      module_id: ClockMod
-     version: 1.8.0-Dev.${{ github.run_number }}
-     BSVersion: 1.27.0_3631150051
+     version: 1.8.1-Dev.${{ github.run_number }}
+     BSVersion: 1.28.0_4124311467
 #     ndkname: android-ndk-r24
     
 jobs:
