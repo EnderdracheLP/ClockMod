@@ -76,7 +76,7 @@ echo "Actions: Packaging QMod $qmodName"
     $qmodName += "_$($modJson.version)"
 }
 
-foreach ($mod in $modJson.modFiles)
+foreach ($mod in $modJson.lateModFiles)
 {
     $path = "./build/" + $mod
     if (-not (Test-Path $path))

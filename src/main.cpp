@@ -20,11 +20,13 @@
 #include "GlobalNamespace/PlayerSpecificSettings.hpp"        // For checking if noTextandHUDs is enabled
 #include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp"  // For checking it it's an MP Song
 #include "GlobalNamespace/MultiplayerResultsViewController.hpp"
+#include "GlobalNamespace/BeatmapCallbacksController.hpp"
 using namespace GlobalNamespace;
 
 #include "TMPro/TextMeshPro.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "TMPro/TextAlignmentOptions.hpp"
+#include "TMPro/FontStyles.hpp"
 #include "TMPro/TMP_Text.hpp"
 using namespace TMPro;
 
@@ -40,13 +42,13 @@ using namespace TMPro;
 #include "UnityEngine/CanvasRenderer.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "UnityEngine/SceneManagement/Scene.hpp"
+#include "UnityEngine/TextAnchor.hpp"
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 
-//#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/QuestUI.hpp"
-using namespace QuestUI;
+#include "bsml/shared/BSML-Lite/Creation/Layout.hpp"
+#include "bsml/shared/BSML-Lite/Creation/Text.hpp"
+#include "bsml/shared/BSML.hpp"
 
 #include "HMUI/CurvedCanvasSettings.hpp"
 using namespace HMUI;
@@ -73,12 +75,12 @@ ClockPos_t ClockPos;
 #error No supported HOOK macro found, make sure that you have ran: 'qpm-rust restore' and that you have a compatible version of bs-hook
 #endif
 
-ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
+inline modloader::ModInfo modInfo = {MOD_ID, VERSION, 0}; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
 // Returns a logger, useful for printing debug messages
-Logger& logger() {
-    static auto logger = new Logger(modInfo, LoggerOptions(false, true));
-    return *logger;
+Paper::ConstLoggerContext<9UL> logger() {
+    static auto fastContext = Paper::Logger::WithContext<"ClockMod">();
+    return fastContext;
 }
 
 float RotateSongX;
@@ -95,7 +97,8 @@ void MPLobbyClockPos(float MLobbyVCPosY) {
     layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, 0, 0));
 }
 
-MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::DidActivate, void, MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::DidActivate, void, MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) 
+{
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if (firstActivation && ClockModInit) {
@@ -126,14 +129,14 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::Did
         // Makes the clock visible for every camera in the scene, if there ever should be more than one.
         canvas->set_renderMode(UnityEngine::RenderMode::WorldSpace);
 
-        layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(canvas_object->get_transform());
+        layout = BSML::Lite::CreateVerticalLayoutGroup(canvas_object->get_transform());
         //layout = CreateVerticalLayoutGroup(canvas_object->get_transform());
-        auto clock_text = QuestUI::BeatSaberUI::CreateText(layout->get_rectTransform(), "", false);
+        auto clock_text = BSML::Lite::CreateText(layout->get_rectTransform(), "", TMPro::FontStyles::Normal);
         //auto clock_text = CreateText(layout->get_rectTransform(), "");
 
         layout->GetComponent<LayoutElement*>()->set_minWidth(7);
         layout->GetComponent<LayoutElement*>()->set_minHeight(80);
-        layout->set_childAlignment(TMPro::TextAlignmentOptions::Center);
+        layout->set_childAlignment(UnityEngine::TextAnchor::MiddleCenter);
 
         clock_text->get_gameObject()->AddComponent<ClockMod::ClockUpdater*>();
 
@@ -389,7 +392,6 @@ MAKE_HOOK_MATCH(PauseMenuManager_StartResumeAnimation, &PauseMenuManager::StartR
 
 // TODO: Use the below information wisely
 // Check if it there are RotationEvents within the map, and if there are, declare it a 360/90 Map.
-#include "GlobalNamespace/BeatmapCallbacksController_InitData.hpp"
 MAKE_HOOK_FIND_INSTANCE(BeatmapDataCallback, classof(BeatmapCallbacksController::InitData*), ".ctor", void, BeatmapCallbacksController::InitData* self, IReadonlyBeatmapData* beatmapData, float startFilterTime, bool shouldKeepReplayState) {
     BeatmapDataCallback(self, beatmapData, startFilterTime, shouldKeepReplayState);
     if (beatmapData) {
@@ -406,7 +408,7 @@ MAKE_HOOK_FIND_INSTANCE(BeatmapDataCallback, classof(BeatmapCallbacksController:
 }
 
 MAKE_HOOK_MATCH(FlyingGameHUDRotation_FixedUpdate, &FlyingGameHUDRotation::FixedUpdate, void, GlobalNamespace::FlyingGameHUDRotation* self) {
-    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, self->yAngle, 0));
+    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, self->_yAngle, 0));
     FlyingGameHUDRotation_FixedUpdate(self);
 }
 
@@ -469,7 +471,7 @@ MAKE_HOOK_MATCH(MultiplayerLobbyController_DeactivateMultiplayerLobby, &Multipla
 MAKE_HOOK_MATCH(ResultsViewController_DidActivate, &ResultsViewController::DidActivate, void, ResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     ResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     std::vector<std::string> failTexts({ "Get Better", "fail", "lol", "learn2play", "no skills", "get skills", "loser", "hit bloq", "no comment", "you failed", "can you even play" });
-    if (ClockPos.ap1 && self->levelCompletionResults->levelEndStateType == LevelCompletionResults::LevelEndStateType::Failed) {
+    if (ClockPos.ap1 && self->_levelCompletionResults->levelEndStateType == LevelCompletionResults::LevelEndStateType::Failed) {
         ClockUpdater* clockUpdater = ClockUpdater::getInstance();
         if (clockUpdater) {
             std::random_device random_device;
@@ -482,10 +484,12 @@ MAKE_HOOK_MATCH(ResultsViewController_DidActivate, &ResultsViewController::DidAc
 
 
 // Called at the early stages of game loading
-extern "C" void setup(ModInfo & info) {
-    info.id = MOD_ID;
-    info.version = VERSION;
-    modInfo = info;
+MOD_EXPORT void setup(CModInfo *info) {
+    *info = modInfo.to_c();
+
+    getModConfig().Init(modInfo);
+
+    Paper::Logger::RegisterFileContextId(logger().tag);
 
     ClockModInit = true;
 
@@ -501,9 +505,9 @@ extern "C" void setup(ModInfo & info) {
 }
 
 // Called later on in the game loading - a good time to install function hooks
-extern "C" void load() {
+MOD_EXPORT "C" void late_load() {
     il2cpp_functions::Init();
-    QuestUI::Init();
+    BSML::Init();
 
     logger().debug("Init ModConfig...");
 
@@ -525,10 +529,10 @@ extern "C" void load() {
 
     logger().info("Installing Clockmod hooks...");
 
-    Logger& hkLog = logger();
+    auto hkLog = logger();
 
     custom_types::Register::AutoRegister();
-    QuestUI::Register::RegisterModSettingsViewController<ClockMod::ClockViewController*>(modInfo);
+    BSML::Register::RegisterSettingsMenu<ClockMod::ClockViewController*>("ClockMod");
 
     if (timeinfo && (timeinfo->tm_mon == 2 && timeinfo->tm_mday == 31) || (timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1)) {
         INSTALL_HOOK(hkLog, ResultsViewController_DidActivate);

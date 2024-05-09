@@ -1,4 +1,5 @@
 {
+  "version": "0.1.0",
   "sharedDir": "shared",
   "dependenciesDir": "extern",
   "info": {
@@ -7,39 +8,48 @@
     "version": "1.8.0",
     "url": null,
     "additionalData": {
-      "overrideSoName": "libClockMod.so"
+      "overrideSoName": "libClockMod.so",
+      "cmake": true
     }
   },
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^3.14.0",
-      "additionalData": {
-        "extraFiles": [
-          "src/inline-hook"
-        ]
-      }
-    },
-    {
-      "id": "codegen",
-      "versionRange": "^0.33.0",
+      "versionRange": "^5.1.6",
       "additionalData": {}
     },
     {
-      "id": "questui",
-      "versionRange": "^0.17.11",
+      "id": "scotland2",
+      "versionRange": "^0.1.4",
+      "additionalData": {
+        "includeQmod": false,
+        "private": true
+      }
+    },
+    {
+      "id": "bs-cordl",
+      "versionRange": "^3500.0.0",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.15.23",
+      "versionRange": "^0.17.2",
+      "additionalData": {}
+    },
+    {
+      "id": "bsml",
+      "versionRange": "=0.4.24",
       "additionalData": {}
     },
     {
       "id": "config-utils",
-      "versionRange": "*",
+      "versionRange": "^1.4.2",
+      "additionalData": {}
+    },
+    {
+      "id": "paper",
+      "versionRange": "^3.6.3",
       "additionalData": {}
     }
-  ],
-  "additionalData": {}
+  ]
 }

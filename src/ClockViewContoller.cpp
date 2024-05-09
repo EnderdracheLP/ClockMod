@@ -4,8 +4,6 @@
 #include "ClockUpdater.hpp"
 using namespace ClockMod;
 
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/QuestUI.hpp"
 
 #include "System/Collections/IEnumerator.hpp"
 
@@ -23,9 +21,13 @@ using namespace ClockMod;
 #include "HMUI/ScrollView.hpp"
 
 #include "TMPro/TextMeshProUGUI.hpp" // Added for color change
+#include "TMPro/FontStyles.hpp"
+
+#include "bsml/shared/BSML-Lite/Creation/Buttons.hpp"
+#include "bsml/shared/BSML-Lite/Creation/Settings.hpp"
+#include "bsml/shared/BSML-Lite/Creation/Text.hpp"
 
 //#include "GlobalNamespace/ColorChangeUIEventType.hpp" // Added for Colorpicker
-using namespace QuestUI;
 using namespace UnityEngine;
 using namespace HMUI;
 
@@ -60,19 +62,20 @@ namespace ClockMod {
         if (firstActivation) {
     //        Config.InSettings = true;
             get_gameObject()->AddComponent<Touchable*>();
-            GameObject* container = BeatSaberUI::CreateScrollableSettingsContainer(get_transform());
+            GameObject* container = BSML::Lite::CreateScrollableSettingsContainer(get_transform());
             Transform* parent = container->get_transform();
 
             ClockUpdater* instance = ClockMod::ClockUpdater::getInstance();
             if (instance) {
                 char timeInformation[45];
-                std::string timeFormat = "Your Timezone -  %Z\r\nUTC offset -  %z";
+                std::string timeFormat = "Your Timezone -  %Z\nUTC offset -  %z";
                 strftime(timeInformation, sizeof(timeInformation), timeFormat.c_str(), instance->getTimeInfo());
-                TimeInfo = BeatSaberUI::CreateText(parent, timeInformation, false);
+                // Doesnt currently work in bsml. It isnt recognized as a layoutelement for the container. Also the user can just view the time on the normal time label from this mod
+                // TimeInfo = BSML::Lite::CreateText(parent, timeInformation, TMPro::FontStyles::Normal);
 
                 //lastChangedColor = getModConfig().ClockColor.GetValue();
 
-                ColorPicker = BeatSaberUI::CreateColorPickerModal(parent, getModConfig().ClockColor.GetName(), getModConfig().ClockColor.GetValue(),
+                ColorPicker = BSML::Lite::CreateColorPickerModal(parent, getModConfig().ClockColor.GetName(), getModConfig().ClockColor.GetValue(),
                     [instance](UnityEngine::Color value) {
                         //lastChangedColor = value;
                         getModConfig().ClockColor.SetValue(value);
@@ -106,8 +109,8 @@ namespace ClockMod {
             //    });
 
             if (ColorPicker)
-                QuestUI::BeatSaberUI::CreateUIButton(parent, "Change ClockColor", [this] {
-                    ColorPicker->Show();
+                BSML::Lite::CreateUIButton(parent, "Change ClockColor", [this] {
+                    ColorPicker->modalView->Show();
                     }
                 );
 

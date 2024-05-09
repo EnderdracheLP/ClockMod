@@ -22,12 +22,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED 20)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# stop symbol leaking
+add_link_options(-Wl,--exclude-libs,ALL)
+
 # compile options used
-add_compile_options(-frtti -fexceptions)
+add_compile_options(-frtti -fexceptions -fvisibility=hidden)
 add_compile_options(-O3)
 # compile definitions used
 add_compile_definitions(VERSION=\"${MOD_VERSION}\")
-add_compile_definitions(ID=\"${MOD_ID}\")
 add_compile_definitions(MOD_ID=\"${MOD_ID}\")
 
 # recursively get all src files
