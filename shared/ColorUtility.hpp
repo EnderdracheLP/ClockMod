@@ -13,8 +13,8 @@ namespace ClockMod {
         }
 
         static std::string ToHtmlStringRGB(Color color) {
-            Color32 color2(conv(color.r), conv(color.g), conv(color.b), 1);
-            return string_format("#%02X%02X%02X", color2.r, color2.g, color2.b);
+            Color32 color2(0, conv(color.r), conv(color.g), conv(color.b), 1);
+            return fmt::format("#{0:02x}{1:02x}{2:02x}", color2.r, color2.g, color2.b);
         }
 
     };

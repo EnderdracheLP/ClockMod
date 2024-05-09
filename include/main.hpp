@@ -1,7 +1,8 @@
 #pragma once
 
 // Include the modloader header, which allows us to tell the modloader which mod this is, and the version etc.
-#include "modloader/shared/modloader.hpp"
+#include "scotland2/shared/loader.hpp"
+#include "paper/shared/logger.hpp"
 
 // beatsaber-hook is a modding framework that lets us call functions and fetch field values from in the game
 // It also allows creating objects, configuration, and importantly, hooking methods to modify their values
@@ -9,12 +10,10 @@
 #include "beatsaber-hook/shared/config/config-utils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
-#ifndef BS__1_13_2
 #include "beatsaber-hook/shared/utils/hooking.hpp"
-#endif
 
 // Define these functions here so that we can easily read configuration and log information from other files
-Logger& logger();
+Paper::ConstLoggerContext<9UL> logger();
 
 // Defining values here, so I can use them wherever the fuck I want to.
 struct Config_t {
@@ -28,5 +27,6 @@ struct Config_t {
     bool noTextAndHUD = false;
 };
 extern Config_t Config;
+#define MOD_EXPORT extern "C" __attribute__((visibility("default")))
 
 // extern bool InMPLobby;
