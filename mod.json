@@ -16,9 +16,9 @@
       "downloadIfMissing": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.17.7/CustomTypes.qmod"
     },
     {
-      "version": "^0.4.24",
+      "version": "^0.4.31",
       "id": "bsml",
-      "downloadIfMissing": "https://github.com/RedBrumbler/Quest-BSML/releases/download/v0.4.24/BSML.qmod"
+      "downloadIfMissing": "https://github.com/RedBrumbler/Quest-BSML/releases/download/v0.4.31/BSML.qmod"
     },
     {
       "version": "^3.6.3",
@@ -31,8 +31,7 @@
     "libClockMod.so"
   ],
   "libraryFiles": [
-    "libbeatsaber-hook_5_1_6.so",
-    "libsl2.so"
+    "libbeatsaber-hook_5_1_6.so"
   ],
   "fileCopies": [],
   "copyExtensions": []
