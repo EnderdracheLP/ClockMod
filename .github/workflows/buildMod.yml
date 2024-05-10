@@ -108,7 +108,7 @@ jobs:
         ls -lh ${GITHUB_WORKSPACE}/extern/libs
         echo ""
         echo "Checking QPM/cache Folder"
-        ls -lh $HOME/.local/share/QPM/cache
+        ls -lh $HOME/.local/share/QPM-RS/cache
         echo ""
 
     - name: Build
