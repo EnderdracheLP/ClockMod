@@ -21,9 +21,8 @@ on:
 
 env:
      module_id: ClockMod
-     version: 1.8.1-Dev.${{ github.run_number }}
-     BSVersion: 1.28.0_4124311467
-#     ndkname: android-ndk-r24
+     version: 1.8.2-Dev.${{ github.run_number }}
+     BSVersion: 1.35.0_8016709773
     
 jobs:
   build:
@@ -37,32 +36,6 @@ jobs:
         lfs: true
 
     - uses: seanmiddleditch/gha-setup-ninja@v3
-
-#    - name: Install Powershell
-#      run: sudo apt-get install -y powershell
-
-#    - name: Cache Android NDK
-#      id: cache-ndk
-#      uses: actions/cache@v2
-#      env:
-#        cache-name: cache-ndk
-#      with:
-#        path: ndk
-#        key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
-#        restore-keys: |
-#          ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
-    
-#    - name: Install Android NDK
-#      if: steps.cache-ndk.outputs.cache-hit != 'true'
-#      run: |
-#        wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
-#        unzip -q ndk.zip
-#        mv ${ndkname} ndk
-      
-#    - name: Create ndkpath.txt
-#      run: |
-#        cd ndk
-#        pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
 
     - name: Create ndkpath.txt
       run: |
@@ -89,8 +62,8 @@ jobs:
       env:
         cache-name: cache-qpm-deps
       with:
-        path: /home/runner/.local/share/QPM/cache
-        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('qpm.json', '.github/BuildQSounds.yml') }}
+        path: /home/runner/.local/share/QPM-RS/cache
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('qpm.json') }}
         restore-keys: |
           ${{ runner.os }}-${{ env.cache-name }}-
           ${{ runner.os }}-${{ env.cache-name }}
