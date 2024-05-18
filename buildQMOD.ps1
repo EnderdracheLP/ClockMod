@@ -48,7 +48,7 @@ echo "Packaging QMod $qmodName"
         exit $LASTEXITCODE
     }
 
-    qpm-rust qmod build
+    qpm qmod build
 }
 
 echo "Creating qmod from mod.json"

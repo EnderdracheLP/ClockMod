@@ -6,7 +6,7 @@ echo "Arg $($i) is $($args[$i])"
 }
 if ($args.Count -eq 0 -or $actions -ne $true) {
 $ModID = "ClockMod"
-$VERSION = "1.8.0"
+$VERSION = "1.9.0"
     if ($release -ne $true) {
         $VERSION += "-Dev"
     }
@@ -19,7 +19,7 @@ if ($actions -eq $true) {
     $VERSION = $env:version
     $codegen_ver = $env:codegen
 } else {
-        & qpm-rust package edit --version $VERSION
+        & qpm package edit --version $VERSION
 }
 if ((Test-Path "./extern/includes/beatsaber-hook/shared/inline-hook/And64InlineHook.cpp", "./extern/includes/beatsaber-hook/shared/inline-hook/inlineHook.c", "./extern/includes/beatsaber-hook/shared/inline-hook/relocate.c") -contains $false) {
     Write-Host "Critical: Missing inline-hook"
