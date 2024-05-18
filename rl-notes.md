@@ -9,4 +9,5 @@
 - Option to choose between the Clock being at the Top or the Bottom.
 
 __**Changelog:**__
-- Update to 1.28.0_4124311467
+- Update to 1.35.0_8016709773
+- Switch to BSML-Lite
