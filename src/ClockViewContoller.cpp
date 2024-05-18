@@ -31,10 +31,8 @@ using namespace ClockMod;
 using namespace UnityEngine;
 using namespace HMUI;
 
-#if defined(REGISTER_FUNCTION) || defined(DEFINE_CLASS)
-#error Outdated custom-types
-#elif !defined(DEFINE_TYPE)
-#error Custom-types macro missing, make sure you have ran: 'qpm-rust restore' and that you have a compatible version of custom-types
+#if !defined(DEFINE_TYPE)
+#error Custom-types macro missing, make sure you have ran: 'qpm restore' and that you have a compatible version of custom-types
 #endif
 
 DEFINE_TYPE(ClockMod, ClockViewController);
@@ -50,7 +48,7 @@ namespace ClockMod {
             strftime(UTCtime, sizeof(UTCtime), std::string("\r\n Current Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), ClockUpdater::getInstance()->getTimeInfoUTC());
             //strftime(UTCtime, sizeof(UTCtime), std::string("\r\n Current Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), gmtime(ClockUpdater::getInstance()->getRawTime()));
             if (TimeInfo && SettingsOpen)
-                TimeInfo->set_text(il2cpp_utils::newcsstr(std::string(timeInformation) + UTCtime));
+                TimeInfo->set_text(std::string(timeInformation) + UTCtime);
             co_yield reinterpret_cast<System::Collections::IEnumerator*>(UnityEngine::WaitForSecondsRealtime::New_ctor(0.1));
         }
         co_return;
@@ -70,23 +68,19 @@ namespace ClockMod {
                 char timeInformation[45];
                 std::string timeFormat = "Your Timezone -  %Z\nUTC offset -  %z";
                 strftime(timeInformation, sizeof(timeInformation), timeFormat.c_str(), instance->getTimeInfo());
-                // Doesnt currently work in bsml. It isnt recognized as a layoutelement for the container. Also the user can just view the time on the normal time label from this mod
-                // TimeInfo = BSML::Lite::CreateText(parent, timeInformation, TMPro::FontStyles::Normal);
-
-                //lastChangedColor = getModConfig().ClockColor.GetValue();
+                // We have to specify sizeDelta here otherwise things will overlap
+                TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal, {0,0}, {0,15});
+                // TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal);
 
                 ColorPicker = BSML::Lite::CreateColorPickerModal(parent, getModConfig().ClockColor.GetName(), getModConfig().ClockColor.GetValue(),
                     [instance](UnityEngine::Color value) {
-                        //lastChangedColor = value;
                         getModConfig().ClockColor.SetValue(value);
                     },
                     [instance] {
                         instance->SetColor(getModConfig().ClockColor.GetValue());
-                        //getModConfig().ClockColor.SetValue(lastChangedColor);
                     },
                     [instance](UnityEngine::Color value) {
-                    instance->SetColor(value);
-                    //getModConfig().ClockColor.SetValue(value);
+                        instance->SetColor(value);
                     }
                     );
             }
@@ -119,7 +113,7 @@ namespace ClockMod {
     }
     void ClockViewController::DidDeactivate(bool removedFromHierarchy, bool systemScreenDisabling) {
         SettingsOpen = false;
-        //StopAllCoroutines();
+        StopAllCoroutines();
         //Config.InSettings = false;
     }
 }
