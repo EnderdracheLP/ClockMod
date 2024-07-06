@@ -85,7 +85,6 @@ namespace ClockMod {
             // return fmt::format("<color=#00FF00>%s</color>", percent.c_str());
             return fmt::format("<color=#00FFFF>{}</color>", percent.c_str());
         }
-        logger().warn("BATTERYS:{}", static_cast<int>(status));
         UnityEngine::Color color = instance->batteryGradient->Evaluate(level);
         std::string colorStr = ClockMod::ColorUtility::ToHtmlStringRGB(color);
         return fmt::format("<color={}>{}</color>", colorStr.c_str(), percent.c_str());
