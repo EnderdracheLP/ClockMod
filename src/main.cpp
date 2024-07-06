@@ -434,7 +434,8 @@ MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController:
 }
 
 MAKE_HOOK_MATCH(MultiplayerResultsViewController_DidActivate, &MultiplayerResultsViewController::DidActivate, void, MultiplayerResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    
+    MultiplayerResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
         logger().info("SetActive true MPResultsVC");
@@ -448,11 +449,26 @@ MAKE_HOOK_MATCH(MultiplayerResultsViewController_DidActivate, &MultiplayerResult
     Config.InRotationMap = false;
     //  logger().debug("%g", MLobbyVCPosY);
     MPLobbyClockPos(MLobbyVCPosY);
-    if (Config.InMP == true) { logger().debug("MRVC, InMP is True"); }
-
-    MultiplayerResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+    if (Config.InMP) { logger().debug("MRVC, InMP is True"); }
 }
 
+MAKE_HOOK_MATCH(MultiplayerResultsViewController_Init, &MultiplayerResultsViewController::Init, void, MultiplayerResultsViewController* self, MultiplayerResultsData* multiplayerResultsData, BeatmapKey beatmapKey, bool showBackToLobbyButton, bool showBackToMenuButton)
+{
+    MultiplayerResultsViewController_Init(self, multiplayerResultsData, beatmapKey, showBackToLobbyButton, showBackToMenuButton);
+    if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
+        canvas->get_gameObject()->SetActive(true);
+        logger().info("SetActive true MPResultsVC");
+    }
+    layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
+
+    auto MLobbyVCPosY = self->get_transform()->get_position().y;
+    Config.InMPLobby = true;
+    Config.IsInSong = false;
+    Config.InMP = true;
+    Config.InRotationMap = false;
+    MPLobbyClockPos(MLobbyVCPosY);
+    if (Config.InMP) { logger().debug("MRVC, InMP is True"); }
+}
 MAKE_HOOK_MATCH(MultiplayerLobbyController_DeactivateMultiplayerLobby, &MultiplayerLobbyController::DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_DeactivateMultiplayerLobby(self);
 
@@ -492,14 +508,6 @@ MOD_EXPORT void setup(CModInfo *info) {
     Paper::Logger::RegisterFileContextId(logger().tag);
 
     ClockModInit = true;
-
-    //logger().debug("config path is %s", Modloader::getApplicationId());
-
-    //std::string DD = getDataDir(modInfo);
-    //logger().debug("DataDir path is %s", DD.c_str());
-
-    //std::string CFP = Configuration::getConfigFilePath(modInfo);
-    //logger().debug("Config path is %s", CFP.c_str());
 
     logger().info("Completed ClockMod setup!");
 }

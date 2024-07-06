@@ -15,13 +15,11 @@
 #include "UnityEngine/SystemInfo.hpp"
 #include "UnityEngine/BatteryStatus.hpp"
 
-//#include "..\android-ndk-r22\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\jni.h"
-
 using namespace UnityEngine;
 using namespace TMPro;
 
 #if !defined(DEFINE_TYPE)
-#error Custom-types macro missing, make sure you have ran: 'qpm-rust restore' and that you have a compatible version of custom-types
+#error Custom-types macro missing, make sure you have ran: 'qpm restore' and that you have a compatible version of custom-types
 #endif
 
 DEFINE_TYPE(ClockMod, ClockUpdater);
@@ -172,14 +170,15 @@ namespace ClockMod {
                 // Checks if the clock should be at the Top or Bottom
             if (getModConfig().ClockPosition.GetValue()) {
                 // If set to be at the Bottom do this.
-                auto Pos = UnityEngine::Vector3(0, -1.26, 0);
+                auto Pos = ClockPos.MenuPosBottom;
                 auto Angle = UnityEngine::Vector3(60, 0, 0);
                 auto Scale = UnityEngine::Vector3(0.6, 0.6, 0.6);
                 SetClockPos(clockParent, text, Pos, Angle, Scale);
             }
             else {
                 // Otherwise it will do this.
-                auto Pos = UnityEngine::Vector3(0, -1.7, 5.0);
+                // auto Pos = UnityEngine::Vector3(0, -1.7, 5.0);
+                auto Pos = ClockPos.MenuPosTop;
                 auto Angle = UnityEngine::Vector3(-10, 0, 0);
                 auto Scale = UnityEngine::Vector3(1, 1, 1);
                 SetClockPos(clockParent, text, Pos, Angle, Scale);

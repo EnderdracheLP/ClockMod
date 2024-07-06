@@ -2,15 +2,12 @@
 #include "UnityEngine/Vector3.hpp"
 #include "UnityEngine/UI/VerticalLayoutGroup.hpp"
 
-// WARNING: Changing values here can give unexpected results and cause crashes
 // This containts all the ClockPositions
 struct ClockPos_t {
     // Clock InMenu Positions Top                                           X        Y        Z
-    UnityEngine::Vector3 MenuPosTop =               UnityEngine::Vector3(0.0f,    -1.7f,    4.0f);
-    // Clock InMenu Positions Bottom    // UnityEngine::Vector3(0, Config.ClockY, Config.ClockZ)
-    //float MenuXdown = 0;
-    //float MenuYdown = 0;
-    //float MenuZdown = 0;
+    // UnityEngine::Vector3 MenuPosTop =               UnityEngine::Vector3(0.0f,    -1.7f,    5.0f);
+    UnityEngine::Vector3 MenuPosTop =               UnityEngine::Vector3(0.0f,    -1.4f,    5.0f);
+    UnityEngine::Vector3 MenuPosBottom =            UnityEngine::Vector3(0.0f,    -1.26f,   0.0f);
 
     // Clock InNormalSong Positions Top
     UnityEngine::Vector3 NormalSongPosTop =         UnityEngine::Vector3(0.0f,      -2.5f,   7.5f    ); // 0, -2, 8 // 0, -1.7, 5.6
@@ -34,20 +31,6 @@ struct ClockPos_t {
     //float RotateSongRotationDownX = 20;                                    // Rotation of the Clock in 360/90 Songs Bottom
 
     UnityEngine::Vector3 SongPausePosDown =         UnityEngine::Vector3(0,             -4.45f, 2    );
-    // TODO: Implement this maybe
-    //// Clock Position for MPLobby
-    //float MPLobbyX = 0;
-    //float MPLobbyY = 0;
-    //float MPLobbyZ = 0;
-
-    //// Clock Position MPSong Top
-    //float MPSongXtop = 0;
-    //float MPSongYtop = 0;
-    //float MPSongZtop = 0;
-    //// Clock Position MPSong Bottom
-    //float MPSongXdown = 0;
-    //float MPSongYdown = 0;
-    //float MPSongZdown = 0;
     bool ap1 = false; // This should be set to false by default unless we're testing it
 };
 extern ClockPos_t ClockPos;

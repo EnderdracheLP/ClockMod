@@ -5,8 +5,13 @@ echo "Arg $($i) is $($args[$i])"
     elseif ($args[$i] -eq "--release") { $release = $true }
 }
 if ($args.Count -eq 0 -or $actions -ne $true) {
-$ModID = "ClockMod"
-$VERSION = "1.9.0"
+    $qpmshared = "./qpm.shared.json"
+    $qpmsharedJson = Get-Content $qpmshared -Raw | ConvertFrom-Json
+    $ModID = "ClockMod"
+    $VERSION = $qpmsharedJson.config.info.version.replace("-Dev", "")
+    if ($VERSION -eq $null) {
+        $VERSION = "0.0.1"
+    }
     if ($release -ne $true) {
         $VERSION += "-Dev"
     }
