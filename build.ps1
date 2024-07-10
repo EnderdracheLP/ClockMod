@@ -1,15 +1,28 @@
+Param (
+[Parameter(Mandatory=$false, HelpMessage="The version the mod should be compiled with")][Alias("ver")][string]$Version, # Currently not used
+[Parameter(Mandatory=$false, HelpMessage="Switch to create a clean compilation")][Alias("rebuild")][Switch]$clean,
+[Parameter(Mandatory=$false, HelpMessage="To create a release build")][Alias("publish")][Switch]$release,
+[Parameter(Mandatory=$false, HelpMessage="To create a github actions build, assumes specific Environment variables are set")][Alias("github-build")][Switch]$actions,
+[Parameter(Mandatory=$false, HelpMessage="To create a debug build (Does not strip other libs)")][Alias("debug-build")][Switch]$debugbuild # Not implemented yet
+)
+
+
 $NDKPath = Get-Content $PSScriptRoot/ndkpath.txt
+
+# Legacy arg check, might remove
 for ($i = 0; $i -le $args.Length-1; $i++) {
 echo "Arg $($i) is $($args[$i])"
     if ($args[$i] -eq "--actions") { $actions = $true }
     elseif ($args[$i] -eq "--release") { $release = $true }
 }
+
+
 if ($args.Count -eq 0 -or $actions -ne $true) {
     $qpmshared = "./qpm.shared.json"
     $qpmsharedJson = Get-Content $qpmshared -Raw | ConvertFrom-Json
     $ModID = "ClockMod"
     $VERSION = $qpmsharedJson.config.info.version.replace("-Dev", "")
-    if ($VERSION -eq $null) {
+    if ($null -eq $VERSION) {
         $VERSION = "0.0.1"
     }
     if ($release -ne $true) {
@@ -20,12 +33,11 @@ if ($args.Count -eq 0 -or $actions -ne $true) {
 
 if ($actions -eq $true) {
     $ModID = $env:module_id
-    $BSHook = $env:bs_hook
     $VERSION = $env:version
-    $codegen_ver = $env:codegen
 } else {
         & qpm package edit --version $VERSION
 }
+
 if ((Test-Path "./extern/includes/beatsaber-hook/shared/inline-hook/And64InlineHook.cpp", "./extern/includes/beatsaber-hook/shared/inline-hook/inlineHook.c", "./extern/includes/beatsaber-hook/shared/inline-hook/relocate.c") -contains $false) {
     Write-Host "Critical: Missing inline-hook"
     if (!(Test-Path "./extern/includes/beatsaber-hook/shared/inline-hook/And64InlineHook.cpp")) {

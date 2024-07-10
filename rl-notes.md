@@ -9,5 +9,6 @@
 - Option to choose between the Clock being at the Top or the Bottom.
 
 __**Changelog:**__
-- Update to 1.35.0_8016709773
-- Switch to BSML-Lite
+- Update to 1.37.0_9064817954
+- Fix positioning bug in Multiplayer
+- Move clock slightly higher to avoid overlapping with BeatTogethers server selector
