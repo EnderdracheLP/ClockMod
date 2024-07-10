@@ -16,7 +16,7 @@ Param(
     [Switch] $package
 )
 
-# Builds a .qmod file for loading with QP or BMBF
+# Builds a .qmod file for loading with QP or MBF
 
 
 if ($help -eq $true) {
@@ -47,24 +47,7 @@ echo "Packaging QMod $qmodName"
         echo "Failed to build, exiting..."
         exit $LASTEXITCODE
     }
-
-    # qpm qmod build
 }
-
-echo "Creating qmod from mod.json"
-
-# $mod = "./mod.json"
-# $modJson = Get-Content $mod -Raw | ConvertFrom-Json
-
-# $filelist = @($mod)
-
-# $cover = "./" + $modJson.coverImage
-# if ((-not ($cover -eq "./")) -and (Test-Path $cover))
-# { 
-#     $filelist += ,$cover
-# } else {
-#     echo "No cover Image found"
-# }
 
 $qpmshared = "./qpm.shared.json"
 $qpmsharedJson = Get-Content $qpmshared -Raw | ConvertFrom-Json
@@ -86,37 +69,7 @@ echo "Actions: Packaging QMod $qmodName"
     $qmodName += "_$($qpmsharedJson.config.info.version)"
 }
 
-# foreach ($mod in $modJson.lateModFiles)
-# {
-#     $path = "./build/" + $mod
-#     if (-not (Test-Path $path))
-#     {
-#         $path = "./extern/libs/" + $mod
-#     }
-#     $filelist += $path
-# }
-
-# foreach ($lib in $modJson.libraryFiles)
-# {
-#     $path = "./extern/libs/" + $lib
-#     if (-not (Test-Path $path))
-#     {
-#         $path = "./build/" + $lib
-#     }
-#     $filelist += $path
-# }
-
-# $zip = $qmodName + ".zip"
 $qmod = $qmodName + ".qmod"
-
-# if ((-not ($clean.IsPresent)) -and (Test-Path $qmod))
-# {
-#     echo "Making Clean Qmod"
-#     Move-Item $qmod $zip -Force
-# }
-
-# Compress-Archive -Path $filelist -DestinationPath $zip -Update
-# Move-Item $zip $qmod -Force
 
 qpm qmod zip -i ./build/ -i ./extern/libs/ $qmod
 

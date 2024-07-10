@@ -27,7 +27,6 @@ using namespace ClockMod;
 #include "bsml/shared/BSML-Lite/Creation/Settings.hpp"
 #include "bsml/shared/BSML-Lite/Creation/Text.hpp"
 
-//#include "GlobalNamespace/ColorChangeUIEventType.hpp" // Added for Colorpicker
 using namespace UnityEngine;
 using namespace HMUI;
 

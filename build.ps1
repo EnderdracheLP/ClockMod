@@ -20,9 +20,9 @@ echo "Arg $($i) is $($args[$i])"
 if ($args.Count -eq 0 -or $actions -ne $true) {
     $qpmshared = "./qpm.shared.json"
     $qpmsharedJson = Get-Content $qpmshared -Raw | ConvertFrom-Json
-    $ModID = "ClockMod"
+    $ModID = $qpmsharedJson.config.info.id
     $VERSION = $qpmsharedJson.config.info.version.replace("-Dev", "")
-    if ($null -eq $VERSION) {
+    if ([string]::IsNullOrEmpty($VERSION)) {
         $VERSION = "0.0.1"
     }
     if ($release -ne $true) {
@@ -34,6 +34,10 @@ if ($args.Count -eq 0 -or $actions -ne $true) {
 if ($actions -eq $true) {
     $ModID = $env:module_id
     $VERSION = $env:version
+    if ([string]::IsNullOrEmpty($VERSION)) {
+        $qpmsharedJson = Get-Content $qpmshared -Raw | ConvertFrom-Json
+        $VERSION = $qpmsharedJson.config.info.version.replace("-Dev", "")
+    }
 } else {
         & qpm package edit --version $VERSION
 }

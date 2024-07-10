@@ -82,7 +82,6 @@ jobs:
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm package edit --version ${{ env.version }}
         pwsh -Command ./build.ps1 -actions
 
     - name: Get Library Name
@@ -91,7 +90,7 @@ jobs:
         cd ./build/
         pattern="lib${module_id}*.so"
         files=( $pattern )
-        echo ::set-output name=NAME::"${files[0]}"
+        echo "NAME=${files[0]}" >> $GITHUB_OUTPUT
 
     - name: Package QMOD
       run: |

@@ -4,8 +4,6 @@
 #include "UnityEngine/Color.hpp"
 #include "HMUI/CurvedTextMeshPro.hpp"
 #include "bsml/shared/BSML/Components/ModalColorPicker.hpp"
-//#include "questui/shared/BeatSaberUI.hpp"
-//#include "TMPro/TextMeshProUGUI.hpp"
 
 DECLARE_CLASS_CODEGEN(ClockMod, ClockViewController, HMUI::ViewController,
 
@@ -17,6 +15,4 @@ DECLARE_CLASS_CODEGEN(ClockMod, ClockViewController, HMUI::ViewController,
 
     custom_types::Helpers::Coroutine UpdateTimeText();
     bool SettingsOpen;
-
-    //UnityEngine::Color lastChangedColor;
 );
