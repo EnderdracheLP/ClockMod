@@ -64,13 +64,13 @@
     {
       "dependency": {
         "id": "paper",
-        "versionRange": "=3.6.3",
+        "versionRange": "=3.6.4",
         "additionalData": {
-          "soLink": "https://github.com/Fernthedev/paperlog/releases/download/v3.6.3/libpaperlog.so",
-          "debugSoLink": "https://github.com/Fernthedev/paperlog/releases/download/v3.6.3/debug_libpaperlog.so",
+          "soLink": "https://github.com/Fernthedev/paperlog/releases/download/v3.6.4/libpaperlog.so",
+          "debugSoLink": "https://github.com/Fernthedev/paperlog/releases/download/v3.6.4/debug_libpaperlog.so",
           "overrideSoName": "libpaperlog.so",
-          "modLink": "https://github.com/Fernthedev/paperlog/releases/download/v3.6.3/paperlog.qmod",
-          "branchName": "version/v3_6_3",
+          "modLink": "https://github.com/Fernthedev/paperlog/releases/download/v3.6.4/paperlog.qmod",
+          "branchName": "version/v3_6_4",
           "compileOptions": {
             "systemIncludes": [
               "shared/utfcpp/source"
@@ -79,7 +79,7 @@
           "cmake": false
         }
       },
-      "version": "3.6.3"
+      "version": "3.6.4"
     },
     {
       "dependency": {
@@ -204,6 +204,21 @@
     },
     {
       "dependency": {
+        "id": "tinyxml2",
+        "versionRange": "=10.0.0",
+        "additionalData": {
+          "soLink": "https://github.com/MillzyDev/NDK-tinyxml2/releases/download/v10.0.0/libtinyxml2.so",
+          "debugSoLink": "https://github.com/MillzyDev/NDK-tinyxml2/releases/download/v10.0.0/debug_libtinyxml2.so",
+          "overrideSoName": "libtinyxml2.so",
+          "modLink": "https://github.com/MillzyDev/NDK-tinyxml2/releases/download/v10.0.0/tinyxml2.qmod",
+          "branchName": "version/v10_0_0",
+          "cmake": true
+        }
+      },
+      "version": "10.0.0"
+    },
+    {
+      "dependency": {
         "id": "fmt",
         "versionRange": "=10.0.0",
         "additionalData": {
@@ -217,21 +232,6 @@
               "-DFMT_HEADER_ONLY"
             ]
           }
-        }
-      },
-      "version": "10.0.0"
-    },
-    {
-      "dependency": {
-        "id": "tinyxml2",
-        "versionRange": "=10.0.0",
-        "additionalData": {
-          "soLink": "https://github.com/MillzyDev/NDK-tinyxml2/releases/download/v10.0.0/libtinyxml2.so",
-          "debugSoLink": "https://github.com/MillzyDev/NDK-tinyxml2/releases/download/v10.0.0/debug_libtinyxml2.so",
-          "overrideSoName": "libtinyxml2.so",
-          "modLink": "https://github.com/MillzyDev/NDK-tinyxml2/releases/download/v10.0.0/tinyxml2.qmod",
-          "branchName": "version/v10_0_0",
-          "cmake": true
         }
       },
       "version": "10.0.0"
