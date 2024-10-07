@@ -5,7 +5,7 @@
   "info": {
     "name": "Clock Mod",
     "id": "ClockMod",
-    "version": "1.10.0-Dev",
+    "version": "1.11.0-Dev",
     "url": null,
     "additionalData": {
       "overrideSoName": "libClockMod.so",
@@ -55,6 +55,11 @@
     {
       "id": "paper",
       "versionRange": "^3.6.4",
+      "additionalData": {}
+    },
+    {
+      "id": "conditional-dependencies",
+      "versionRange": "^0.3.0",
       "additionalData": {}
     }
   ]
