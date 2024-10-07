@@ -85,6 +85,7 @@ namespace ClockMod {
             }
 
             AddConfigValueToggle(parent, getModConfig().InSong);
+            AddConfigValueToggle(parent, getModConfig().InReplay);
             AddConfigValueToggle(parent, getModConfig().TwelveToggle);
             AddConfigValueToggle(parent, getModConfig().SecToggle);
             AddConfigValueToggle(parent, getModConfig().BattToggle);
