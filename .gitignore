@@ -54,3 +54,4 @@ Android.mk.backup
 *.cmake
 /CMakeSettings.json
 /build
+.cache
