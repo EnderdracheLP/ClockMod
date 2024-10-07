@@ -55,11 +55,11 @@ using namespace HMUI;
 
 #include "ClockUpdater.hpp"
 #include "ClockViewController.hpp"
-//#include "ClockRotationUpdater.hpp"  // Added for 360/90 Rotation Update [NO LONGER USED IN THE CODE! REPLACED WITH A HOOK]
 using namespace ClockMod;
 
 #include "custom-types/shared/register.hpp"
-//using namespace custom_types;
+
+#include "conditional-dependencies/shared/main.hpp"
 
 #include "ClockModConfig.hpp"
 
@@ -69,9 +69,7 @@ Config_t Config;
 // Clock Positions
 ClockPos_t ClockPos;
 
-#if defined(MAKE_HOOK_OFFSETLESS)
-#error Outdated bs-hook
-#elif !defined(MAKE_HOOK_MATCH)
+#if !defined(MAKE_HOOK_MATCH)
 #error No supported HOOK macro found, make sure that you have ran: 'qpm-rust restore' and that you have a compatible version of bs-hook
 #endif
 
@@ -102,9 +100,7 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::Did
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if (firstActivation && ClockModInit) {
-        //auto EmptyParentObject = UnityEngine::GameObject::New_ctor(il2cpp_utils::newcsstr("EmptyParent"));
         auto canvas_object = UnityEngine::GameObject::New_ctor("ClockCanvas");
-        //canvas_object->get_transform()->SetParent(canvas_object->get_transform());
         canvas = canvas_object->AddComponent<UnityEngine::Canvas*>();
         auto canvas_scaler = canvas_object->AddComponent<CanvasScaler*>();
         auto canvas_renderer = canvas_object->AddComponent<CanvasRenderer*>();
@@ -118,7 +114,6 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::Did
         // button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, OnClockButtonClick));
 
         canvas_object->AddComponent<CurvedCanvasSettings*>();
-        //canvas_object->AddComponent<ClockMod::ClockRotationUpdater*>();         // This will add the Componnent from ClockRotationUpdater to the Clock Canvas_object
         canvas_object->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
         canvas_object->get_transform()->set_position(UnityEngine::Vector3(0, 0.5, 0)); // 0, 0.5, 3
         canvas_object->get_transform()->set_localScale(UnityEngine::Vector3(0.1, 0.1, 0.1));
@@ -161,7 +156,6 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::Did
     layout->get_transform()->set_localEulerAngles(UnityEngine::Vector3(0, 0, 0));
     // Enables the Clock, I mean what did you expect?
     canvas->get_gameObject()->SetActive(true);
-//    layout->get_transform()->set_position(UnityEngine::Vector3(ClockX, ClockY, ClockZ));
     Config.InMP = false;
 }
 
@@ -192,6 +186,16 @@ MAKE_HOOK_MATCH(AudioTimeSyncController_StartSong, &AudioTimeSyncController::Sta
     Config.IsInSong = true;
 
     AudioTimeSyncController_StartSong(self, startTimeOffset);
+
+
+    bool inreplay;
+    static std::optional<bool (*)()> func  = CondDeps::Find<bool>("replay", "IsInReplay");
+    if (func.has_value())
+    {
+        inreplay = func.value()();
+        logger().info("Found replay mod, check in replay: {}", inreplay);
+        Config.noTextAndHUD |=  inreplay && !getModConfig().InReplay.GetValue();
+    }
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(false);
@@ -236,7 +240,9 @@ MAKE_HOOK_MATCH(AudioTimeSyncController_StartSong, &AudioTimeSyncController::Sta
         //auto Pos = UnityEngine::Vector3(0, -1.7, 5.6);
         //auto Angle = UnityEngine::Vector3(-10, 0, 0);
         //auto Scale = UnityEngine::Vector3(1, 1, 1);
-        SetClockPos(ClockPos.NormalSongPosTop, ClockPos.NormalSongRotationTop, ClockPos.NormalSongScaleTop);
+        auto pos = ClockPos.NormalSongPosTop;
+        if (inreplay) pos.y += 0.4f;
+        SetClockPos(pos, ClockPos.NormalSongRotationTop, ClockPos.NormalSongScaleTop);
         logger().info("In Normal Map set to Top");
     } 
 }
@@ -513,7 +519,7 @@ MOD_EXPORT void setup(CModInfo *info) {
 }
 
 // Called later on in the game loading - a good time to install function hooks
-MOD_EXPORT "C" void late_load() {
+MOD_EXPORT void late_load() {
     il2cpp_functions::Init();
     BSML::Init();
 
