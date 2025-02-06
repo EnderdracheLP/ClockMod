@@ -1,31 +1,30 @@
-#include "ClockViewController.hpp"
-#include "main.hpp"
 #include "ClockModConfig.hpp"
 #include "ClockUpdater.hpp"
+#include "ClockViewController.hpp"
 using namespace ClockMod;
-
-
-#include "System/Collections/IEnumerator.hpp"
-
-#include "UnityEngine/WaitForSecondsRealtime.hpp"
-//#include "UnityEngine/WaitForSeconds.hpp"
-
-// UnityEngine stuff, very important!!!
-#include "UnityEngine/UI/VerticalLayoutGroup.hpp"
-#include "UnityEngine/Events/UnityAction_1.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "UnityEngine/Canvas.hpp"
-#include "UnityEngine/Resources.hpp"
-
-#include "HMUI/Touchable.hpp"
-#include "HMUI/ScrollView.hpp"
-
-#include "TMPro/TextMeshProUGUI.hpp" // Added for color change
-#include "TMPro/FontStyles.hpp"
 
 #include "bsml/shared/BSML-Lite/Creation/Buttons.hpp"
 #include "bsml/shared/BSML-Lite/Creation/Settings.hpp"
 #include "bsml/shared/BSML-Lite/Creation/Text.hpp"
+#include "bsml/shared/BSML/Components/ModalColorPicker.hpp"
+#include "custom-types/shared/coroutine.hpp"
+#include "custom-types/shared/macros.hpp"
+
+#include "HMUI/CurvedTextMeshPro.hpp"
+#include "HMUI/ScrollView.hpp"
+#include "HMUI/Touchable.hpp"
+#include "HMUI/ViewController.hpp"
+#include "System/Collections/IEnumerator.hpp"
+#include "TMPro/FontStyles.hpp"
+#include "TMPro/TextMeshProUGUI.hpp" // Added for color change
+
+// Unity engine stuff, very important!
+#include "UnityEngine/Canvas.hpp"
+#include "UnityEngine/Color.hpp"
+#include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/WaitForSecondsRealtime.hpp"
+
+
 
 using namespace UnityEngine;
 using namespace HMUI;

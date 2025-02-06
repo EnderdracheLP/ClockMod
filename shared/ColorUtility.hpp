@@ -1,8 +1,8 @@
 #pragma once
-#include "main.hpp"
-#include "beatsaber-hook/shared/utils/byref.hpp"
-#include "UnityEngine/Color32.hpp"
 #include "UnityEngine/Color.hpp"
+#include "UnityEngine/Color32.hpp"
+
+using namespace UnityEngine;
 
 namespace ClockMod {
     class ColorUtility {
