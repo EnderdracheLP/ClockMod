@@ -1,15 +1,16 @@
 #pragma once
-#include "custom-types/shared/macros.hpp"
+#include "TMPro/TextMeshProUGUI.hpp"  // Text Stuff.
+#include "UnityEngine/GameObject.hpp" // For GameObject Stuff
+#include "UnityEngine/Gradient.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
+#include "UnityEngine/Transform.hpp"  // For Transform stuff
+#include "custom-types/shared/macros.hpp"
 #include <ctime>
 #include <time.h>
-#include "TMPro/TextMeshProUGUI.hpp"                // Text Stuff.
-#include "UnityEngine/Transform.hpp"                // For Transform stuff
-#include "UnityEngine/GameObject.hpp"               // For GameObject Stuff
-#include "UnityEngine/Gradient.hpp"
+
 using namespace UnityEngine;
 
-DECLARE_CLASS_CODEGEN(ClockMod, ClockUpdater, UnityEngine::MonoBehaviour,
+DECLARE_CLASS_CODEGEN(ClockMod, ClockUpdater, UnityEngine::MonoBehaviour) {
 
     DECLARE_INSTANCE_METHOD(void, Start);
     DECLARE_INSTANCE_METHOD(void, Update);
@@ -41,4 +42,4 @@ public:
     static std::string getTimeFormat();
     void ShowMessage(std::string message, int duration = 4);
 
-)
+};

@@ -1,67 +1,68 @@
-#include "main.hpp"
-#include "ClockValues.hpp"
-
-#include "GlobalNamespace/OVRPlugin.hpp"
-
-#include "GlobalNamespace/MainMenuViewController.hpp"
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/PauseMenuManager.hpp"
-#include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
-#include "GlobalNamespace/PartyFreePlayFlowCoordinator.hpp"
-#include "GlobalNamespace/CampaignFlowCoordinator.hpp"          // For setting clock in Campaign back to normal
-#include "GlobalNamespace/BeatmapCharacteristicSO.hpp"          // For checking the characteristic 360/90.
-#include "GlobalNamespace/GameplayCoreInstaller.hpp"            // Also part of the check.
+#include "GlobalNamespace/BeatmapCharacteristicSO.hpp" // --------------------- For checking the characteristic 360/90.
+#include "GlobalNamespace/BeatmapKey.hpp"
+#include "GlobalNamespace/CampaignFlowCoordinator.hpp" // --------------------- For setting clock in Campaign back to normal
+#include "GlobalNamespace/FlyingGameHUDRotation.hpp" // ----------------------- Take rotation from this instead lol
+#include "GlobalNamespace/LobbySetupViewController.hpp" // -------------------- NEW: For 1.16.4
+#include "GlobalNamespace/MainMenuViewController.hpp"
+#include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp" // - For checking it it's an MP Song
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
-#include "GlobalNamespace/LobbySetupViewController.hpp"         // NEW: For 1.16.4
-#include "GlobalNamespace/IReadonlyBeatmapData.hpp"             // To read the BeatmapData
-#include "GlobalNamespace/FlyingGameHUDRotation.hpp"            // Take rotation from this instead lol
-#include "GlobalNamespace/PlayerDataModel.hpp"            // For checking if noTextandHUDs is enabled
-#include "GlobalNamespace/PlayerData.hpp"            // For checking if noTextandHUDs is enabled
-#include "GlobalNamespace/PlayerSpecificSettings.hpp"        // For checking if noTextandHUDs is enabled
-#include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp"  // For checking it it's an MP Song
 #include "GlobalNamespace/MultiplayerResultsViewController.hpp"
-#include "GlobalNamespace/BeatmapCallbacksController.hpp"
+#include "GlobalNamespace/OVRPlugin.hpp"
+#include "GlobalNamespace/PartyFreePlayFlowCoordinator.hpp"
+#include "GlobalNamespace/PauseMenuManager.hpp"
+#include "GlobalNamespace/PlayerData.hpp" // ---------------------------------- For checking if noTextandHUDs is enabled
+#include "GlobalNamespace/PlayerDataModel.hpp" // ----------------------------- For checking if noTextandHUDs is enabled
+#include "GlobalNamespace/PlayerSpecificSettings.hpp"
+#include "GlobalNamespace/PlayerSpecificSettings.hpp" // ---------------------- For checking if noTextandHUDs is enabled
+#include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
+#include "GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp" // ---- For checking if it's a 360/90 Map
 using namespace GlobalNamespace;
 
-#include "TMPro/TextMeshPro.hpp"
-#include "TMPro/TextMeshProUGUI.hpp"
-#include "TMPro/TextAlignmentOptions.hpp"
 #include "TMPro/FontStyles.hpp"
 #include "TMPro/TMP_Text.hpp"
+#include "TMPro/TextMeshPro.hpp"
+#include "TMPro/TextMeshProUGUI.hpp"
 using namespace TMPro;
 
 #include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/CanvasRenderer.hpp"
-#include "UnityEngine/Vector3.hpp"
-#include "UnityEngine/Vector2.hpp"
-#include "UnityEngine/Quaternion.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "UnityEngine/UI/LayoutElement.hpp"
-#include "UnityEngine/RenderMode.hpp"
-#include "UnityEngine/UI/CanvasScaler.hpp"
 #include "UnityEngine/CanvasRenderer.hpp"
+#include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
+#include "UnityEngine/Quaternion.hpp"
+#include "UnityEngine/RenderMode.hpp"
 #include "UnityEngine/SceneManagement/Scene.hpp"
 #include "UnityEngine/TextAnchor.hpp"
+#include "UnityEngine/Vector2.hpp"
+#include "UnityEngine/Vector3.hpp"
 using namespace UnityEngine;
-using namespace UnityEngine::UI;
 
-#include "bsml/shared/BSML-Lite/Creation/Layout.hpp"
-#include "bsml/shared/BSML-Lite/Creation/Text.hpp"
-#include "bsml/shared/BSML.hpp"
+#include "UnityEngine/UI/CanvasScaler.hpp"
+#include "UnityEngine/UI/LayoutElement.hpp"
+using namespace UnityEngine::UI;
 
 #include "HMUI/CurvedCanvasSettings.hpp"
 using namespace HMUI;
 
-#include "ClockUpdater.hpp"
-#include "ClockViewController.hpp"
-using namespace ClockMod;
-
-#include "custom-types/shared/register.hpp"
-
+#include "beatsaber-hook/shared/utils/hooking.hpp"
+#include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
+#include "bsml/shared/BSML-Lite/Creation/Layout.hpp"
+#include "bsml/shared/BSML-Lite/Creation/Text.hpp"
+#include "bsml/shared/BSML.hpp"
 #include "conditional-dependencies/shared/main.hpp"
+#include "custom-types/shared/register.hpp"
+#include "scotland2/shared/loader.hpp"
 
 #include "ClockModConfig.hpp"
+#include "ClockUpdater.hpp"
+#include "ClockValues.hpp"
+#include "ClockViewController.hpp"
+#include "main.hpp"
+using namespace ClockMod;
+
+
+
 
 // Clock Default Position and other stuff stored there
 Config_t Config;
@@ -401,19 +402,17 @@ MAKE_HOOK_MATCH(PauseMenuManager_StartResumeAnimation, &PauseMenuManager::StartR
 }
 
 // TODO: Use the below information wisely
-// Check if it there are RotationEvents within the map, and if there are, declare it a 360/90 Map.
-MAKE_HOOK_FIND_INSTANCE(BeatmapDataCallback, classof(BeatmapCallbacksController::InitData*), ".ctor", void, BeatmapCallbacksController::InitData* self, IReadonlyBeatmapData* beatmapData, float startFilterTime, bool shouldKeepReplayState) {
-    BeatmapDataCallback(self, beatmapData, startFilterTime, shouldKeepReplayState);
-    if (beatmapData) {
-        int RotationEvents = beatmapData->get_spawnRotationEventsCount();
-        if (RotationEvents > 0) {
-            logger().debug("Loaded 360/90 Map");
-            Config.InRotationMap = true;
-        }
-        else {
-            logger().debug("Loaded Normal Map");
-            Config.InRotationMap = false;
-        }
+// Check the beatmap characteristic and set the Config.InRotationMap to true if it requires 360 Movement.
+MAKE_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_InitAndSetupScenes, &StandardLevelScenesTransitionSetupDataSO::InitAndSetupScenes, void, StandardLevelScenesTransitionSetupDataSO* self, PlayerSpecificSettings* playerSpecificSettings, StringW backButtonText, bool startPaused) {
+    StandardLevelScenesTransitionSetupDataSO_InitAndSetupScenes(self, playerSpecificSettings, backButtonText, startPaused);
+
+    if (self->beatmapKey.beatmapCharacteristic->containsRotationEvents) {
+        logger().debug("Loaded 360/90 Map");
+        Config.InRotationMap = true;
+    }
+    else {
+        logger().debug("Loaded Normal Map");
+        Config.InRotationMap = false;
     }
 }
 
@@ -564,7 +563,7 @@ MOD_EXPORT void late_load() {
     INSTALL_HOOK(hkLog, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate);
     INSTALL_HOOK(hkLog, PauseMenuManager_ShowMenu);
     INSTALL_HOOK(hkLog, PauseMenuManager_StartResumeAnimation);
-    INSTALL_HOOK(hkLog, BeatmapDataCallback);
+    INSTALL_HOOK(hkLog, StandardLevelScenesTransitionSetupDataSO_InitAndSetupScenes);
     INSTALL_HOOK(hkLog, LobbySetupViewController_DidActivate);
     INSTALL_HOOK(hkLog, MultiplayerLobbyController_DeactivateMultiplayerLobby);
     INSTALL_HOOK(hkLog, MultiplayerResultsViewController_DidActivate);
