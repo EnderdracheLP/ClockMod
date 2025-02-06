@@ -1,0 +1,19 @@
+{
+  "name": "QPM",
+  "image": "ghcr.io/dantheman827/qpm-docker:master",
+  "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+          "username": "codespace",
+          "userUid": "1000",
+          "userGid": "1000",
+          "installZsh": false,
+          "installOhMyZsh": false,
+          "installOhMyZshConfig": false,
+          "upgradePackages": false
+      }
+  },
+  "remoteUser": "codespace",
+  "containerUser": "codespace",
+  "onCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+  "postCreateCommand": "qpm ndk resolve -d && qpm restore"
+}

@@ -1,19 +1,15 @@
-#include "main.hpp"                                 // Well the main.hpp what else, this wouldn't be the same without.
+#include "main.hpp"                      // Well the main.hpp what else, this wouldn't be the same without.
+
+#include "ClockModConfig.hpp"            // Just the Config
+#include "ClockUpdater.hpp"              // For the ClockUpdater, like the stuff you see down there
 #include "ClockValues.hpp"
-
-#include "ClockUpdater.hpp"                         // For the ClockUpdater, like the stuff you see down there
-
-#include "ClockModConfig.hpp"                       // Just the Config
+#include "ColorUtility.hpp"
+#include "RainbowClock.hpp"              // Where the magic stuff is that makes the Clock Rainbowy (is that actually a word?)
 
 #include "GlobalNamespace/OVRPlugin.hpp" // Where I get the Battery Percentage from as float
-
-#include "RainbowClock.hpp"                         // Where the magic stuff is that makes the Clock Rainbowy (is that actually a word?)
-
-#include "ColorUtility.hpp"
-
+#include "UnityEngine/BatteryStatus.hpp"
 #include "UnityEngine/GradientColorKey.hpp"
 #include "UnityEngine/SystemInfo.hpp"
-#include "UnityEngine/BatteryStatus.hpp"
 
 using namespace UnityEngine;
 using namespace TMPro;
