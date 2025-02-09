@@ -188,13 +188,17 @@ MAKE_HOOK_MATCH(AudioTimeSyncController_StartSong, &AudioTimeSyncController::Sta
     AudioTimeSyncController_StartSong(self, startTimeOffset);
 
 
-    bool inreplay;
-    static std::optional<bool (*)()> func  = CondDeps::Find<bool>("replay", "IsInReplay");
-    if (func.has_value())
+    bool isInReplay;
+    static std::optional<bool (*)()> isInReplayFunc  = CondDeps::Find<bool>("replay", "IsInReplay");
+    if (isInReplayFunc.has_value())
     {
-        inreplay = func.value()();
-        logger().info("Found replay mod, check in replay: {}", inreplay);
-        Config.noTextAndHUD |=  inreplay && !getModConfig().InReplay.GetValue();
+        static std::optional<bool (*)()> isInRenderFunc  = CondDeps::Find<bool>("replay", "IsInRender ");
+        bool isInRender = false;
+        isInReplay = isInReplayFunc.value()();
+        if (isInRenderFunc.has_value())
+                isInRender = isInRenderFunc.value()();
+        logger().info("Found replay mod, check in replay: {}, check in render: {}", isInReplay, isInRender);
+        Config.noTextAndHUD |=  (isInReplay && !getModConfig().InReplay.GetValue()) || isInRender;
     }
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
@@ -241,7 +245,7 @@ MAKE_HOOK_MATCH(AudioTimeSyncController_StartSong, &AudioTimeSyncController::Sta
         //auto Angle = UnityEngine::Vector3(-10, 0, 0);
         //auto Scale = UnityEngine::Vector3(1, 1, 1);
         auto pos = ClockPos.NormalSongPosTop;
-        if (inreplay) pos.y += 0.4f;
+        if (isInReplay) pos.y += 0.4f;
         SetClockPos(pos, ClockPos.NormalSongRotationTop, ClockPos.NormalSongScaleTop);
         logger().info("In Normal Map set to Top");
     } 
