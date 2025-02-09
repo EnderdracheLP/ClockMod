@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       name: Checkout
       with:
         submodules: true
@@ -41,41 +41,23 @@ jobs:
 
     - uses: seanmiddleditch/gha-setup-ninja@v3
 
-    - name: Create ndkpath.txt
-      run: |
-        echo "$ANDROID_NDK_LATEST_HOME" > ${GITHUB_WORKSPACE}/ndkpath.txt
+    - uses: seanmiddleditch/gha-setup-ninja@v5
 
     - name: Get QPM
-      if: steps.cache-qpm.outputs.cache-hit != 'true'
-      uses: dawidd6/action-download-artifact@v2
+      uses: Fernthedev/qpm-action@v1
       with:
-        github_token: ${{secrets.GITHUB_TOKEN}}
-        workflow: cargo-build.yml
-        name: linux-qpm
-        path: QPM
-        repo: QuestPackageManager/QPM.CLI
+        resolve_ndk: true
+        #required
+        workflow_token: ${{secrets.GITHUB_TOKEN}}
+        restore: true # will run restore on download
+        cache: true #will cache dependencies
+        version: '${{ env.version }}'
+        #qpm_qmod: '${{ env.module_id }}_${{ env.qmodversion }}.qmod'
         
     - name: QPM Collapse
       run: |
-        chmod +x ./QPM/qpm
-        ./QPM/qpm collapse
-        
-    - name: QPM Dependencies Cache
-      id: cache-qpm-deps
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-qpm-deps
-      with:
-        path: /home/runner/.local/share/QPM-RS/cache
-        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('qpm.json') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ env.cache-name }}-
-          ${{ runner.os }}-${{ env.cache-name }}
-      
-    - name: QPM Restore
-      run: |
-        ./QPM/qpm restore
-
+        qpm collapse
+              
     - name: Check dependency Folders
       run: |
         echo "Checking extern includes"
@@ -91,9 +73,10 @@ jobs:
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm package edit --version ${{ env.version }}
-        ./QPM/qpm qmod build
         pwsh -Command ./build.ps1 -actions
+#        ./QPM/qpm package edit --version ${{ env.version }}
+#        ./QPM/qpm qmod build
+#        pwsh -Command ./build.ps1 -actions
 
     - name: Get Library Name
       id: libname
@@ -106,7 +89,7 @@ jobs:
     - name: Package QMOD
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm qmod zip -i ./build/ -i ./extern/libs/ ${module_id}_${version}.qmod
+        qpm qmod zip -i ./build/ -i ./extern/libs/ ${module_id}_${version}.qmod
 
 
     - name: Upload non-debug artifact
