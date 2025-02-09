@@ -77,17 +77,17 @@ jobs:
         $modTemplate.packageVersion = $BSVersion
         $modTemplate | ConvertTo-Json | Out-File -FilePath ./mod.template.json -Encoding utf8
 
-    - name: Temp Fix QPM extern.cmake issue
-      shell: pwsh
-      run: |
-        $cmakeFilePath = "./extern.cmake"
-        $externcmake = Get-Content $cmakeFilePath -Raw
-        $partToRemove = 'add_library(${COMPILE_ID} SHARED ${EXTERN_DIR}/includes/bs-cordl/version.txt)'
-        $externcmake -replace [regex]::Escape($partToRemove), '' | Set-Content $cmakeFilePath
-#        $qpmjson = Get-Content ./qpm.json -Raw | ConvertFrom-Json
-#        foreach ($dependency in $qpmjson.dependencies) { if ($dependency.id -eq "bs-cordl") { $dependency.additionalData.PSObject.Properties.Remove("extraFiles") } }
-#        $qpmjson | ConvertTo-Json -Depth 5 | Out-File -FilePath ./qpm.json -Encoding utf8
-#        qpm restore
+#     - name: Temp Fix QPM extern.cmake issue
+#       shell: pwsh
+#       run: |
+#         $cmakeFilePath = "./extern.cmake"
+#         $externcmake = Get-Content $cmakeFilePath -Raw
+#         $partToRemove = 'add_library(${COMPILE_ID} SHARED ${EXTERN_DIR}/includes/bs-cordl/version.txt)'
+#         $externcmake -replace [regex]::Escape($partToRemove), '' | Set-Content $cmakeFilePath
+# #        $qpmjson = Get-Content ./qpm.json -Raw | ConvertFrom-Json
+# #        foreach ($dependency in $qpmjson.dependencies) { if ($dependency.id -eq "bs-cordl") { $dependency.additionalData.PSObject.Properties.Remove("extraFiles") } }
+# #        $qpmjson | ConvertTo-Json -Depth 5 | Out-File -FilePath ./qpm.json -Encoding utf8
+# #        qpm restore
 
     - name: Build
       run: |

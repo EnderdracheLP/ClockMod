@@ -40,6 +40,8 @@ if ($actions -eq $true) {
     }
 } else {
         & qpm package edit --version $VERSION
+        # Temp Fix for qpm adding version.txt as library in extern.cmake
+        #$cmakeFilePath = "./extern.cmake"; $externcmake = Get-Content $cmakeFilePath -Raw; $externcmake -replace [regex]::Escape('add_library(${COMPILE_ID} SHARED ${EXTERN_DIR}/includes/bs-cordl/version.txt)'), '' | Set-Content $cmakeFilePath
 }
 
 if ((Test-Path "./extern/includes/beatsaber-hook/shared/inline-hook/And64InlineHook.cpp", "./extern/includes/beatsaber-hook/shared/inline-hook/inlineHook.c", "./extern/includes/beatsaber-hook/shared/inline-hook/relocate.c") -contains $false) {
@@ -56,7 +58,7 @@ if ((Test-Path "./extern/includes/beatsaber-hook/shared/inline-hook/And64InlineH
     Write-Host "Task Failed"
     exit 1;
 }
-echo "Building mod with ModID: $ModID version: $VERSION"
+Write-Output "Building mod with ModID: $ModID version: $VERSION"
 
 if ($clean.IsPresent)
 {
@@ -71,10 +73,10 @@ if (($clean.IsPresent) -or (-not (Test-Path -Path "build")))
     $out = new-item -Path build -ItemType Directory
 }
 
-cd build
+Set-Location build
 & cmake -G "Ninja" -DCMAKE_BUILD_TYPE="RelWithDebInfo" ../
 & cmake --build . -j 6
 $ExitCode = $LastExitCode
-cd ..
+Set-Location ..
 exit $ExitCode
-echo Done
+Write-Output Done

@@ -62,13 +62,13 @@ jobs:
         $modTemplate.packageVersion = $BSVersion
         $modTemplate | ConvertTo-Json | Out-File -FilePath ./mod.template.json -Encoding utf8
 
-    - name: Temp Fix QPM extern.cmake issue
-      shell: pwsh
-      run: |
-        $cmakeFilePath = "./extern.cmake"
-        $externcmake = Get-Content $cmakeFilePath -Raw
-        $partToRemove = 'add_library(${COMPILE_ID} SHARED ${EXTERN_DIR}/includes/bs-cordl/version.txt)'
-        $externcmake -replace [regex]::Escape($partToRemove), '' | Set-Content $cmakeFilePath
+    # - name: Temp Fix QPM extern.cmake issue
+    #   shell: pwsh
+    #   run: |
+    #     $cmakeFilePath = "./extern.cmake"
+    #     $externcmake = Get-Content $cmakeFilePath -Raw
+    #     $partToRemove = 'add_library(${COMPILE_ID} SHARED ${EXTERN_DIR}/includes/bs-cordl/version.txt)'
+    #     $externcmake -replace [regex]::Escape($partToRemove), '' | Set-Content $cmakeFilePath
   
     - name: Build
       run: |

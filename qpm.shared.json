@@ -37,6 +37,11 @@
       {
         "id": "bs-cordl",
         "versionRange": "^4020.0.0",
+        "additionalData": {}
+      },
+      {
+        "id": "bs-cordl",
+        "versionRange": "^4020.0.0",
         "additionalData": {
           "extraFiles": [
             "version.txt"
