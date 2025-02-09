@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/QuestPackageManager/QPM.Package/refs/heads/main/qpm.schema.json",
   "version": "0.4.0",
   "sharedDir": "shared",
   "dependenciesDir": "extern",
@@ -22,7 +23,37 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^6.3.0",
+      "versionRange": "^6.4.1",
+      "additionalData": {}
+    },
+    {
+      "id": "bs-cordl",
+      "versionRange": "4030.*",
+      "additionalData": {}
+    },
+    {
+      "id": "bsml",
+      "versionRange": "^0.4.50",
+      "additionalData": {}
+    },
+    {
+      "id": "conditional-dependencies",
+      "versionRange": "^0.3.0",
+      "additionalData": {}
+    },
+    {
+      "id": "config-utils",
+      "versionRange": "^2.0.2",
+      "additionalData": {}
+    },
+    {
+      "id": "custom-types",
+      "versionRange": "^0.18.2",
+      "additionalData": {}
+    },
+    {
+      "id": "paper2_scotland2",
+      "versionRange": "^4.5.0",
       "additionalData": {}
     },
     {
@@ -32,46 +63,6 @@
         "includeQmod": false,
         "private": true
       }
-    },
-    {
-      "id": "bs-cordl",
-      "versionRange": "^4020.0.0",
-      "additionalData": {
-      }
-    },
-    {
-      "id": "bs-cordl",
-      "versionRange": "^4020.0.0",
-      "additionalData": {
-        "extraFiles": [
-          "version.txt"
-        ]
-      }
-    },
-    {
-      "id": "custom-types",
-      "versionRange": "^0.18.0",
-      "additionalData": {}
-    },
-    {
-      "id": "bsml",
-      "versionRange": "^0.4.48",
-      "additionalData": {}
-    },
-    {
-      "id": "config-utils",
-      "versionRange": "^2.0.2",
-      "additionalData": {}
-    },
-    {
-      "id": "paper2_scotland2",
-      "versionRange": "^4.5.0",
-      "additionalData": {}
-    },
-    {
-      "id": "conditional-dependencies",
-      "versionRange": "^0.3.0",
-      "additionalData": {}
     }
   ]
 }
