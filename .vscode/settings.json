@@ -115,5 +115,11 @@
         "xutility": "cpp",
         "format": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Enabled"
+    "C_Cpp.errorSquiggles": "Enabled",
+    "json.schemas": [
+        {
+            "fileMatch": ["/qpm.json", "/qpm.shared.json"],
+            "url": "https://raw.githubusercontent.com/QuestPackageManager/QPM.Package/refs/heads/main/qpm.schema.json"
+        }
+    ]
 }
