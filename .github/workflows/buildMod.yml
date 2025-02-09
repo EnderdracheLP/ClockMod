@@ -82,7 +82,7 @@ jobs:
       run: |
         $qpmjson = Get-Content ./qpm.json -Raw | ConvertFrom-Json
         foreach ($dependency in $qpmjson.dependencies) { if ($dependency.id -eq "bs-cordl") { $dependency.additionalData.PSObject.Properties.Remove("extraFiles") } }
-        $qpmjson | ConvertTo-Json | Out-File -FilePath ./qpm.json -Encoding utf8
+        $qpmjson | ConvertTo-Json -Depth 5 | Out-File -FilePath ./qpm.json -Encoding utf8
         qpm restore
 
     - name: Build
