@@ -21,7 +21,6 @@ on:
 
 env:
      module_id: ClockMod
-     BSVersion: 1.35.0_8016709773
     
 jobs:
   build:
@@ -39,6 +38,16 @@ jobs:
       run: |
         $branchParts = '${{ github.ref_name }}'.Split('/'); $branchMain = $branchParts[0]; if ($branchParts[0] -match "^\d+$") { $branchMain = 'pr'; $branchSub = "$($branchParts[0])." } elseif ($branchParts.Length -eq 2) { $branchSub = "$($branchParts[1].Replace('.', '-'))." }; echo "version=$((Get-Content ./qpm.shared.json -Raw | ConvertFrom-Json).config.info.version.Split('-')[0])-$($branchMain).${{ github.run_number }}+$($branchSub)ra${{ github.run_attempt }}.$($env:GITHUB_SHA.Substring(0, 7))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Get BSVersion & Update mod.template.json
+      shell: pwsh
+      run: |
+        $BSVersion = Get-Content ./extern/includes/bs-cordl/version.txt
+        echo "BSVersion=$($BSVersion)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        $modTemplate = Get-Content ./mod.template.json -Raw | ConvertFrom-Json
+        $modTemplate.packageVersion = $BSVersion
+        $modTemplate | ConvertTo-Json | Out-File -FilePath ./mod.template.json -Encoding utf8
+    
+
     - uses: seanmiddleditch/gha-setup-ninja@v5
 
     - name: Get QPM
@@ -51,7 +60,7 @@ jobs:
         cache: true #will cache dependencies
         version: '${{ env.version }}'
         #qpm_qmod: '${{ env.module_id }}_${{ env.qmodversion }}.qmod'
-        
+
     - name: QPM Collapse
       run: |
         qpm collapse
@@ -72,9 +81,6 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}
         pwsh -Command ./build.ps1 -actions
-#        ./QPM/qpm package edit --version ${{ env.version }}
-#        ./QPM/qpm qmod build
-#        pwsh -Command ./build.ps1 -actions
 
     - name: Get Library Name
       id: libname

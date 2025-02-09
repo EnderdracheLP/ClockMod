@@ -7,8 +7,9 @@
 - Option to Rainbowify the Clock.
 - Option to change Clock Color, (unless rainbowify is on).
 - Option to choose between the Clock being at the Top or the Bottom.
+- Option to hide the Clock in replays.
 
 __**Changelog:**__
-- Update to 1.37.0_9064817954
-- Fix positioning bug in Multiplayer
-- Move clock slightly higher to avoid overlapping with BeatTogethers server selector
+- Update to 1.40.2_4113
+- Option to hide clock in a replay
+- Automatically hide the clock when rendering a replay

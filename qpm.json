@@ -36,7 +36,11 @@
     {
       "id": "bs-cordl",
       "versionRange": "^4020.0.0",
-      "additionalData": {}
+      "additionalData": {
+        "extraFiles": [
+          "version.txt"
+        ]
+      }
     },
     {
       "id": "custom-types",
