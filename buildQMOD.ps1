@@ -47,6 +47,17 @@ echo "Packaging QMod $qmodName"
         echo "Failed to build, exiting..."
         exit $LASTEXITCODE
     }
+
+    # Update BS Version in mod.template.json using bs-cordl version.txt
+    $modTemplate = Get-Content "./mod.template.json" -Raw | ConvertFrom-Json
+    $bsversion = Get-Content "./extern/includes/bs-cordl/version.txt"
+    if (-not [string]::IsNullOrWhitespace($bsversion)) {
+        Write-Output "Setting Package Version to $bsversion"
+        $modTemplate.packageVersion = $bsversion
+        $modTemplate | ConvertTo-Json -Depth 10 | Set-Content "./mod.template.json"    
+    } else {
+        Write-Error "Missing bs-cordl version.txt"
+    }
 }
 
 $qpmshared = "./qpm.shared.json"
@@ -71,6 +82,6 @@ echo "Actions: Packaging QMod $qmodName"
 
 $qmod = $qmodName + ".qmod"
 
-qpm qmod zip -i ./build/ -i ./extern/libs/ $qmod
+& qpm qmod zip -i ./build/ -i ./extern/libs/ $qmod
 
 echo "Task Completed"
