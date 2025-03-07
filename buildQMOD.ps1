@@ -50,11 +50,11 @@ echo "Packaging QMod $qmodName"
 
     # Update BS Version in mod.template.json using bs-cordl version.txt
     $modTemplate = Get-Content "./mod.template.json" -Raw | ConvertFrom-Json
-    $bsversion = Get-Content "./extern/includes/bs-cordl/version.txt"
+    $bsversion = Get-Content "./extern/includes/bs-cordl/include/version.txt"
     if (-not [string]::IsNullOrWhitespace($bsversion)) {
         Write-Output "Setting Package Version to $bsversion"
         $modTemplate.packageVersion = $bsversion
-        $modTemplate | ConvertTo-Json -Depth 10 | Set-Content "./mod.template.json"    
+        $modTemplate | ConvertTo-Json -Depth 10 | Set-Content "./mod.template.json"
     } else {
         Write-Error "Missing bs-cordl version.txt"
     }

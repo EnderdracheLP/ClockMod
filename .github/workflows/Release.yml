@@ -13,7 +13,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
       name: Checkout
@@ -25,7 +25,7 @@ jobs:
       run: echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
     - uses: seanmiddleditch/gha-setup-ninja@v5
-        
+
     - name: Get QPM
       uses: Fernthedev/qpm-action@v1
       with:
@@ -56,7 +56,7 @@ jobs:
     - name: Get BSVersion & Update mod.template.json
       shell: pwsh
       run: |
-        $BSVersion = Get-Content ./extern/includes/bs-cordl/version.txt
+        $BSVersion = Get-Content ./extern/includes/bs-cordl/include/version.txt
         echo "BSVersion=$($BSVersion)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         $modTemplate = Get-Content ./mod.template.json -Raw | ConvertFrom-Json
         $modTemplate.packageVersion = $BSVersion
@@ -69,7 +69,7 @@ jobs:
     #     $externcmake = Get-Content $cmakeFilePath -Raw
     #     $partToRemove = 'add_library(${COMPILE_ID} SHARED ${EXTERN_DIR}/includes/bs-cordl/version.txt)'
     #     $externcmake -replace [regex]::Escape($partToRemove), '' | Set-Content $cmakeFilePath
-  
+
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
