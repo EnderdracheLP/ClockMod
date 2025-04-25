@@ -74,7 +74,7 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}
         pwsh -Command ./build.ps1 -actions
-        cp ./build/debug/${{ env.module_id }}.so ./build/debug_${{ env.module_id }}.so
+        cp ./build/debug/lib${{ env.module_id }}.so ./build/debug_lib${{ env.module_id }}.so
 
     - name: Get Library Name
       id: libname
@@ -95,7 +95,7 @@ jobs:
           name: ${{ env.module_id }} ${{ env.version }} for Beat Saber ${{ env.BSVersion }}
           files: |
             ./${{ env.module_id }}_${{ env.version }}.qmod
-            ./build/${{ env.module_id }}.so
-            ./build/debug_${{ env.module_id }}.so
+            ./build/lib${{ env.module_id }}.so
+            ./build/debug_lib${{ env.module_id }}.so
           body_path: ./rl-notes.md
           draft: true
