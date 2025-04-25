@@ -10,6 +10,6 @@
 - Option to hide the Clock in replays.
 
 __**Changelog:**__
-- Update to 1.40.2_4113
+- Update to 1.40.4_5283
 - Option to hide clock in a replay
 - Automatically hide the clock when rendering a replay
