@@ -1,6 +1,5 @@
 # Clock Mod
-[![NDK build 1.15.2 Branch](https://github.com/EnderdracheLP/ClockMod/actions/workflows/buildMod.yml/badge.svg?branch=1.15.0)](https://github.com/EnderdracheLP/ClockMod/actions/workflows/buildMod.yml)
-[![NDK build 1.13.2 Legacy Branch](https://github.com/EnderdracheLP/ClockMod/actions/workflows/buildMod-Legacy.yml/badge.svg?branch=1.13.2)](https://github.com/EnderdracheLP/ClockMod/actions/workflows/buildMod-Legacy.yml)
+[![NDK build Latest](https://github.com/EnderdracheLP/ClockMod/actions/workflows/buildMod.yml/badge.svg)](https://github.com/EnderdracheLP/ClockMod/actions/workflows/buildMod.yml)
 
 Displays the time and optionally the battery percentage in the game.
 
