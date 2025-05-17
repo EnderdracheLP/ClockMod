@@ -14,7 +14,27 @@
     }
   },
   "workspace": {
-    "scripts": {},
+    "scripts": {
+      "build": [
+        "pwsh ./build.ps1"
+      ],
+      "clean": [
+        "pwsh ./build.ps1 -clean"
+      ],
+      "copy": [
+        "pwsh ./copy.ps1"
+      ],
+      "log": [
+        "pwsh ./start-logging.ps1"
+      ],
+      "qmod": [
+        "qpm s build",
+        "pwsh ./buildQMOD.ps1"
+      ],
+      "restart": [
+        "pwsh ./restart-game.ps1"
+      ]
+    },
     "ndk": "^27.2.12479018",
     "qmodIncludeDirs": [],
     "qmodIncludeFiles": [],
@@ -28,12 +48,12 @@
     },
     {
       "id": "bs-cordl",
-      "versionRange": "4004.*",
+      "versionRange": "4005.*",
       "additionalData": {}
     },
     {
       "id": "bsml",
-      "versionRange": "^0.4.51",
+      "versionRange": "^0.4.52",
       "additionalData": {}
     },
     {
