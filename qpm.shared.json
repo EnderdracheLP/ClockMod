@@ -15,11 +15,36 @@
       }
     },
     "workspace": {
-      "scripts": {},
+      "scripts": {
+        "build": [
+          "pwsh build.ps1 $0:?"
+        ],
+        "clean": [
+          "qpm s build -- -clean"
+        ],
+        "copy": [
+          "pwsh copy.ps1 $0:?"
+        ],
+        "log": [
+          "pwsh start-logging.ps1 $0:?"
+        ],
+        "qmod": [
+          "pwsh buildQMOD.ps1 ClockMod $0:?"
+        ],
+        "restart": [
+          "pwsh restart-game.ps1 $0:?"
+        ],
+        "validate": [
+          "pwsh validate-modjson.ps1 $0:?"
+        ]
+      },
       "ndk": "^27.2.12479018",
-      "qmodIncludeDirs": [],
+      "qmodIncludeDirs": [
+        "./build",
+        "./extern/libs"
+      ],
       "qmodIncludeFiles": [],
-      "qmodOutput": null
+      "qmodOutput": "ClockMod.qmod"
     },
     "dependencies": [
       {
