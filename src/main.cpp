@@ -193,7 +193,7 @@ MAKE_HOOK_MATCH(AudioTimeSyncController_StartSong, &AudioTimeSyncController::Sta
     static std::optional<bool (*)()> isInReplayFunc  = CondDeps::Find<bool>("replay", "IsInReplay");
     if (isInReplayFunc.has_value())
     {
-        static std::optional<bool (*)()> isInRenderFunc  = CondDeps::Find<bool>("replay", "IsInRender ");
+        static std::optional<bool (*)()> isInRenderFunc  = CondDeps::Find<bool>("replay", "IsInRender");
         bool isInRender = false;
         isInReplay = isInReplayFunc.value()();
         if (isInRenderFunc.has_value())
