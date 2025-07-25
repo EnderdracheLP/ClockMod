@@ -14,9 +14,19 @@
     }
   },
   "workspace": {
-    "scripts": {},
-    "ndk": "^27.2.12479018",
-    "qmodIncludeDirs": [],
+    "scripts": {
+      "build": [
+        "pwsh build.ps1"
+      ],
+      "clean": [
+        "pwsh build.ps1 -clean"
+      ]
+    },
+    "ndk": "^27.3.13750724",
+    "qmodIncludeDirs": [
+      "build",
+      "extern/libs"
+    ],
     "qmodIncludeFiles": [],
     "qmodOutput": null
   },
@@ -28,12 +38,12 @@
     },
     {
       "id": "bs-cordl",
-      "versionRange": "4007.*",
+      "versionRange": "4008.*",
       "additionalData": {}
     },
     {
       "id": "bsml",
-      "versionRange": "^0.4.54",
+      "versionRange": "^0.4.55",
       "additionalData": {}
     },
     {
