@@ -7,7 +7,7 @@
   "modloader": "Scotland2",
   "version": "${version}",
   "packageId": "com.beatgames.beatsaber",
-  "packageVersion": "1.40.7_7060",
+  "packageVersion": "1.40.8_7379",
   "description": "Displays the time in game. Alternatively also the Battery Percentage",
   "coverImage": "Cover.jpg",
   "dependencies": [],

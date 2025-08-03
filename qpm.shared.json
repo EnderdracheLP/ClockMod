@@ -15,9 +15,19 @@
       }
     },
     "workspace": {
-      "scripts": {},
-      "ndk": "^27.2.12479018",
-      "qmodIncludeDirs": [],
+      "scripts": {
+        "build": [
+          "pwsh build.ps1"
+        ],
+        "clean": [
+          "pwsh build.ps1 -clean"
+        ]
+      },
+      "ndk": "^27.3.13750724",
+      "qmodIncludeDirs": [
+        "build",
+        "extern/libs"
+      ],
       "qmodIncludeFiles": [],
       "qmodOutput": null
     },
@@ -29,12 +39,12 @@
       },
       {
         "id": "bs-cordl",
-        "versionRange": "4007.*",
+        "versionRange": "4008.*",
         "additionalData": {}
       },
       {
         "id": "bsml",
-        "versionRange": "^0.4.54",
+        "versionRange": "^0.4.55",
         "additionalData": {}
       },
       {
@@ -103,10 +113,10 @@
     {
       "dependency": {
         "id": "bs-cordl",
-        "versionRange": "=4007.0.0",
+        "versionRange": "=4008.0.0",
         "additionalData": {
           "headersOnly": true,
-          "branchName": "version/v4007_0_0",
+          "branchName": "version/v4008_0_0",
           "compileOptions": {
             "includePaths": [
               "include"
@@ -122,7 +132,7 @@
           }
         }
       },
-      "version": "4007.0.0"
+      "version": "4008.0.0"
     },
     {
       "dependency": {
@@ -226,17 +236,17 @@
     {
       "dependency": {
         "id": "bsml",
-        "versionRange": "=0.4.54",
+        "versionRange": "=0.4.55",
         "additionalData": {
-          "soLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.4.54/libbsml.so",
-          "debugSoLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.4.54/debug_libbsml.so",
+          "soLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.4.55/libbsml.so",
+          "debugSoLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.4.55/debug_libbsml.so",
           "overrideSoName": "libbsml.so",
-          "modLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.4.54/BSML.qmod",
-          "branchName": "version/v0_4_54",
+          "modLink": "https://github.com/bsq-ports/Quest-BSML/releases/download/v0.4.55/BSML.qmod",
+          "branchName": "version/v0_4_55",
           "cmake": true
         }
       },
-      "version": "0.4.54"
+      "version": "0.4.55"
     },
     {
       "dependency": {
