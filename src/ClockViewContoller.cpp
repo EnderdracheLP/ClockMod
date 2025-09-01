@@ -50,8 +50,10 @@ namespace ClockMod {
             
             std::string sessionTime = "\nSession Time -  " + ClockUpdater::getTimerString(ClockUpdater::getInstance()->getSessionTimeSeconds());
 
+            std::string stopwatchTime = "\nStopwatch Time -  " + ClockUpdater::getTimerString(ClockUpdater::getInstance()->getStopwatchSeconds());
+
             if (TimeInfo && SettingsOpen)
-                TimeInfo->set_text(std::string(timeInformation) + UTCtime + sessionTime);
+                TimeInfo->set_text(std::string(timeInformation) + UTCtime + sessionTime + stopwatchTime);
             co_yield reinterpret_cast<System::Collections::IEnumerator*>(UnityEngine::WaitForSecondsRealtime::New_ctor(0.1));
         }
         co_return;
@@ -72,7 +74,7 @@ namespace ClockMod {
                 std::string timeFormat = "Your Timezone -  %Z\nUTC offset -  %z";
                 strftime(timeInformation, sizeof(timeInformation), timeFormat.c_str(), instance->getTimeInfo());
                 // We have to specify sizeDelta here otherwise things will overlap
-                TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal, {0,0}, {0,20});
+                TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal, {0,0}, {0,5*5});
                 // TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal);
 
                 ColorPicker = BSML::Lite::CreateColorPickerModal(parent, getModConfig().ClockColor.GetName(), getModConfig().ClockColor.GetValue(),

@@ -4,13 +4,13 @@
 
 enum class ClockTypes {
     CurrentTime,
-    SessionTime
-    // CustomTimer
+    SessionTime,
+    Stopwatch
 };
 static std::string_view clockTypeStrs[] = {
     "Current Time",
-    "Session Time"
-    // Custom Timer
+    "Session Time",
+    "Stopwatch"
 };
 
 // This containts all the ClockPositions
