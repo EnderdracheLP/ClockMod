@@ -205,12 +205,15 @@ namespace ClockMod {
             text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
         }
 
+        static double lastSessionTimeSeconds = Time::get_realtimeSinceStartup();
+
         this_time = clock();
         sessionTimeSeconds = Time::get_realtimeSinceStartup();
-        if(!getModConfig().StopwatchPaused.GetValue()) stopwatchSeconds += (double)(this_time - last_time) / CLOCKS_PER_SEC;
+        if(!getModConfig().StopwatchPaused.GetValue()) stopwatchSeconds += sessionTimeSeconds - lastSessionTimeSeconds;
         time_counter += (double)(this_time - last_time);
 
         last_time = this_time;
+        lastSessionTimeSeconds = sessionTimeSeconds;
 
         if (!(time_counter > (double)(NUM_SECONDS * CLOCKS_PER_SEC)))
         {
