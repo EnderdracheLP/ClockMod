@@ -301,6 +301,10 @@ namespace ClockMod {
         return stopwatchSeconds;
     }
 
+    void ClockUpdater::resetStopwatch() {
+        stopwatchSeconds = 0;
+    }
+
     TMPro::TextMeshProUGUI* ClockUpdater::getTextMesh() {
         return text;
     }

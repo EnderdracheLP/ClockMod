@@ -41,6 +41,7 @@ public:
     struct tm* getTimeInfoUTC();
     const double getSessionTimeSeconds() const;
     const double getStopwatchSeconds() const;
+    void resetStopwatch();
     TMPro::TextMeshProUGUI* getTextMesh();
     void SetColor(UnityEngine::Color color);
     static ClockUpdater* getInstance();

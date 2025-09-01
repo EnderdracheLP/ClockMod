@@ -10,6 +10,7 @@ using namespace ClockMod;
 #include "bsml/shared/BSML/Components/ModalColorPicker.hpp"
 #include "custom-types/shared/coroutine.hpp"
 #include "custom-types/shared/macros.hpp"
+#include "custom-types/shared/delegate.hpp"
 
 #include "HMUI/CurvedTextMeshPro.hpp"
 #include "HMUI/ScrollView.hpp"
@@ -23,6 +24,8 @@ using namespace ClockMod;
 #include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/Color.hpp"
 #include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/UI/Button.hpp"
+#include "UnityEngine/UI/LayoutElement.hpp"
 #include "UnityEngine/WaitForSecondsRealtime.hpp"
 
 
@@ -89,6 +92,19 @@ namespace ClockMod {
                     }
                     );
             }
+
+            auto stopwatchPauseButton = BSML::Lite::CreateUIButton(parent, getModConfig().StopwatchPaused.GetValue() ? "Start" : "Pause", {68, -19.9}, {-5, 0}, nullptr);
+            stopwatchPauseButton->GetComponent<UI::LayoutElement*>()->set_ignoreLayout(true);
+            stopwatchPauseButton->get_onClick()->AddListener(custom_types::MakeDelegate<Events::UnityAction*>(std::function<void()>([stopwatchPauseButton](){
+                getModConfig().StopwatchPaused.SetValue(!getModConfig().StopwatchPaused.GetValue());
+                if(getModConfig().StopwatchPaused.GetValue()) BSML::Lite::SetButtonText(stopwatchPauseButton, "Start");
+                else BSML::Lite::SetButtonText(stopwatchPauseButton, "Pause");
+            })));
+            auto stopwatchResetButton = BSML::Lite::CreateUIButton(parent, "Reset", {83, -19.9}, {-5, 8}, nullptr);
+            stopwatchResetButton->GetComponent<UI::LayoutElement*>()->set_ignoreLayout(true);
+            stopwatchResetButton->get_onClick()->AddListener(custom_types::MakeDelegate<Events::UnityAction*>(std::function<void()>([](){
+                if(ClockMod::ClockUpdater::getInstance()) ClockMod::ClockUpdater::getInstance()->resetStopwatch();
+            })));
 
             AddConfigValueDropdownEnum(parent, getModConfig().ClockType, clockTypeStrs);
             AddConfigValueToggle(parent, getModConfig().InSong);
