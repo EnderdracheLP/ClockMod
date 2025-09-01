@@ -27,6 +27,8 @@ private:
     time_t rawtime;
     struct tm* timeinfo;
 
+    double sessionTime = 0;
+
     static ClockUpdater* instance;
 
     std::string _message;

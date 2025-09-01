@@ -10,6 +10,7 @@
 #include "UnityEngine/BatteryStatus.hpp"
 #include "UnityEngine/GradientColorKey.hpp"
 #include "UnityEngine/SystemInfo.hpp"
+#include "UnityEngine/Time.hpp"
 
 using namespace UnityEngine;
 using namespace TMPro;
@@ -208,6 +209,8 @@ namespace ClockMod {
         time_counter += (double)(this_time - last_time);
 
         last_time = this_time;
+
+        sessionTime = Time::get_realtimeSinceStartup();
 
         if (!(time_counter > (double)(NUM_SECONDS * CLOCKS_PER_SEC)))
         {
