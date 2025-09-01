@@ -231,14 +231,9 @@ namespace ClockMod {
             ClockPos.ap1 = (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1);
 
             std::string clockresult;
-
-            if (_message.empty()) {
-                // Gets the time using the function at the top.
-                clockresult = getTimeString((struct tm*)timeinfo);
-            } 
-            else {
-                clockresult = _message;
-            }
+            if(!_message.empty()) clockresult = _message;
+            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::SessionTime)) clockresult = getTimerString(sessionTime);
+            else clockresult = getTimeString((struct tm*)timeinfo);
 
             // Checks, if the clock is set to rainbowify
             if (getModConfig().RainbowClock.GetValue()) {
