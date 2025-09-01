@@ -27,7 +27,7 @@ private:
     time_t rawtime;
     struct tm* timeinfo;
 
-    double sessionTime = 0;
+    double sessionTimeSeconds = 0;
 
     static ClockUpdater* instance;
 
@@ -38,7 +38,7 @@ public:
     const time_t getRawTime() const;
     struct tm* getTimeInfo();
     struct tm* getTimeInfoUTC();
-    const double getSessionTime() const;
+    const double getSessionTimeSeconds() const;
     TMPro::TextMeshProUGUI* getTextMesh();
     void SetColor(UnityEngine::Color color);
     static ClockUpdater* getInstance();

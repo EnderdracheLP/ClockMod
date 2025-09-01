@@ -210,7 +210,7 @@ namespace ClockMod {
 
         last_time = this_time;
 
-        sessionTime = Time::get_realtimeSinceStartup();
+        sessionTimeSeconds = Time::get_realtimeSinceStartup();
 
         if (!(time_counter > (double)(NUM_SECONDS * CLOCKS_PER_SEC)))
         {
@@ -232,7 +232,7 @@ namespace ClockMod {
 
             std::string clockresult;
             if(!_message.empty()) clockresult = _message;
-            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::SessionTime)) clockresult = getTimerString(sessionTime);
+            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::SessionTime)) clockresult = getTimerString(sessionTimeSeconds);
             else clockresult = getTimeString((struct tm*)timeinfo);
 
             // Checks, if the clock is set to rainbowify
@@ -281,8 +281,8 @@ namespace ClockMod {
         return gmtime(&time);
     }
 
-    const double ClockUpdater::getSessionTime() const {
-        return sessionTime;
+    const double ClockUpdater::getSessionTimeSeconds() const {
+        return sessionTimeSeconds;
     }
 
     TMPro::TextMeshProUGUI* ClockUpdater::getTextMesh() {
