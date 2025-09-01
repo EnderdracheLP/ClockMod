@@ -42,11 +42,15 @@ namespace ClockMod {
         while (SettingsOpen) {
             char timeInformation[45];
             strftime(timeInformation, sizeof(timeInformation), "Your Timezone -  %Z    UTC offset -  %z", ClockUpdater::getInstance()->getTimeInfo());
+
             char UTCtime[40];
             strftime(UTCtime, sizeof(UTCtime), std::string("\r\n Current Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), ClockUpdater::getInstance()->getTimeInfoUTC());
             //strftime(UTCtime, sizeof(UTCtime), std::string("\r\n Current Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), gmtime(ClockUpdater::getInstance()->getRawTime()));
+            
+            std::string sessionTime = "\nSession Time -  " + ClockUpdater::getTimerString(ClockUpdater::getInstance()->getSessionTime());
+
             if (TimeInfo && SettingsOpen)
-                TimeInfo->set_text(std::string(timeInformation) + UTCtime);
+                TimeInfo->set_text(std::string(timeInformation) + UTCtime + sessionTime);
             co_yield reinterpret_cast<System::Collections::IEnumerator*>(UnityEngine::WaitForSecondsRealtime::New_ctor(0.1));
         }
         co_return;
@@ -67,7 +71,7 @@ namespace ClockMod {
                 std::string timeFormat = "Your Timezone -  %Z\nUTC offset -  %z";
                 strftime(timeInformation, sizeof(timeInformation), timeFormat.c_str(), instance->getTimeInfo());
                 // We have to specify sizeDelta here otherwise things will overlap
-                TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal, {0,0}, {0,15});
+                TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal, {0,0}, {0,20});
                 // TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal);
 
                 ColorPicker = BSML::Lite::CreateColorPickerModal(parent, getModConfig().ClockColor.GetName(), getModConfig().ClockColor.GetValue(),

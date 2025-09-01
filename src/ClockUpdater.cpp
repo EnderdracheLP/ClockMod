@@ -55,7 +55,7 @@ namespace ClockMod {
     }
 
     // Turns an uncapped duration in seconds into a nicely formatted string
-    std::string getTimerString(double totalSeconds) {
+    std::string ClockUpdater::getTimerString(const double totalSeconds) {
         int seconds = (int)totalSeconds % 60;
         int minutes = (int)(totalSeconds / 60) % 60;
         int hours = (int)(totalSeconds / 60 / 60) % 24;
@@ -284,6 +284,10 @@ namespace ClockMod {
     struct tm* ClockUpdater::getTimeInfoUTC() {
         time_t time = rawtime;
         return gmtime(&time);
+    }
+
+    const double ClockUpdater::getSessionTime() const {
+        return sessionTime;
     }
 
     TMPro::TextMeshProUGUI* ClockUpdater::getTextMesh() {
