@@ -1,5 +1,6 @@
 #include "ClockModConfig.hpp"
 #include "ClockUpdater.hpp"
+#include "ClockValues.hpp"
 #include "ClockViewController.hpp"
 using namespace ClockMod;
 
@@ -87,6 +88,7 @@ namespace ClockMod {
                     );
             }
 
+            AddConfigValueDropdownEnum(parent, getModConfig().ClockType, clockTypeStrs);
             AddConfigValueToggle(parent, getModConfig().InSong);
             AddConfigValueToggle(parent, getModConfig().InReplay);
             AddConfigValueToggle(parent, getModConfig().TwelveToggle);
