@@ -3,6 +3,7 @@
 
 DECLARE_CONFIG(ModConfig) {
 
+    CONFIG_VALUE(ClockType,     int,   "Clock Type",                  0,     "Which time the Clock should display.");
     CONFIG_VALUE(InSong,        bool,  "Show During Song",            true,  "If the Clock should be shown while playing a beatmap.");
     CONFIG_VALUE(InReplay,      bool,  "Show During Replay",          true,  "If the Clock should be shown while playing a replay.");
     CONFIG_VALUE(TwelveToggle,  bool,  "24/12 Toggle",                false, "If time should be in 12 or 24 hour format.");

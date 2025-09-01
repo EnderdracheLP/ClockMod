@@ -2,6 +2,17 @@
 #include "UnityEngine/Vector3.hpp"
 #include "UnityEngine/UI/VerticalLayoutGroup.hpp"
 
+enum class ClockTypes {
+    CurrentTime,
+    SessionTime
+    // CustomTimer
+};
+static std::string_view clockTypeStrs[] = {
+    "Current Time",
+    "Session Time"
+    // Custom Timer
+};
+
 // This containts all the ClockPositions
 struct ClockPos_t {
     // Clock InMenu Positions Top                                           X        Y        Z
