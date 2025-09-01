@@ -65,8 +65,8 @@ namespace ClockMod {
 
         std::string timerStr;
         if(days > 0) timerStr += fmt::format("{}:", days);
-        if(hours > 0 || !timerStr.empty() || !showSeconds) timerStr += fmt::format("{:02}:", hours);
-        timerStr += fmt::format("{:02}", minutes);
+        if(hours > 0 || !timerStr.empty() || !showSeconds) timerStr += timerStr.empty() ? fmt::format("{}:", hours) : fmt::format("{:02}:", hours);
+        timerStr += timerStr.empty() ? fmt::format("{}", minutes) : fmt::format("{:02}", minutes);
         if(showSeconds) timerStr += fmt::format(":{:02}", seconds);
 
         return timerStr;
