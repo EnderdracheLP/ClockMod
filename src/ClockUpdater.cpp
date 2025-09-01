@@ -53,6 +53,24 @@ namespace ClockMod {
         return time;
     }
 
+    // Turns an uncapped duration in seconds into a nicely formatted string
+    std::string getTimerString(double totalSeconds) {
+        int seconds = (int)totalSeconds % 60;
+        int minutes = (int)(totalSeconds / 60) % 60;
+        int hours = (int)(totalSeconds / 60 / 60) % 24;
+        int days = (int)(totalSeconds / 60 / 60 / 24);
+
+        bool showSeconds = getModConfig().SecToggle.GetValue();
+
+        std::string timerStr;
+        if(days > 0) timerStr += fmt::format("{}:", days);
+        if(hours > 0 || !timerStr.empty() || !showSeconds) timerStr += fmt::format("{:02}:", hours);
+        timerStr += fmt::format("{:02}", minutes);
+        if(showSeconds) timerStr += fmt::format(":{:02}", seconds);
+
+        return timerStr;
+    }
+
     // New Battery Percentage Formatting
     std::string getBatteryString(float level, UnityEngine::BatteryStatus status, ClockMod::ClockUpdater* instance)
     {
