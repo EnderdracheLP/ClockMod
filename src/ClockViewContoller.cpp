@@ -45,7 +45,7 @@ namespace ClockMod {
             strftime(timeInformation, sizeof(timeInformation), "Your Timezone -  %Z    UTC offset -  %z", ClockUpdater::getInstance()->getTimeInfo());
 
             char UTCtime[40];
-            strftime(UTCtime, sizeof(UTCtime), std::string("\r\n Current Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), ClockUpdater::getInstance()->getTimeInfoUTC());
+            strftime(UTCtime, sizeof(UTCtime), std::string("\r\nCurrent Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), ClockUpdater::getInstance()->getTimeInfoUTC());
             //strftime(UTCtime, sizeof(UTCtime), std::string("\r\n Current Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), gmtime(ClockUpdater::getInstance()->getRawTime()));
             
             std::string sessionTime = "\nSession Time -  " + ClockUpdater::getTimerString(ClockUpdater::getInstance()->getSessionTime());
