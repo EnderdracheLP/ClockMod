@@ -155,6 +155,7 @@ namespace ClockMod {
 
         text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
         clockParent = get_transform()->GetParent();
+        stopwatchSeconds = getModConfig().StopwatchSeconds.GetValue();
         getModConfig().ClockColor.AddChangeEvent([this](UnityEngine::Color color) {
             if (text)
                 text->set_color(color);
@@ -216,6 +217,14 @@ namespace ClockMod {
             return;
         }
         time_counter = 0;
+
+        // Scuffed, but not any more than the rest of this codebase
+        static int stopwatchSaveTimer = 0;
+        stopwatchSaveTimer++;
+        if(stopwatchSaveTimer > 10 / NUM_SECONDS && !Config.IsInSong) { // Avoid dropping frames during gameplay
+            getModConfig().StopwatchSeconds.SetValue(stopwatchSeconds);
+            stopwatchSaveTimer = 0;
+        }
 
         if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
             time(&rawtime);
