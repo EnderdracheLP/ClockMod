@@ -55,7 +55,7 @@ namespace ClockMod {
     }
 
     // Turns an uncapped duration in seconds into a nicely formatted string
-    std::string ClockUpdater::getTimerString(const double totalSeconds) {
+    std::string ClockUpdater::getStopwatchString(const double totalSeconds) {
         int seconds = (int)totalSeconds % 60;
         int minutes = (int)(totalSeconds / 60) % 60;
         int hours = (int)(totalSeconds / 60 / 60) % 24;
@@ -63,13 +63,13 @@ namespace ClockMod {
 
         bool showSeconds = getModConfig().SecToggle.GetValue();
 
-        std::string timerStr;
-        if(days > 0) timerStr += fmt::format("{}:", days);
-        if(hours > 0 || !timerStr.empty() || !showSeconds) timerStr += timerStr.empty() ? fmt::format("{}:", hours) : fmt::format("{:02}:", hours);
-        timerStr += timerStr.empty() ? fmt::format("{}", minutes) : fmt::format("{:02}", minutes);
-        if(showSeconds) timerStr += fmt::format(":{:02}", seconds);
+        std::string stopwatchStr;
+        if(days > 0) stopwatchStr += fmt::format("{}:", days);
+        if(hours > 0 || !stopwatchStr.empty() || !showSeconds) stopwatchStr += stopwatchStr.empty() ? fmt::format("{}:", hours) : fmt::format("{:02}:", hours);
+        stopwatchStr += stopwatchStr.empty() ? fmt::format("{}", minutes) : fmt::format("{:02}", minutes);
+        if(showSeconds) stopwatchStr += fmt::format(":{:02}", seconds);
 
-        return timerStr;
+        return stopwatchStr;
     }
 
     // New Battery Percentage Formatting
@@ -246,9 +246,9 @@ namespace ClockMod {
 
             std::string clockresult;
             if(!_message.empty()) clockresult = _message;
-            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::SessionTime)) clockresult = getTimerString(sessionTimeSeconds);
-            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::Stopwatch1)) clockresult = getTimerString(stopwatch1Seconds);
-            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::Stopwatch2)) clockresult = getTimerString(stopwatch2Seconds);
+            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::SessionTime)) clockresult = getStopwatchString(sessionTimeSeconds);
+            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::Stopwatch1)) clockresult = getStopwatchString(stopwatch1Seconds);
+            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::Stopwatch2)) clockresult = getStopwatchString(stopwatch2Seconds);
             else clockresult = getTimeString((struct tm*)timeinfo);
 
             // Checks, if the clock is set to rainbowify

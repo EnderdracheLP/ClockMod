@@ -49,7 +49,7 @@ public:
     void SetColor(UnityEngine::Color color);
     static ClockUpdater* getInstance();
     static std::string getTimeFormat();
-    static std::string getTimerString(const double totalSeconds);
+    static std::string getStopwatchString(const double totalSeconds);
     void ShowMessage(std::string message, int duration = 4);
 
 };

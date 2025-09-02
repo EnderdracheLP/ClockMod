@@ -51,10 +51,9 @@ namespace ClockMod {
             strftime(UTCtime, sizeof(UTCtime), std::string("\r\nCurrent Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), ClockUpdater::getInstance()->getTimeInfoUTC());
             //strftime(UTCtime, sizeof(UTCtime), std::string("\r\n Current Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), gmtime(ClockUpdater::getInstance()->getRawTime()));
             
-            std::string sessionTime = "\nSession Time -  " + ClockUpdater::getTimerString(ClockUpdater::getInstance()->getSessionTimeSeconds());
-
-            std::string stopwatch1Time = "\nStopwatch 1 Time -  " + ClockUpdater::getTimerString(ClockUpdater::getInstance()->getStopwatch1Seconds());
-            std::string stopwatch2Time = "\nStopwatch 2 Time -  " + ClockUpdater::getTimerString(ClockUpdater::getInstance()->getStopwatch2Seconds());
+            std::string sessionTime = "\nSession Time -  " + ClockUpdater::getStopwatchString(ClockUpdater::getInstance()->getSessionTimeSeconds());
+            std::string stopwatch1Time = "\nStopwatch 1 Time -  " + ClockUpdater::getStopwatchString(ClockUpdater::getInstance()->getStopwatch1Seconds());
+            std::string stopwatch2Time = "\nStopwatch 2 Time -  " + ClockUpdater::getStopwatchString(ClockUpdater::getInstance()->getStopwatch2Seconds());
 
             if (TimeInfo && SettingsOpen)
                 TimeInfo->set_text(std::string(timeInformation) + UTCtime + sessionTime + stopwatch1Time + stopwatch2Time);
