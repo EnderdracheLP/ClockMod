@@ -28,7 +28,8 @@ private:
     struct tm* timeinfo;
 
     double sessionTimeSeconds = 0;
-    double stopwatchSeconds = 0;
+    double stopwatch1Seconds = 0;
+    double stopwatch2Seconds = 0;
 
     static ClockUpdater* instance;
 
@@ -40,8 +41,10 @@ public:
     struct tm* getTimeInfo();
     struct tm* getTimeInfoUTC();
     const double getSessionTimeSeconds() const;
-    const double getStopwatchSeconds() const;
-    void resetStopwatch();
+    const double getStopwatch1Seconds() const;
+    const double getStopwatch2Seconds() const;
+    void resetStopwatch1();
+    void resetStopwatch2();
     TMPro::TextMeshProUGUI* getTextMesh();
     void SetColor(UnityEngine::Color color);
     static ClockUpdater* getInstance();

@@ -4,8 +4,10 @@
 DECLARE_CONFIG(ModConfig) {
 
     CONFIG_VALUE(ClockType,          int,    "Clock Type",                  0,     "Which time the Clock should display.");
-    CONFIG_VALUE(StopwatchSeconds,   int,    "Stopwatch Seconds",           0,     "The saved time on the stopwatch.");
-    CONFIG_VALUE(StopwatchPaused,    bool,   "Stopwatch Paused",            true,  "If the stopwatch is locked from incrementing.")
+    CONFIG_VALUE(Stopwatch1Seconds,  int,    "Stopwatch 1 Seconds",         0,     "The saved time on stopwatch 1.");
+    CONFIG_VALUE(Stopwatch2Seconds,  int,    "Stopwatch 2 Seconds",         0,     "The saved time on stopwatch 2.");
+    CONFIG_VALUE(Stopwatch1Paused,   bool,   "Stopwatch 1 Paused",          true,  "If stopwatch 1 is locked from incrementing.");
+    CONFIG_VALUE(Stopwatch2Paused,   bool,   "Stopwatch 2 Paused",          true,  "If stopwatch 2 is locked from incrementing.");
     CONFIG_VALUE(InSong,             bool,   "Show During Song",            true,  "If the Clock should be shown while playing a beatmap.");
     CONFIG_VALUE(InReplay,           bool,   "Show During Replay",          true,  "If the Clock should be shown while playing a replay.");
     CONFIG_VALUE(TwelveToggle,       bool,   "24/12 Toggle",                false, "If time should be in 12 or 24 hour format.");

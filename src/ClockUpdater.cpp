@@ -155,7 +155,8 @@ namespace ClockMod {
 
         text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
         clockParent = get_transform()->GetParent();
-        stopwatchSeconds = getModConfig().StopwatchSeconds.GetValue();
+        stopwatch1Seconds = getModConfig().Stopwatch1Seconds.GetValue();
+        stopwatch2Seconds = getModConfig().Stopwatch2Seconds.GetValue();
         getModConfig().ClockColor.AddChangeEvent([this](UnityEngine::Color color) {
             if (text)
                 text->set_color(color);
@@ -209,7 +210,8 @@ namespace ClockMod {
 
         this_time = clock();
         sessionTimeSeconds = Time::get_realtimeSinceStartup();
-        if(!getModConfig().StopwatchPaused.GetValue()) stopwatchSeconds += sessionTimeSeconds - lastSessionTimeSeconds;
+        if(!getModConfig().Stopwatch1Paused.GetValue()) stopwatch1Seconds += sessionTimeSeconds - lastSessionTimeSeconds;
+        if(!getModConfig().Stopwatch2Paused.GetValue()) stopwatch2Seconds += sessionTimeSeconds - lastSessionTimeSeconds;
         time_counter += (double)(this_time - last_time);
 
         last_time = this_time;
@@ -225,7 +227,8 @@ namespace ClockMod {
         static int stopwatchSaveTimer = 0;
         stopwatchSaveTimer++;
         if(stopwatchSaveTimer > 10 / NUM_SECONDS && !Config.IsInSong) { // Avoid dropping frames during gameplay
-            getModConfig().StopwatchSeconds.SetValue(stopwatchSeconds);
+            getModConfig().Stopwatch1Seconds.SetValue(stopwatch1Seconds);
+            getModConfig().Stopwatch2Seconds.SetValue(stopwatch2Seconds);
             stopwatchSaveTimer = 0;
         }
 
@@ -244,7 +247,8 @@ namespace ClockMod {
             std::string clockresult;
             if(!_message.empty()) clockresult = _message;
             else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::SessionTime)) clockresult = getTimerString(sessionTimeSeconds);
-            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::Stopwatch)) clockresult = getTimerString(stopwatchSeconds);
+            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::Stopwatch1)) clockresult = getTimerString(stopwatch1Seconds);
+            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::Stopwatch2)) clockresult = getTimerString(stopwatch2Seconds);
             else clockresult = getTimeString((struct tm*)timeinfo);
 
             // Checks, if the clock is set to rainbowify
@@ -297,12 +301,20 @@ namespace ClockMod {
         return sessionTimeSeconds;
     }
 
-    const double ClockUpdater::getStopwatchSeconds() const {
-        return stopwatchSeconds;
+    const double ClockUpdater::getStopwatch1Seconds() const {
+        return stopwatch1Seconds;
     }
 
-    void ClockUpdater::resetStopwatch() {
-        stopwatchSeconds = 0;
+    const double ClockUpdater::getStopwatch2Seconds() const {
+        return stopwatch2Seconds;
+    }
+
+    void ClockUpdater::resetStopwatch1() {
+        stopwatch1Seconds = 0;
+    }
+
+    void ClockUpdater::resetStopwatch2() {
+        stopwatch2Seconds = 0;
     }
 
     TMPro::TextMeshProUGUI* ClockUpdater::getTextMesh() {
