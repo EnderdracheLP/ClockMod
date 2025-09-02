@@ -1,6 +1,7 @@
 #pragma once
 #include "UnityEngine/Vector3.hpp"
 #include "UnityEngine/UI/VerticalLayoutGroup.hpp"
+#include <string_view>
 
 enum class ClockTypes {
     CurrentTime,
