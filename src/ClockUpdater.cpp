@@ -226,7 +226,7 @@ namespace ClockMod {
         // Scuffed, but not any more than the rest of this codebase
         static int stopwatchSaveTimer = 0;
         stopwatchSaveTimer++;
-        if(stopwatchSaveTimer > 10 / NUM_SECONDS && !Config.IsInSong) { // Avoid dropping frames during gameplay
+        if(stopwatchSaveTimer > 5 / NUM_SECONDS && !Config.IsInSong) { // Avoid dropping frames during gameplay
             getModConfig().Stopwatch1Seconds.SetValue(stopwatch1Seconds);
             getModConfig().Stopwatch2Seconds.SetValue(stopwatch2Seconds);
             stopwatchSaveTimer = 0;
