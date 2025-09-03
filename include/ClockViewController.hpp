@@ -6,11 +6,12 @@
 
 DECLARE_CLASS_CODEGEN(ClockMod, ClockViewController, HMUI::ViewController) {
 
-    DECLARE_OVERRIDE_METHOD(void, DidActivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidActivate", 3), bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
-    DECLARE_OVERRIDE_METHOD(void, DidDeactivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidDeactivate", 2), bool removedFromHierarchy, bool systemScreenDisabling);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, DidDeactivate, &HMUI::ViewController::DidDeactivate, bool removedFromHierarchy, bool systemScreenDisabling);
 
     DECLARE_INSTANCE_FIELD(BSML::ModalColorPicker*, ColorPicker);
     DECLARE_INSTANCE_FIELD(HMUI::CurvedTextMeshPro*, TimeInfo);
+    DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, timeInfoRoutine);
 
     custom_types::Helpers::Coroutine UpdateTimeText();
     bool SettingsOpen;

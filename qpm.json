@@ -1,5 +1,4 @@
 {
-  "$schema": "https://raw.githubusercontent.com/QuestPackageManager/QPM.Package/refs/heads/main/qpm.schema.json",
   "version": "0.4.0",
   "sharedDir": "shared",
   "dependenciesDir": "extern",
@@ -22,7 +21,7 @@
         "pwsh build.ps1 -clean"
       ]
     },
-    "ndk": "^27.3.13750724",
+    "ndk": "^27.2.12479018",
     "qmodIncludeDirs": [
       "build",
       "extern/libs"

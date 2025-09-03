@@ -138,11 +138,6 @@ namespace ClockMod {
     //        BeatSaberUI::AddHoverHint(AddConfigValueIncrementFloat(parent, getModConfig().ClockYOffset, 1, 0.1f, -10.0f, 10.0f)->get_gameObject(), "Offsets the Y (Up/Down) Position of the Clock");
     //        BeatSaberUI::AddHoverHint(AddConfigValueIncrementFloat(parent, getModConfig().ClockZOffset, 1, 0.1f, -10.0f, 10.0f)->get_gameObject(), "Offsets the Z (Forward/Backward) Position of the Clock");
 
-            //BeatSaberUI::CreateColorPicker(parent, getModConfig().ClockColor.GetName(), getModConfig().ClockColor.GetValue(),
-            //    [](UnityEngine::Color value, GlobalNamespace::ColorChangeUIEventType eventType) {
-            //        getModConfig().ClockColor.SetValue(value);
-            //    });
-
             if (ColorPicker)
                 BSML::Lite::CreateUIButton(parent, "Change ClockColor", [this] {
                     ColorPicker->modalView->Show();
@@ -150,11 +145,15 @@ namespace ClockMod {
                 );
 
         }
-        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(UpdateTimeText()));
+        timeInfoRoutine = StartCoroutine(custom_types::Helpers::CoroutineHelper::New(UpdateTimeText()));
     }
     void ClockViewController::DidDeactivate(bool removedFromHierarchy, bool systemScreenDisabling) {
         SettingsOpen = false;
-        StopAllCoroutines();
+        if (timeInfoRoutine) {
+            StopCoroutine(timeInfoRoutine);
+            timeInfoRoutine = nullptr;
+        }
+        // StopAllCoroutines();
         //Config.InSettings = false;
     }
 }

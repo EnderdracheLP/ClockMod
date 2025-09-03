@@ -550,6 +550,7 @@ MOD_EXPORT void late_load() {
 
     custom_types::Register::AutoRegister();
     BSML::Register::RegisterSettingsMenu<ClockMod::ClockViewController*>("ClockMod");
+    BSML::Register::RegisterMainMenu<ClockMod::ClockViewController*>("ClockMod", "ClockMod", "Open the ClockMod Settings");
 
     if (timeinfo && (timeinfo->tm_mon == 2 && timeinfo->tm_mday == 31) || (timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1)) {
         INSTALL_HOOK(hkLog, ResultsViewController_DidActivate);
