@@ -1,5 +1,6 @@
 #include "ClockModConfig.hpp"
 #include "ClockUpdater.hpp"
+#include "ClockValues.hpp"
 #include "ClockViewController.hpp"
 using namespace ClockMod;
 
@@ -9,6 +10,7 @@ using namespace ClockMod;
 #include "bsml/shared/BSML/Components/ModalColorPicker.hpp"
 #include "custom-types/shared/coroutine.hpp"
 #include "custom-types/shared/macros.hpp"
+#include "custom-types/shared/delegate.hpp"
 
 #include "HMUI/CurvedTextMeshPro.hpp"
 #include "HMUI/ScrollView.hpp"
@@ -22,6 +24,8 @@ using namespace ClockMod;
 #include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/Color.hpp"
 #include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/UI/Button.hpp"
+#include "UnityEngine/UI/LayoutElement.hpp"
 #include "UnityEngine/WaitForSecondsRealtime.hpp"
 
 
@@ -42,11 +46,17 @@ namespace ClockMod {
         while (SettingsOpen) {
             char timeInformation[45];
             strftime(timeInformation, sizeof(timeInformation), "Your Timezone -  %Z    UTC offset -  %z", ClockUpdater::getInstance()->getTimeInfo());
+
             char UTCtime[40];
-            strftime(UTCtime, sizeof(UTCtime), std::string("\r\n Current Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), ClockUpdater::getInstance()->getTimeInfoUTC());
+            strftime(UTCtime, sizeof(UTCtime), std::string("\r\nCurrent Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), ClockUpdater::getInstance()->getTimeInfoUTC());
             //strftime(UTCtime, sizeof(UTCtime), std::string("\r\n Current Time in UTC -  " + ClockUpdater::getTimeFormat()).c_str(), gmtime(ClockUpdater::getInstance()->getRawTime()));
+            
+            std::string sessionTime = "\nSession Time -  " + ClockUpdater::getStopwatchString(ClockUpdater::getInstance()->getSessionTimeSeconds());
+            std::string stopwatch1Time = "\nStopwatch 1 Time -  " + ClockUpdater::getStopwatchString(ClockUpdater::getInstance()->getStopwatch1Seconds());
+            std::string stopwatch2Time = "\nStopwatch 2 Time -  " + ClockUpdater::getStopwatchString(ClockUpdater::getInstance()->getStopwatch2Seconds());
+
             if (TimeInfo && SettingsOpen)
-                TimeInfo->set_text(std::string(timeInformation) + UTCtime);
+                TimeInfo->set_text(std::string(timeInformation) + UTCtime + sessionTime + stopwatch1Time + stopwatch2Time);
             co_yield reinterpret_cast<System::Collections::IEnumerator*>(UnityEngine::WaitForSecondsRealtime::New_ctor(0.1));
         }
         co_return;
@@ -67,7 +77,7 @@ namespace ClockMod {
                 std::string timeFormat = "Your Timezone -  %Z\nUTC offset -  %z";
                 strftime(timeInformation, sizeof(timeInformation), timeFormat.c_str(), instance->getTimeInfo());
                 // We have to specify sizeDelta here otherwise things will overlap
-                TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal, {0,0}, {0,15});
+                TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal, {0,0}, {0,5*6});
                 // TimeInfo = BSML::Lite::CreateText(parent, std::string(timeInformation), TMPro::FontStyles::Normal);
 
                 ColorPicker = BSML::Lite::CreateColorPickerModal(parent, getModConfig().ClockColor.GetName(), getModConfig().ClockColor.GetValue(),
@@ -83,6 +93,38 @@ namespace ClockMod {
                     );
             }
 
+            // Could optimize these into a small lambda or #define, but there's only two as of now so it's not that big a deal
+            auto stopwatch1PauseButton = BSML::Lite::CreateUIButton(parent, getModConfig().Stopwatch1Paused.GetValue() ? "Start" : "Pause", {70, -19.9}, {-5, 0}, nullptr);
+            stopwatch1PauseButton->GetComponent<UI::LayoutElement*>()->set_ignoreLayout(true);
+            stopwatch1PauseButton->get_transform()->set_localScale({0.9, 0.9, 0.9});
+            stopwatch1PauseButton->get_onClick()->AddListener(custom_types::MakeDelegate<Events::UnityAction*>(std::function<void()>([stopwatch1PauseButton](){
+                getModConfig().Stopwatch1Paused.SetValue(!getModConfig().Stopwatch1Paused.GetValue());
+                if(getModConfig().Stopwatch1Paused.GetValue()) BSML::Lite::SetButtonText(stopwatch1PauseButton, "Start");
+                else BSML::Lite::SetButtonText(stopwatch1PauseButton, "Pause");
+            })));
+            auto stopwatch1ResetButton = BSML::Lite::CreateUIButton(parent, "Reset", {83.5, -19.9}, {-5, 0}, nullptr);
+            stopwatch1ResetButton->GetComponent<UI::LayoutElement*>()->set_ignoreLayout(true);
+            stopwatch1ResetButton->get_transform()->set_localScale({0.9, 0.9, 0.9});
+            stopwatch1ResetButton->get_onClick()->AddListener(custom_types::MakeDelegate<Events::UnityAction*>(std::function<void()>([](){
+                if(ClockMod::ClockUpdater::getInstance()) ClockMod::ClockUpdater::getInstance()->resetStopwatch1();
+            })));
+
+            auto stopwatch2PauseButton = BSML::Lite::CreateUIButton(parent, getModConfig().Stopwatch2Paused.GetValue() ? "Start" : "Pause", {70, -25.5}, {-5, 0}, nullptr);
+            stopwatch2PauseButton->GetComponent<UI::LayoutElement*>()->set_ignoreLayout(true);
+            stopwatch2PauseButton->get_transform()->set_localScale({0.9, 0.9, 0.9});
+            stopwatch2PauseButton->get_onClick()->AddListener(custom_types::MakeDelegate<Events::UnityAction*>(std::function<void()>([stopwatch2PauseButton](){
+                getModConfig().Stopwatch2Paused.SetValue(!getModConfig().Stopwatch2Paused.GetValue());
+                if(getModConfig().Stopwatch2Paused.GetValue()) BSML::Lite::SetButtonText(stopwatch2PauseButton, "Start");
+                else BSML::Lite::SetButtonText(stopwatch2PauseButton, "Pause");
+            })));
+            auto stopwatch2ResetButton = BSML::Lite::CreateUIButton(parent, "Reset", {83.5, -25.5}, {-5, 0}, nullptr);
+            stopwatch2ResetButton->GetComponent<UI::LayoutElement*>()->set_ignoreLayout(true);
+            stopwatch2ResetButton->get_transform()->set_localScale({0.9, 0.9, 0.9});
+            stopwatch2ResetButton->get_onClick()->AddListener(custom_types::MakeDelegate<Events::UnityAction*>(std::function<void()>([](){
+                if(ClockMod::ClockUpdater::getInstance()) ClockMod::ClockUpdater::getInstance()->resetStopwatch2();
+            })));
+
+            AddConfigValueDropdownEnum(parent, getModConfig().ClockType, clockTypeStrs);
             AddConfigValueToggle(parent, getModConfig().InSong);
             AddConfigValueToggle(parent, getModConfig().InReplay);
             AddConfigValueToggle(parent, getModConfig().TwelveToggle);

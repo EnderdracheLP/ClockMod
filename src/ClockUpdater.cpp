@@ -10,6 +10,7 @@
 #include "UnityEngine/BatteryStatus.hpp"
 #include "UnityEngine/GradientColorKey.hpp"
 #include "UnityEngine/SystemInfo.hpp"
+#include "UnityEngine/Time.hpp"
 
 using namespace UnityEngine;
 using namespace TMPro;
@@ -51,6 +52,24 @@ namespace ClockMod {
         char time[20];
         strftime(time, sizeof(time), ClockUpdater::getTimeFormat().c_str(), timeinfo);
         return time;
+    }
+
+    // Turns an uncapped duration in seconds into a nicely formatted string
+    std::string ClockUpdater::getStopwatchString(const double totalSeconds) {
+        int seconds = (int)totalSeconds % 60;
+        int minutes = (int)(totalSeconds / 60) % 60;
+        int hours = (int)(totalSeconds / 60 / 60) % 24;
+        int days = (int)(totalSeconds / 60 / 60 / 24);
+
+        bool showSeconds = getModConfig().SecToggle.GetValue();
+
+        std::string stopwatchStr;
+        if(days > 0) stopwatchStr += fmt::format("{}:", days);
+        if(hours > 0 || !stopwatchStr.empty() || !showSeconds) stopwatchStr += stopwatchStr.empty() ? fmt::format("{}:", hours) : fmt::format("{:02}:", hours);
+        stopwatchStr += stopwatchStr.empty() ? fmt::format("{}", minutes) : fmt::format("{:02}", minutes);
+        if(showSeconds) stopwatchStr += fmt::format(":{:02}", seconds);
+
+        return stopwatchStr;
     }
 
     // New Battery Percentage Formatting
@@ -136,6 +155,8 @@ namespace ClockMod {
 
         text = get_gameObject()->GetComponent<TextMeshProUGUI*>();
         clockParent = get_transform()->GetParent();
+        stopwatch1Seconds = getModConfig().Stopwatch1Seconds.GetValue();
+        stopwatch2Seconds = getModConfig().Stopwatch2Seconds.GetValue();
         getModConfig().ClockColor.AddChangeEvent([this](UnityEngine::Color color) {
             if (text)
                 text->set_color(color);
@@ -185,17 +206,31 @@ namespace ClockMod {
             text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
         }
 
-        this_time = clock();
+        static double lastSessionTimeSeconds = Time::get_realtimeSinceStartup();
 
+        this_time = clock();
+        sessionTimeSeconds = Time::get_realtimeSinceStartup();
+        if(!getModConfig().Stopwatch1Paused.GetValue()) stopwatch1Seconds += sessionTimeSeconds - lastSessionTimeSeconds;
+        if(!getModConfig().Stopwatch2Paused.GetValue()) stopwatch2Seconds += sessionTimeSeconds - lastSessionTimeSeconds;
         time_counter += (double)(this_time - last_time);
 
         last_time = this_time;
+        lastSessionTimeSeconds = sessionTimeSeconds;
 
         if (!(time_counter > (double)(NUM_SECONDS * CLOCKS_PER_SEC)))
         {
             return;
         }
         time_counter = 0;
+
+        // Scuffed, but not any more than the rest of this codebase
+        static int stopwatchSaveTimer = 0;
+        stopwatchSaveTimer++;
+        if(stopwatchSaveTimer > 5 / NUM_SECONDS && !Config.IsInSong) { // Avoid dropping frames during gameplay
+            getModConfig().Stopwatch1Seconds.SetValue(stopwatch1Seconds);
+            getModConfig().Stopwatch2Seconds.SetValue(stopwatch2Seconds);
+            stopwatchSaveTimer = 0;
+        }
 
         if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
             time(&rawtime);
@@ -210,14 +245,11 @@ namespace ClockMod {
             ClockPos.ap1 = (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1);
 
             std::string clockresult;
-
-            if (_message.empty()) {
-                // Gets the time using the function at the top.
-                clockresult = getTimeString((struct tm*)timeinfo);
-            } 
-            else {
-                clockresult = _message;
-            }
+            if(!_message.empty()) clockresult = _message;
+            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::SessionTime)) clockresult = getStopwatchString(sessionTimeSeconds);
+            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::Stopwatch1)) clockresult = getStopwatchString(stopwatch1Seconds);
+            else if(getModConfig().ClockType.GetValue() == static_cast<int>(ClockTypes::Stopwatch2)) clockresult = getStopwatchString(stopwatch2Seconds);
+            else clockresult = getTimeString((struct tm*)timeinfo);
 
             // Checks, if the clock is set to rainbowify
             if (getModConfig().RainbowClock.GetValue()) {
@@ -263,6 +295,26 @@ namespace ClockMod {
     struct tm* ClockUpdater::getTimeInfoUTC() {
         time_t time = rawtime;
         return gmtime(&time);
+    }
+
+    const double ClockUpdater::getSessionTimeSeconds() const {
+        return sessionTimeSeconds;
+    }
+
+    const double ClockUpdater::getStopwatch1Seconds() const {
+        return stopwatch1Seconds;
+    }
+
+    const double ClockUpdater::getStopwatch2Seconds() const {
+        return stopwatch2Seconds;
+    }
+
+    void ClockUpdater::resetStopwatch1() {
+        stopwatch1Seconds = 0;
+    }
+
+    void ClockUpdater::resetStopwatch2() {
+        stopwatch2Seconds = 0;
     }
 
     TMPro::TextMeshProUGUI* ClockUpdater::getTextMesh() {

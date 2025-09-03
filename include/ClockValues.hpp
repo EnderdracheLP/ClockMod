@@ -1,6 +1,20 @@
 #pragma once
 #include "UnityEngine/Vector3.hpp"
 #include "UnityEngine/UI/VerticalLayoutGroup.hpp"
+#include <string_view>
+
+enum class ClockTypes {
+    CurrentTime,
+    SessionTime,
+    Stopwatch1,
+    Stopwatch2
+};
+static std::string_view clockTypeStrs[] = {
+    "Current Time",
+    "Session Time",
+    "Stopwatch 1",
+    "Stopwatch 2",
+};
 
 // This containts all the ClockPositions
 struct ClockPos_t {

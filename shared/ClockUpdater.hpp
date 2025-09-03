@@ -27,6 +27,10 @@ private:
     time_t rawtime;
     struct tm* timeinfo;
 
+    double sessionTimeSeconds = 0;
+    double stopwatch1Seconds = 0;
+    double stopwatch2Seconds = 0;
+
     static ClockUpdater* instance;
 
     std::string _message;
@@ -36,10 +40,16 @@ public:
     const time_t getRawTime() const;
     struct tm* getTimeInfo();
     struct tm* getTimeInfoUTC();
+    const double getSessionTimeSeconds() const;
+    const double getStopwatch1Seconds() const;
+    const double getStopwatch2Seconds() const;
+    void resetStopwatch1();
+    void resetStopwatch2();
     TMPro::TextMeshProUGUI* getTextMesh();
     void SetColor(UnityEngine::Color color);
     static ClockUpdater* getInstance();
     static std::string getTimeFormat();
+    static std::string getStopwatchString(const double totalSeconds);
     void ShowMessage(std::string message, int duration = 4);
 
 };
