@@ -1,11 +1,9 @@
 #include "GlobalNamespace/AudioTimeSyncController.hpp"
-#include "GlobalNamespace/BeatmapCharacteristicSO.hpp" // --------------------- For checking the characteristic 360/90.
 #include "GlobalNamespace/BeatmapKey.hpp"
 #include "GlobalNamespace/CampaignFlowCoordinator.hpp" // --------------------- For setting clock in Campaign back to normal
 #include "GlobalNamespace/FlyingGameHUDRotation.hpp" // ----------------------- Take rotation from this instead lol
 #include "GlobalNamespace/LobbySetupViewController.hpp" // -------------------- NEW: For 1.16.4
 #include "GlobalNamespace/MainMenuViewController.hpp"
-#include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp" // - For checking it it's an MP Song
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
 #include "GlobalNamespace/MultiplayerResultsViewController.hpp"
 #include "GlobalNamespace/OVRPlugin.hpp"
@@ -16,7 +14,7 @@
 #include "GlobalNamespace/PlayerSpecificSettings.hpp"
 #include "GlobalNamespace/PlayerSpecificSettings.hpp" // ---------------------- For checking if noTextandHUDs is enabled
 #include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
-#include "GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp" // ---- For checking if it's a 360/90 Map
+#include "GlobalNamespace/StandardLevelScenesTransitionSetupData.hpp" // For checking if it's a 360/90 Map
 using namespace GlobalNamespace;
 
 #include "TMPro/FontStyles.hpp"
@@ -45,8 +43,7 @@ using namespace UnityEngine::UI;
 #include "HMUI/CurvedCanvasSettings.hpp"
 using namespace HMUI;
 
-#include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
+#include "beatsaber-hook/shared/hooking.hpp"
 #include "bsml/shared/BSML-Lite/Creation/Layout.hpp"
 #include "bsml/shared/BSML-Lite/Creation/Text.hpp"
 #include "bsml/shared/BSML.hpp"
@@ -403,10 +400,33 @@ MAKE_HOOK_MATCH(PauseMenuManager_StartResumeAnimation, &PauseMenuManager::StartR
 
 // TODO: Use the below information wisely
 // Check the beatmap characteristic and set the Config.InRotationMap to true if it requires 360 Movement.
-MAKE_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_InitAndSetupScenes, &StandardLevelScenesTransitionSetupDataSO::InitAndSetupScenes, void, StandardLevelScenesTransitionSetupDataSO* self, PlayerSpecificSettings* playerSpecificSettings, StringW backButtonText, bool startPaused) {
-    StandardLevelScenesTransitionSetupDataSO_InitAndSetupScenes(self, playerSpecificSettings, backButtonText, startPaused);
+MAKE_HOOK_MATCH(StandardLevelScenesTransitionSetupData_Init, &StandardLevelScenesTransitionSetupData::Init, void,
+    StandardLevelScenesTransitionSetupData* self,
+    GameMode gameMode,
+    by_ref<BeatmapKey const> beatmapKey,
+    BeatmapLevel* beatmapLevel,
+    OverrideEnvironmentSettings* overrideEnvironmentSettings,
+    ColorScheme* playerOverrideColorScheme,
+    bool playerOverrideLightshowColors,
+    GameplayModifiers* gameplayModifiers,
+    PlayerSpecificSettings* playerSpecificSettings,
+    PracticeSettings* practiceSettings,
+    EnvironmentsListModel* environmentsListModel,
+    AudioClipAsyncLoader* audioClipAsyncLoader,
+    SettingsManager* settingsManager,
+    GameplayAdditionalInformation* gameplayAdditionalInformation,
+    BeatmapDataLoader* beatmapDataLoader,
+    BeatmapLevelsEntitlementModel* beatmapLevelsEntitlementModel,
+    BeatmapLevelsModel* beatmapLevelsModel,
+    IBeatmapLevelData* beatmapLevelData) {
+    StandardLevelScenesTransitionSetupData_Init(self, gameMode, beatmapKey, beatmapLevel, overrideEnvironmentSettings,
+        playerOverrideColorScheme, playerOverrideLightshowColors, gameplayModifiers, playerSpecificSettings,
+        practiceSettings, environmentsListModel, audioClipAsyncLoader, settingsManager, gameplayAdditionalInformation,
+        beatmapDataLoader, beatmapLevelsEntitlementModel, beatmapLevelsModel, beatmapLevelData);
 
-    if (self->beatmapKey.beatmapCharacteristic->containsRotationEvents) {
+    const auto characteristic = static_cast<int32_t>(beatmapKey->characteristic);
+    if (characteristic == static_cast<int32_t>(BeatmapCharacteristic::Degree360) ||
+        characteristic == static_cast<int32_t>(BeatmapCharacteristic::Degree90)) {
         logger().debug("Loaded 360/90 Map");
         Config.InRotationMap = true;
     }
@@ -523,7 +543,6 @@ MOD_EXPORT void setup(CModInfo *info) {
 
 // Called later on in the game loading - a good time to install function hooks
 MOD_EXPORT void late_load() {
-    il2cpp_functions::Init();
     BSML::Init();
 
     logger().debug("Init ModConfig...");
@@ -564,7 +583,7 @@ MOD_EXPORT void late_load() {
     INSTALL_HOOK(hkLog, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate);
     INSTALL_HOOK(hkLog, PauseMenuManager_ShowMenu);
     INSTALL_HOOK(hkLog, PauseMenuManager_StartResumeAnimation);
-    INSTALL_HOOK(hkLog, StandardLevelScenesTransitionSetupDataSO_InitAndSetupScenes);
+    INSTALL_HOOK(hkLog, StandardLevelScenesTransitionSetupData_Init);
     INSTALL_HOOK(hkLog, LobbySetupViewController_DidActivate);
     INSTALL_HOOK(hkLog, MultiplayerLobbyController_DeactivateMultiplayerLobby);
     INSTALL_HOOK(hkLog, MultiplayerResultsViewController_DidActivate);

@@ -44,20 +44,6 @@ if ($actions -eq $true) {
         #$cmakeFilePath = "./extern.cmake"; $externcmake = Get-Content $cmakeFilePath -Raw; $externcmake -replace [regex]::Escape('add_library(${COMPILE_ID} SHARED ${EXTERN_DIR}/includes/bs-cordl/version.txt)'), '' | Set-Content $cmakeFilePath
 }
 
-if ((Test-Path "./extern/includes/beatsaber-hook/shared/inline-hook/And64InlineHook.cpp", "./extern/includes/beatsaber-hook/shared/inline-hook/inlineHook.c", "./extern/includes/beatsaber-hook/shared/inline-hook/relocate.c") -contains $false) {
-    Write-Host "Critical: Missing inline-hook"
-    if (!(Test-Path "./extern/includes/beatsaber-hook/shared/inline-hook/And64InlineHook.cpp")) {
-        Write-Host "./extern/includes/beatsaber-hook/shared/inline-hook/And64InlineHook.cpp"
-    }
-    if (!(Test-Path "./extern/includes/beatsaber-hook/shared/inline-hook/inlineHook.c")) {
-        Write-Host "./extern/includes/beatsaber-hook/shared/inline-hook/inlineHook.c"
-    }
-        if (!(Test-Path "./extern/includes/beatsaber-hook/inline-hook/shared/relocate.c")) {
-        Write-Host "./extern/includes/beatsaber-hook/shared/inline-hook/relocate.c"
-    }
-    Write-Host "Task Failed"
-    exit 1;
-}
 Write-Output "Building mod with ModID: $ModID version: $VERSION"
 
 if ($clean.IsPresent)
