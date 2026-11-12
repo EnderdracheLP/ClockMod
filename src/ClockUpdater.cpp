@@ -242,7 +242,7 @@ namespace ClockMod {
             stopwatchSaveTimer = 0;
         }
 
-        if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
+        if (!Config.IsInSong || getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
             time(&rawtime);
             timeinfo = localtime_r(&rawtime, &localTime);
             //auto clockParent = get_transform();
