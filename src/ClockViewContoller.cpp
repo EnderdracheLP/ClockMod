@@ -112,6 +112,7 @@ namespace ClockMod {
 
             if (ColorPicker) {
                 BSML::Lite::CreateUIButton(parent, "Change ClockColor", [this] {
+                    ColorPicker->set_currentColor(getModConfig().ClockColor.GetValue());
                     ColorPicker->modalView->Show();
                 });
             }
