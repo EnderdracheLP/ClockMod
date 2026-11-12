@@ -5,7 +5,7 @@
 #include "GlobalNamespace/FlyingGameHUDRotation.hpp" // ----------------------- Take rotation from this instead lol
 #include "GlobalNamespace/LobbySetupViewController.hpp" // -------------------- NEW: For 1.16.4
 #include "GlobalNamespace/MainMenuViewController.hpp"
-#include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp" // - For checking it it's an MP Song
+#include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupData.hpp" // - For checking it it's an MP Song
 #include "GlobalNamespace/MultiplayerLobbyController.hpp"
 #include "GlobalNamespace/MultiplayerResultsViewController.hpp"
 #include "GlobalNamespace/OVRPlugin.hpp"
@@ -16,7 +16,24 @@
 #include "GlobalNamespace/PlayerSpecificSettings.hpp"
 #include "GlobalNamespace/PlayerSpecificSettings.hpp" // ---------------------- For checking if noTextandHUDs is enabled
 #include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
-#include "GlobalNamespace/StandardLevelScenesTransitionSetupDataSO.hpp" // ---- For checking if it's a 360/90 Map
+#include "GlobalNamespace/StandardLevelScenesTransitionSetupData.hpp" // ---- For checking if it's a 360/90 Map
+#include "GlobalNamespace/BeatmapCharacteristicExtensions.hpp"
+#include "GlobalNamespace/GameMode.hpp"
+#include "GlobalNamespace/BeatmapKey.hpp"
+#include "GlobalNamespace/BeatmapLevel.hpp"
+#include "GlobalNamespace/OverrideEnvironmentSettings.hpp"
+#include "GlobalNamespace/ColorScheme.hpp"
+#include "GlobalNamespace/GameplayModifiers.hpp"
+#include "GlobalNamespace/PlayerSpecificSettings.hpp"
+#include "GlobalNamespace/PracticeSettings.hpp"
+#include "GlobalNamespace/EnvironmentsListModel.hpp"
+#include "GlobalNamespace/AudioClipAsyncLoader.hpp"
+#include "GlobalNamespace/SettingsManager.hpp"
+#include "GlobalNamespace/GameplayAdditionalInformation.hpp"
+#include "GlobalNamespace/BeatmapDataLoader.hpp"
+#include "GlobalNamespace/BeatmapLevelsEntitlementModel.hpp"
+#include "GlobalNamespace/BeatmapLevelsModel.hpp"
+#include "GlobalNamespace/IBeatmapLevelData.hpp"
 using namespace GlobalNamespace;
 
 #include "TMPro/FontStyles.hpp"
@@ -45,8 +62,8 @@ using namespace UnityEngine::UI;
 #include "HMUI/CurvedCanvasSettings.hpp"
 using namespace HMUI;
 
-#include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
+#include "beatsaber-hook/shared/hooking.hpp"
+#include "beatsaber-hook/shared/api.hpp"
 #include "bsml/shared/BSML-Lite/Creation/Layout.hpp"
 #include "bsml/shared/BSML-Lite/Creation/Text.hpp"
 #include "bsml/shared/BSML.hpp"
@@ -59,6 +76,8 @@ using namespace HMUI;
 #include "ClockValues.hpp"
 #include "ClockViewController.hpp"
 #include "main.hpp"
+#include <algorithm>
+#include <cmath>
 using namespace ClockMod;
 
 
@@ -84,13 +103,21 @@ Paper::ConstLoggerContext<9UL> logger() {
 
 float RotateSongX;
 
-bool ClockModInit;
+safe_ptr<UnityEngine::Canvas*> canvas;
+safe_ptr<UnityEngine::UI::VerticalLayoutGroup*> layout;
 
-UnityEngine::Canvas* canvas;
-UnityEngine::UI::VerticalLayoutGroup* layout;
+void ReleaseClockObjects() {
+    layout.clear();
+    canvas.clear();
+}
+
+bool ClockReady() {
+    return canvas && layout && UnityW(layout->get_transform()->GetParent());
+}
 
 // Function that sets the ClockPosition for Multiplayer Lobbies.
 void MPLobbyClockPos(float MLobbyVCPosY) {
+    if (!ClockReady()) return;
     layout->get_transform()->set_position(UnityEngine::Vector3(0, MLobbyVCPosY-1, 1.75));
     layout->get_transform()->set_localScale(UnityEngine::Vector3(0.35, 0.35, 0.35));
     layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, 0, 0));
@@ -100,7 +127,9 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::Did
 {
     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-    if (firstActivation && ClockModInit) {
+    if (!ClockReady()) {
+        if (canvas) Object::Destroy(canvas.ptr()->get_gameObject());
+        ReleaseClockObjects();
         auto canvas_object = UnityEngine::GameObject::New_ctor("ClockCanvas");
         canvas = canvas_object->AddComponent<UnityEngine::Canvas*>();
         auto canvas_scaler = canvas_object->AddComponent<CanvasScaler*>();
@@ -109,10 +138,10 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::Did
         //canvas_object->AddComponent<QuestUI::Backgroundable*>()->ApplyBackgroundWithAlpha(il2cpp_utils::createcsstr("round-rect-panel"), 0.75f);
 
         // For reference on adding Button to clock
-        //        UnityEngine::UI::Button* button = QuestUI::BeatSaberUI::CreateUIButton(rectTransform, "", "SettingsButton", il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, +[](Il2CppObject* obj, UnityEngine::UI::Button* button){}));
-        //button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, OnClockButtonClick));
+        //        UnityEngine::UI::Button* button = QuestUI::BeatSaberUI::CreateUIButton(rectTransform, "", "SettingsButton", il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(i2c::class_of<UnityEngine::Events::UnityAction*>(), (Il2CppObject*)nullptr, +[](Il2CppObject* obj, UnityEngine::UI::Button* button){}));
+        //button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(i2c::class_of<UnityEngine::Events::UnityAction*>(), (Il2CppObject*)nullptr, OnClockButtonClick));
         //
-        // button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(classof(UnityEngine::Events::UnityAction*), (Il2CppObject*)nullptr, OnClockButtonClick));
+        // button->get_onClick()->AddListener(il2cpp_utils::MakeDelegate<UnityEngine::Events::UnityAction*>(i2c::class_of<UnityEngine::Events::UnityAction*>(), (Il2CppObject*)nullptr, OnClockButtonClick));
 
         canvas_object->AddComponent<CurvedCanvasSettings*>();
         canvas_object->get_transform()->set_rotation(UnityEngine::Quaternion(0, 0, 0, 1));
@@ -146,7 +175,7 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::Did
         //if (getModConfig().RainbowClock.GetValue()) { logger().debug("RainbowClock true"); } else { logger().debug("RainbowClock false"); }
         ////if (getModConfig().ClockColor.GetValue()) { logger().debug("ClockColor true"); } else { logger().debug("ClockColor false"); }
         //if (getModConfig().ClockPosition.GetValue()) { logger().debug("ClockPosition bottom"); } else { logger().debug("ClockPosition top"); }
-        ClockModInit = false;
+        logger().info("Created clock canvas");
     }
     Config.IsInSong = false;
     Config.InMPLobby = false;
@@ -162,6 +191,7 @@ MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &MainMenuViewController::Did
 
 // Function for updating the Clock Position
 void SetClockPos(UnityEngine::Vector3 Pos, UnityEngine::Vector3 Angle, float ScaleFloat) {
+    if (!ClockReady()) return;
     layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, 0, 0));
     layout->get_transform()->GetParent()->set_position(UnityEngine::Vector3(0, 0.5, 0));
     layout->get_transform()->set_position(Pos);
@@ -171,8 +201,15 @@ void SetClockPos(UnityEngine::Vector3 Pos, UnityEngine::Vector3 Angle, float Sca
 
 // TODO: Use a different hook, this one is too small and causes issues
 MAKE_HOOK_MATCH(AudioTimeSyncController_StartSong, &AudioTimeSyncController::StartSong, void, AudioTimeSyncController* self, float startTimeOffset) {
+    AudioTimeSyncController_StartSong(self, startTimeOffset);
+    if (!ClockReady()) return;
     // Instance of PlayerDataModel the noTextAndHUDs variable specifically
-    Config.noTextAndHUD = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>()->playerData->get_playerSpecificSettings()->noTextsAndHuds;
+    Config.noTextAndHUD = false;
+    auto playerDataModel = UnityEngine::Object::FindObjectOfType<PlayerDataModel*>();
+    if (playerDataModel && playerDataModel->playerData) {
+        if (auto settings = playerDataModel->playerData->get_playerSpecificSettings())
+            Config.noTextAndHUD = settings->noTextsAndHuds;
+    }
 
     //float LayoutClockPosX = layout->get_transform()->get_position().x;
     //float LayoutClockPosY = layout->get_transform()->get_position().y;
@@ -186,10 +223,7 @@ MAKE_HOOK_MATCH(AudioTimeSyncController_StartSong, &AudioTimeSyncController::Sta
     Config.InMPLobby = false;
     Config.IsInSong = true;
 
-    AudioTimeSyncController_StartSong(self, startTimeOffset);
-
-
-    bool isInReplay;
+    bool isInReplay = false;
     static std::optional<bool (*)()> isInReplayFunc  = CondDeps::Find<bool>("replay", "IsInReplay");
     if (isInReplayFunc.has_value())
     {
@@ -331,6 +365,7 @@ MAKE_HOOK_MATCH(AudioTimeSyncController_StartSong, &AudioTimeSyncController::Sta
 
 MAKE_HOOK_MATCH(CampaignFlowCoordinator_DidActivate, &CampaignFlowCoordinator::DidActivate, void, CampaignFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     CampaignFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+    if (!ClockReady()) return;
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -349,6 +384,7 @@ MAKE_HOOK_MATCH(CampaignFlowCoordinator_DidActivate, &CampaignFlowCoordinator::D
 
 MAKE_HOOK_MATCH(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, &PartyFreePlayFlowCoordinator::SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, PartyFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
+    if (!ClockReady()) return;
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -367,6 +403,7 @@ MAKE_HOOK_MATCH(PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoord
 
 MAKE_HOOK_MATCH(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate, &SoloFreePlayFlowCoordinator::SinglePlayerLevelSelectionFlowCoordinatorDidActivate, void, SoloFreePlayFlowCoordinator* self, bool firstActivation, bool addedToHierarchy) {
     SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate(self, firstActivation, addedToHierarchy);
+    if (!ClockReady()) return;
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -385,6 +422,7 @@ MAKE_HOOK_MATCH(SoloFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordi
 
 MAKE_HOOK_MATCH(PauseMenuManager_ShowMenu, &PauseMenuManager::ShowMenu, void, PauseMenuManager* self) {
     PauseMenuManager_ShowMenu(self);
+    if (!ClockReady()) return;
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -394,6 +432,7 @@ MAKE_HOOK_MATCH(PauseMenuManager_ShowMenu, &PauseMenuManager::ShowMenu, void, Pa
 
 MAKE_HOOK_MATCH(PauseMenuManager_StartResumeAnimation, &PauseMenuManager::StartResumeAnimation, void, PauseMenuManager* self) {
     PauseMenuManager_StartResumeAnimation(self);
+    if (!ClockReady()) return;
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(false);
@@ -403,10 +442,18 @@ MAKE_HOOK_MATCH(PauseMenuManager_StartResumeAnimation, &PauseMenuManager::StartR
 
 // TODO: Use the below information wisely
 // Check the beatmap characteristic and set the Config.InRotationMap to true if it requires 360 Movement.
-MAKE_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_InitAndSetupScenes, &StandardLevelScenesTransitionSetupDataSO::InitAndSetupScenes, void, StandardLevelScenesTransitionSetupDataSO* self, PlayerSpecificSettings* playerSpecificSettings, StringW backButtonText, bool startPaused) {
-    StandardLevelScenesTransitionSetupDataSO_InitAndSetupScenes(self, playerSpecificSettings, backButtonText, startPaused);
+MAKE_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Init, &StandardLevelScenesTransitionSetupData::Init, void, StandardLevelScenesTransitionSetupData* self,
+                GameMode gameMode, by_ref<const BeatmapKey> beatmapKey, BeatmapLevel* beatmapLevel, OverrideEnvironmentSettings* overrideEnvironmentSettings,
+                ColorScheme* playerOverrideColorScheme, bool playerOverrideLightshowColors, GameplayModifiers* gameplayModifiers, PlayerSpecificSettings* playerSpecificSettings,
+                PracticeSettings* practiceSettings, EnvironmentsListModel* environmentsListModel, AudioClipAsyncLoader* audioClipAsyncLoader, SettingsManager* settingsManager,
+                GameplayAdditionalInformation* gameplayAdditionalInformation, BeatmapDataLoader* beatmapDataLoader, BeatmapLevelsEntitlementModel* beatmapLevelsEntitlementModel,
+                BeatmapLevelsModel* beatmapLevelsModel, IBeatmapLevelData* beatmapLevelData) {
+    StandardLevelScenesTransitionSetupDataSO_Init(self, gameMode, beatmapKey, beatmapLevel, overrideEnvironmentSettings, playerOverrideColorScheme, playerOverrideLightshowColors,
+                                                  gameplayModifiers, playerSpecificSettings, practiceSettings, environmentsListModel, audioClipAsyncLoader, settingsManager,
+                                                  gameplayAdditionalInformation, beatmapDataLoader, beatmapLevelsEntitlementModel, beatmapLevelsModel, beatmapLevelData);
 
-    if (self->beatmapKey.beatmapCharacteristic->containsRotationEvents) {
+    // 1.45 identifies characteristics by enum instead of BeatmapCharacteristicSO.
+    if (BeatmapCharacteristicExtensions::ContainsRotationEvents(beatmapKey->characteristic)) {
         logger().debug("Loaded 360/90 Map");
         Config.InRotationMap = true;
     }
@@ -417,12 +464,15 @@ MAKE_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_InitAndSetupScenes, &St
 }
 
 MAKE_HOOK_MATCH(FlyingGameHUDRotation_FixedUpdate, &FlyingGameHUDRotation::FixedUpdate, void, GlobalNamespace::FlyingGameHUDRotation* self) {
-    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, self->_yAngle, 0));
     FlyingGameHUDRotation_FixedUpdate(self);
+    if (!ClockReady()) return;
+    layout->get_gameObject()->get_transform()->GetParent()->set_eulerAngles(UnityEngine::Vector3(0, self->_yAngle, 0));
 }
 
 
 MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController::DidActivate, void, LobbySetupViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    LobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+    if (!ClockReady()) return;
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -439,11 +489,11 @@ MAKE_HOOK_MATCH(LobbySetupViewController_DidActivate, &LobbySetupViewController:
     MPLobbyClockPos(MLobbyVCPosY);
     if (Config.InMP == true) { logger().debug("CLobby, InMP is True"); }
 
-    LobbySetupViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 
 MAKE_HOOK_MATCH(MultiplayerResultsViewController_DidActivate, &MultiplayerResultsViewController::DidActivate, void, MultiplayerResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     MultiplayerResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+    if (!ClockReady()) return;
 
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
@@ -464,6 +514,7 @@ MAKE_HOOK_MATCH(MultiplayerResultsViewController_DidActivate, &MultiplayerResult
 MAKE_HOOK_MATCH(MultiplayerResultsViewController_Init, &MultiplayerResultsViewController::Init, void, MultiplayerResultsViewController* self, MultiplayerResultsData* multiplayerResultsData, BeatmapKey beatmapKey, bool showBackToLobbyButton, bool showBackToMenuButton)
 {
     MultiplayerResultsViewController_Init(self, multiplayerResultsData, beatmapKey, showBackToLobbyButton, showBackToMenuButton);
+    if (!ClockReady()) return;
     if (!getModConfig().InSong.GetValue() || Config.noTextAndHUD) {
         canvas->get_gameObject()->SetActive(true);
         logger().info("SetActive true MPResultsVC");
@@ -480,6 +531,7 @@ MAKE_HOOK_MATCH(MultiplayerResultsViewController_Init, &MultiplayerResultsViewCo
 }
 MAKE_HOOK_MATCH(MultiplayerLobbyController_DeactivateMultiplayerLobby, &MultiplayerLobbyController::DeactivateMultiplayerLobby, void, MultiplayerLobbyController* self) {
     MultiplayerLobbyController_DeactivateMultiplayerLobby(self);
+    if (!ClockReady()) return;
 
     Config.InMPLobby = false;
     Config.IsInSong = false;
@@ -496,7 +548,7 @@ MAKE_HOOK_MATCH(MultiplayerLobbyController_DeactivateMultiplayerLobby, &Multipla
 MAKE_HOOK_MATCH(ResultsViewController_DidActivate, &ResultsViewController::DidActivate, void, ResultsViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     ResultsViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     std::vector<std::string> failTexts({ "Get Better", "fail", "lol", "learn2play", "no skills", "get skills", "loser", "hit bloq", "no comment", "you failed", "can you even play" });
-    if (ClockPos.ap1 && self->_levelCompletionResults->levelEndStateType == LevelCompletionResults::LevelEndStateType::Failed) {
+    if (ClockPos.ap1 && self->_levelCompletionResults && self->_levelCompletionResults->levelEndStateType == LevelCompletionResults::LevelEndStateType::Failed) {
         ClockUpdater* clockUpdater = ClockUpdater::getInstance();
         if (clockUpdater) {
             std::random_device random_device;
@@ -516,20 +568,32 @@ MOD_EXPORT void setup(CModInfo *info) {
 
     Paper::Logger::RegisterFileContextId(logger().tag);
 
-    ClockModInit = true;
-
     logger().info("Completed ClockMod setup!");
 }
 
 // Called later on in the game loading - a good time to install function hooks
 MOD_EXPORT void late_load() {
-    il2cpp_functions::Init();
+    i2c::functions::initialize();
     BSML::Init();
 
     logger().debug("Init ModConfig...");
 
     //Init/Load Config
     getModConfig().Init(modInfo);
+
+    // Config callbacks outlive individual canvases: resolve the live instance on every call.
+    getModConfig().ClockColor.AddChangeEvent([](UnityEngine::Color value) {
+        if (auto clock = ClockUpdater::getInstance()) clock->SetColor(value);
+    });
+    getModConfig().FontSize.AddChangeEvent([](float value) {
+        if (auto clock = ClockUpdater::getInstance()) {
+            if (auto text = clock->getTextMesh())
+                text->set_fontSize(std::isfinite(value) ? std::clamp(value, 1.0f, 5.0f) : 3.5f);
+        }
+    });
+    auto& clockType = getModConfig().ClockType;
+    if (clockType.GetValue() < 0 || clockType.GetValue() >= std::size(clockTypeStrs))
+        clockType.SetValue(0);
 
     logger().debug("Init ModConfig...Done");
 
@@ -539,8 +603,9 @@ MOD_EXPORT void late_load() {
     struct tm* timeinfo = localtime(&rawtime);
     // Months start at 0 so 0 = January while days start at 1
     ClockPos.ap1 = (timeinfo && timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1);
-    logger().debug("Year is: %d Day is: %d Month is: %d time is %d:%d:%d", 
-    timeinfo->tm_year, timeinfo->tm_mday, timeinfo->tm_mon + 1, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+    if (timeinfo)
+        logger().debug("Year is: {} Day is: {} Month is: {} time is {}:{}:{}",
+            timeinfo->tm_year, timeinfo->tm_mday, timeinfo->tm_mon + 1, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 
     logger().debug("CheckTime...Done");
 
@@ -552,7 +617,7 @@ MOD_EXPORT void late_load() {
     BSML::Register::RegisterSettingsMenu<ClockMod::ClockViewController*>("ClockMod");
     BSML::Register::RegisterMainMenu<ClockMod::ClockViewController*>("ClockMod", "ClockMod", "Open the ClockMod Settings");
 
-    if (timeinfo && (timeinfo->tm_mon == 2 && timeinfo->tm_mday == 31) || (timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1)) {
+    if (timeinfo && ((timeinfo->tm_mon == 2 && timeinfo->tm_mday == 31) || (timeinfo->tm_mon == 3 && timeinfo->tm_mday == 1))) {
         INSTALL_HOOK(hkLog, ResultsViewController_DidActivate);
     }
 
@@ -564,7 +629,7 @@ MOD_EXPORT void late_load() {
     INSTALL_HOOK(hkLog, PartyFreePlayFlowCoordinator_SinglePlayerLevelSelectionFlowCoordinatorDidActivate);
     INSTALL_HOOK(hkLog, PauseMenuManager_ShowMenu);
     INSTALL_HOOK(hkLog, PauseMenuManager_StartResumeAnimation);
-    INSTALL_HOOK(hkLog, StandardLevelScenesTransitionSetupDataSO_InitAndSetupScenes);
+    INSTALL_HOOK(hkLog, StandardLevelScenesTransitionSetupDataSO_Init);
     INSTALL_HOOK(hkLog, LobbySetupViewController_DidActivate);
     INSTALL_HOOK(hkLog, MultiplayerLobbyController_DeactivateMultiplayerLobby);
     INSTALL_HOOK(hkLog, MultiplayerResultsViewController_DidActivate);

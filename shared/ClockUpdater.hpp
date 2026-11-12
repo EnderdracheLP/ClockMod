@@ -5,6 +5,8 @@
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "UnityEngine/Transform.hpp"  // For Transform stuff
 #include "custom-types/shared/macros.hpp"
+#include "beatsaber-hook/shared/safeptr.hpp"
+#include "cordl_internals/unity-utils.hpp"
 #include <ctime>
 #include <time.h>
 
@@ -12,26 +14,33 @@ using namespace UnityEngine;
 
 DECLARE_CLASS_CODEGEN(ClockMod, ClockUpdater, UnityEngine::MonoBehaviour) {
 
+    DECLARE_DEFAULT_CTOR();
+    DECLARE_SIMPLE_DTOR();
+    DECLARE_INSTANCE_METHOD(void, Awake);
     DECLARE_INSTANCE_METHOD(void, Start);
     DECLARE_INSTANCE_METHOD(void, Update);
+    DECLARE_INSTANCE_METHOD(void, OnDestroy);
 
 private:
-    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, text);
-    DECLARE_INSTANCE_FIELD(UnityEngine::Transform*, clockParent);
+    DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, text);
+    DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::Transform>, clockParent);
     DECLARE_INSTANCE_FIELD(UnityEngine::Gradient*, batteryGradient);
-    double time_counter = 0;
+    double lastSessionTimeSeconds = 0;
+    double nextTextUpdateTime = 0;
+    double nextStopwatchSaveTime = 0;
+    double nextBatteryUpdateTime = 0;
+    std::string cachedBatteryText;
 
-    clock_t this_time = clock();
-    clock_t last_time = this_time;
-
-    time_t rawtime;
-    struct tm* timeinfo;
+    time_t rawtime = 0;
+    struct tm localTime{};
+    struct tm utcTime{};
+    struct tm* timeinfo = nullptr;
 
     double sessionTimeSeconds = 0;
     double stopwatch1Seconds = 0;
     double stopwatch2Seconds = 0;
 
-    static ClockUpdater* instance;
+    static safe_ptr<ClockUpdater*, true> instance;
 
     std::string _message;
     int messageShowing = 0;
