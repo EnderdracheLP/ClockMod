@@ -25,10 +25,9 @@ private:
     DECLARE_INSTANCE_FIELD(UnityW<TMPro::TextMeshProUGUI>, text);
     DECLARE_INSTANCE_FIELD(UnityW<UnityEngine::Transform>, clockParent);
     DECLARE_INSTANCE_FIELD(UnityEngine::Gradient*, batteryGradient);
-    double time_counter = 0;
-
-    clock_t this_time = clock();
-    clock_t last_time = this_time;
+    double lastSessionTimeSeconds = 0;
+    double nextTextUpdateTime = 0;
+    double nextStopwatchSaveTime = 0;
 
     time_t rawtime = 0;
     struct tm localTime{};

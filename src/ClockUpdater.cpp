@@ -165,6 +165,9 @@ namespace ClockMod {
         clockParent = get_transform()->GetParent();
         stopwatch1Seconds = getModConfig().Stopwatch1Seconds.GetValue();
         stopwatch2Seconds = getModConfig().Stopwatch2Seconds.GetValue();
+        sessionTimeSeconds = Time::get_realtimeSinceStartupAsDouble();
+        lastSessionTimeSeconds = sessionTimeSeconds;
+        nextStopwatchSaveTime = sessionTimeSeconds + 5.0;
         rawtime = std::time(nullptr);
         if (text) {
             text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
@@ -216,30 +219,21 @@ namespace ClockMod {
             text->get_transform()->set_localScale(UnityEngine::Vector3(1, 1, 1));
         }
 
-        static double lastSessionTimeSeconds = Time::get_realtimeSinceStartup();
-
-        this_time = clock();
-        sessionTimeSeconds = Time::get_realtimeSinceStartup();
+        sessionTimeSeconds = Time::get_realtimeSinceStartupAsDouble();
         if(!getModConfig().Stopwatch1Paused.GetValue()) stopwatch1Seconds += sessionTimeSeconds - lastSessionTimeSeconds;
         if(!getModConfig().Stopwatch2Paused.GetValue()) stopwatch2Seconds += sessionTimeSeconds - lastSessionTimeSeconds;
-        time_counter += (double)(this_time - last_time);
-
-        last_time = this_time;
         lastSessionTimeSeconds = sessionTimeSeconds;
 
-        if (!(time_counter > (double)(NUM_SECONDS * CLOCKS_PER_SEC)))
+        if (sessionTimeSeconds < nextTextUpdateTime)
         {
             return;
         }
-        time_counter = 0;
+        nextTextUpdateTime = sessionTimeSeconds + NUM_SECONDS;
 
-        // Scuffed, but not any more than the rest of this codebase
-        static int stopwatchSaveTimer = 0;
-        stopwatchSaveTimer++;
-        if(stopwatchSaveTimer > 5 / NUM_SECONDS && !Config.IsInSong) { // Avoid dropping frames during gameplay
+        if (sessionTimeSeconds >= nextStopwatchSaveTime && !Config.IsInSong) { // Avoid dropping frames during gameplay
             getModConfig().Stopwatch1Seconds.SetValue(static_cast<int>(stopwatch1Seconds));
             getModConfig().Stopwatch2Seconds.SetValue(static_cast<int>(stopwatch2Seconds));
-            stopwatchSaveTimer = 0;
+            nextStopwatchSaveTime = sessionTimeSeconds + 5.0;
         }
 
         if (!Config.IsInSong || getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
