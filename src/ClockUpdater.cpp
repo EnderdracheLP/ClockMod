@@ -231,8 +231,14 @@ namespace ClockMod {
         nextTextUpdateTime = sessionTimeSeconds + NUM_SECONDS;
 
         if (sessionTimeSeconds >= nextStopwatchSaveTime && !Config.IsInSong) { // Avoid dropping frames during gameplay
-            getModConfig().Stopwatch1Seconds.SetValue(static_cast<int>(stopwatch1Seconds));
-            getModConfig().Stopwatch2Seconds.SetValue(static_cast<int>(stopwatch2Seconds));
+            auto& config = getModConfig();
+            const int seconds1 = static_cast<int>(stopwatch1Seconds);
+            const int seconds2 = static_cast<int>(stopwatch2Seconds);
+            if (config.Stopwatch1Seconds.GetValue() != seconds1 || config.Stopwatch2Seconds.GetValue() != seconds2) {
+                config.Stopwatch1Seconds.SetValue(seconds1, false);
+                config.Stopwatch2Seconds.SetValue(seconds2, false);
+                config.Save();
+            }
             nextStopwatchSaveTime = sessionTimeSeconds + 5.0;
         }
 
