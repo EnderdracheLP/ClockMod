@@ -3,6 +3,9 @@
 #include "ClockModConfig.hpp"            // Just the Config
 #include "ClockUpdater.hpp"              // For the ClockUpdater, like the stuff you see down there
 #include "ClockValues.hpp"
+#include "ClockFormatting.hpp"
+#include <algorithm>
+#include <cmath>
 #include "ColorUtility.hpp"
 #include "RainbowClock.hpp"              // Where the magic stuff is that makes the Clock Rainbowy (is that actually a word?)
 
@@ -46,20 +49,19 @@ namespace ClockMod {
         return TFormat;
     }
 
-    ClockUpdater* ClockUpdater::instance;
+    safe_ptr<ClockUpdater*, true> ClockUpdater::instance;
     // Function for getting time. Checks config Settings for 12/24 Hour time and if Show Seconds is toggled on or off.
     std::string getTimeString(struct tm* timeinfo) {
-        char time[20];
-        strftime(time, sizeof(time), ClockUpdater::getTimeFormat().c_str(), timeinfo);
-        return time;
+        return FormatTime(timeinfo, ClockUpdater::getTimeFormat());
     }
 
     // Turns an uncapped duration in seconds into a nicely formatted string
     std::string ClockUpdater::getStopwatchString(const double totalSeconds) {
-        int seconds = (int)totalSeconds % 60;
-        int minutes = (int)(totalSeconds / 60) % 60;
-        int hours = (int)(totalSeconds / 60 / 60) % 24;
-        int days = (int)(totalSeconds / 60 / 60 / 24);
+        const int wholeSeconds = static_cast<int>(totalSeconds);
+        int seconds = wholeSeconds % 60;
+        int minutes = wholeSeconds / 60 % 60;
+        int hours = wholeSeconds / 3600 % 24;
+        int days = wholeSeconds / 86400;
 
         bool showSeconds = getModConfig().SecToggle.GetValue();
 
@@ -75,8 +77,10 @@ namespace ClockMod {
     // New Battery Percentage Formatting
     std::string getBatteryString(float level, UnityEngine::BatteryStatus status, ClockMod::ClockUpdater* instance)
     {
+        if (!instance || !std::isfinite(level) || level < 0) return "Battery unavailable";
+        level = std::clamp(level, 0.0f, 1.0f);
         std::string percent = fmt::format("{}%", (int)(level * 100));
-        if (!(instance && instance->batteryGradient)) {
+        if (!instance->batteryGradient) {
             instance->batteryGradient = UnityEngine::Gradient::New_ctor();
             instance->batteryGradient->set_colorKeys(
                 {
@@ -146,6 +150,10 @@ namespace ClockMod {
 
     #define NUM_SECONDS 0.25
 
+    void ClockUpdater::Awake() {
+        instance = this;
+    }
+
     void ClockUpdater::Start() {
         //JNIEnv* javaEnv = Modloader::getJni();
 
@@ -157,27 +165,29 @@ namespace ClockMod {
         clockParent = get_transform()->GetParent();
         stopwatch1Seconds = getModConfig().Stopwatch1Seconds.GetValue();
         stopwatch2Seconds = getModConfig().Stopwatch2Seconds.GetValue();
-        getModConfig().ClockColor.AddChangeEvent([this](UnityEngine::Color color) {
-            if (text)
-                text->set_color(color);
-            }
-        );
-        getModConfig().FontSize.AddChangeEvent([this](float value) {
-            if (text)
-                text->set_fontSize(value);
-            }
-        );
+        rawtime = std::time(nullptr);
         if (text) {
             text->set_color(getModConfig().ClockColor.GetValue());         // Sets the clocks color, will only color in the "-" if rainbowifier is enabled.
-            text->set_fontSize(getModConfig().FontSize.GetValue());
+            auto fontSize = getModConfig().FontSize.GetValue();
+            text->set_fontSize(std::isfinite(fontSize) ? std::clamp(fontSize, 1.0f, 5.0f) : 3.5f);
             // text->set_alignment(TMPro::TextAlignmentOptions::Center);
         }
-        instance = this;
+        logger().info("Clock updater started");
+    }
+
+    void ClockUpdater::OnDestroy() {
+        if (instance.unchecked_ptr() == this) {
+            instance.clear();
+            ReleaseClockObjects();
+        }
+        text = nullptr;
+        clockParent = nullptr;
+        batteryGradient = nullptr;
     }
 
     // Updates the Clock.
     void ClockUpdater::Update() {
-
+        if (!text || !clockParent) return;
 
         // Temp Code for updating Position.
         if (Config.IsInSong == false && Config.InMPLobby == false) {
@@ -227,14 +237,14 @@ namespace ClockMod {
         static int stopwatchSaveTimer = 0;
         stopwatchSaveTimer++;
         if(stopwatchSaveTimer > 5 / NUM_SECONDS && !Config.IsInSong) { // Avoid dropping frames during gameplay
-            getModConfig().Stopwatch1Seconds.SetValue(stopwatch1Seconds);
-            getModConfig().Stopwatch2Seconds.SetValue(stopwatch2Seconds);
+            getModConfig().Stopwatch1Seconds.SetValue(static_cast<int>(stopwatch1Seconds));
+            getModConfig().Stopwatch2Seconds.SetValue(static_cast<int>(stopwatch2Seconds));
             stopwatchSaveTimer = 0;
         }
 
         if (getModConfig().InSong.GetValue() || !Config.noTextAndHUD) {
             time(&rawtime);
-            timeinfo = localtime(&rawtime);
+            timeinfo = localtime_r(&rawtime, &localTime);
             //auto clockParent = get_transform();
 
             if (timeinfo && timeinfo->tm_mon == 0 && timeinfo->tm_mday == 1 && timeinfo->tm_hour == 0 && timeinfo->tm_min == 0 && timeinfo->tm_sec == 0 && messageShowing == 0)
@@ -288,13 +298,12 @@ namespace ClockMod {
     }
 
     struct tm* ClockUpdater::getTimeInfo() {
-        time_t time = rawtime;
-        return localtime(&time);
+        rawtime = std::time(nullptr);
+        return localtime_r(&rawtime, &localTime);
     }
 
     struct tm* ClockUpdater::getTimeInfoUTC() {
-        time_t time = rawtime;
-        return gmtime(&time);
+        return gmtime_r(&rawtime, &utcTime);
     }
 
     const double ClockUpdater::getSessionTimeSeconds() const {
@@ -318,7 +327,7 @@ namespace ClockMod {
     }
 
     TMPro::TextMeshProUGUI* ClockUpdater::getTextMesh() {
-        return text;
+        return text ? text.ptr() : nullptr;
     }
 
     void ClockUpdater::SetColor(UnityEngine::Color color) {
@@ -328,7 +337,7 @@ namespace ClockMod {
     }
 
     ClockUpdater* ClockUpdater::getInstance() {
-        return instance;
+        return instance ? instance.ptr() : nullptr;
     }
 
     void ClockUpdater::ShowMessage(std::string message, int duration) {

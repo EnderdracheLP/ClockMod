@@ -5,6 +5,7 @@
 
 // Define these functions here so that we can easily read configuration and log information from other files
 Paper::ConstLoggerContext<9UL> logger();
+void ReleaseClockObjects();
 
 // Defining values here, so I can use them wherever the fuck I want to.
 struct Config_t {
