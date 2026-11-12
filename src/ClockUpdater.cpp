@@ -320,10 +320,12 @@ namespace ClockMod {
 
     void ClockUpdater::resetStopwatch1() {
         stopwatch1Seconds = 0;
+        getModConfig().Stopwatch1Seconds.SetValue(0);
     }
 
     void ClockUpdater::resetStopwatch2() {
         stopwatch2Seconds = 0;
+        getModConfig().Stopwatch2Seconds.SetValue(0);
     }
 
     TMPro::TextMeshProUGUI* ClockUpdater::getTextMesh() {
