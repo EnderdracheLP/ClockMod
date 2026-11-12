@@ -40,7 +40,7 @@ namespace ClockMod {
         if (!SettingsOpen) return;
         auto now = Time::get_unscaledTime();
         if (now < nextTimeUpdate) return;
-        nextTimeUpdate = now + 0.1f;
+        nextTimeUpdate = now + 1.0f;
         UpdateTimeText();
     }
 
@@ -117,7 +117,7 @@ namespace ClockMod {
                 });
             }
         }
-        nextTimeUpdate = 0;
+        nextTimeUpdate = Time::get_unscaledTime() + 1.0f;
         UpdateTimeText();
     }
 

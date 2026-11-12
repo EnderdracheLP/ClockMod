@@ -272,7 +272,10 @@ namespace ClockMod {
                 if (getModConfig().BattToggle.GetValue() && _message.empty()) {
                     // Gets the Battery Percentage as float 1.00, multiplies it by 100, and then uses the getBatteryString function defined above to format the percentage.
                     // auto battery = getBatteryString((int)(GlobalNamespace::OVRPlugin::OVRP_1_1_0::ovrp_GetSystemBatteryLevel() * 100));
-                    auto battery = getBatteryString(UnityEngine::SystemInfo::get_batteryLevel(), UnityEngine::SystemInfo::get_batteryStatus(), this);
+                    if (sessionTimeSeconds >= nextBatteryUpdateTime) {
+                        cachedBatteryText = getBatteryString(UnityEngine::SystemInfo::get_batteryLevel(), UnityEngine::SystemInfo::get_batteryStatus(), this);
+                        nextBatteryUpdateTime = sessionTimeSeconds + 5.0;
+                    }
 
                     // static float testPercentage = 1.0f;
                     // auto battery = getBatteryString(testPercentage, this);
@@ -280,7 +283,7 @@ namespace ClockMod {
                     // else testPercentage = 1.0f;
 
                     clockresult += " - ";                // Adds  -  to it with spaces, before and after the - .
-                    clockresult += battery;         // Here is where the Battery gets added to the tandb string.
+                    clockresult += cachedBatteryText;
                 }
 
                 if (!_message.empty() && messageShowing > 0) messageShowing--;

@@ -28,6 +28,8 @@ private:
     double lastSessionTimeSeconds = 0;
     double nextTextUpdateTime = 0;
     double nextStopwatchSaveTime = 0;
+    double nextBatteryUpdateTime = 0;
+    std::string cachedBatteryText;
 
     time_t rawtime = 0;
     struct tm localTime{};
