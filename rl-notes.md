@@ -8,18 +8,11 @@
 - Option to change Clock Color, (unless rainbowify is on).
 - Option to choose between the Clock being at the Top or the Bottom.
 - Option to hide the Clock in replays.
-- NEW: Option to switch between 4 clock types.
+- Option to switch between 4 clock types.
   - Current Time (default).
   - Session Time (time since you started playing).
   - Stopwatch1 (start/pause and reset using the buttons).
   - Stopwatch2 (start/pause and reset using the buttons).
 
 __**Changelog:**__
-- Update to 1.40.8_7379
-- Added new clock types
-- Added session time tracking.
-- Added stopwatch functionality.
-- Added Button into Main Menu for quick access to mod settings.
-
-**Special Thanks To:**
-- Furzz who added the session time and stopwatch into the mod.
+- Update to 1.45.3_30054 in PR #26 thanks to @FrozenAlex
